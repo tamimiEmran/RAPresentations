@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FactorGraphs &mdash; Phase 0 + Phase 1 Results</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F8F9FB;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #F0F1F4;
+      --border: #E0E2E8;
+      --text: #1A1D26;
+      --text-dim: #5A5E6E;
+      --text-muted: #8E92A0;
+      --accent: #0E9A7E;
+      --accent-dim: rgba(14, 154, 126, 0.08);
+      --red: #D9453E;
+      --red-dim: rgba(217, 69, 62, 0.07);
+      --blue: #3B6FD6;
+      --blue-dim: rgba(59, 111, 214, 0.08);
+      --purple: #8B5CC4;
+      --purple-dim: rgba(139, 92, 196, 0.08);
+      --amber: #C88A1A;
+      --amber-dim: rgba(200, 138, 26, 0.08);
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--mono);
+    }
+    .breadcrumb a {
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .breadcrumb a:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: rgba(59, 111, 214, 0.04);
+    }
+
+    /* Page header */
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+    .lede {
+      font-size: 14.5px;
+      color: var(--text-dim);
+      max-width: 880px;
+      line-height: 1.65;
+    }
+    .lede strong { color: var(--text); font-weight: 600; }
+
+    /* Brief panel */
+    .brief {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 40px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .brief-stat {
+      padding: 4px 16px;
+      position: relative;
+      text-align: left;
+    }
+    .brief-stat + .brief-stat::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 4px;
+      width: 1px;
+      background: var(--border);
+    }
+    .brief-stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .brief-stat-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .brief-stat-value.accent { color: var(--accent); }
+
+    /* Phase card */
+    .phase-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 28px;
+    }
+    .phase-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .phase-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+    .phase-badge.anchor { background: var(--accent-dim); color: var(--accent); }
+    .phase-badge.problem { background: var(--red-dim); color: var(--red); }
+    .phase-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .phase-question {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    /* Key takeaway */
+    .takeaway {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .takeaway.pass { background: var(--accent-dim); border: 1px solid rgba(14, 154, 126, 0.22); }
+    .takeaway.fail { background: var(--red-dim); border: 1px solid rgba(217, 69, 62, 0.2); }
+    .takeaway-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .takeaway.pass .takeaway-icon { background: var(--accent); color: #fff; }
+    .takeaway.fail .takeaway-icon { background: var(--red); color: #fff; }
+    .takeaway-text {
+      flex: 1;
+      color: var(--text-dim);
+    }
+    .takeaway-text strong { color: var(--text); font-weight: 600; }
+    .takeaway-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .takeaway.pass .takeaway-label { color: var(--accent); }
+    .takeaway.fail .takeaway-label { color: var(--red); }
+
+    /* Section sub-labels */
+    .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* Phase 0 matrix */
+    .matrix {
+      display: grid;
+      grid-template-columns: 110px repeat(3, 1fr);
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .matrix-colh,
+    .matrix-rowh {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .matrix-colh { justify-content: center; text-align: center; }
+    .matrix-rowh { font-size: 12.5px; color: var(--text); }
+    .cell {
+      background: var(--bg-elevated);
+      border-radius: 4px;
+      padding: 12px 10px;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+    .cell.anchor {
+      background: rgba(14, 154, 126, 0.08);
+      border-color: rgba(14, 154, 126, 0.35);
+    }
+    .cell.weak { opacity: 0.55; }
+    .cell-acc {
+      font-family: var(--mono);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .cell.anchor .cell-acc { color: var(--accent); }
+    .cell-delta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .cell-delta.red { color: var(--red); }
+    .cell-delta.red-bold { color: var(--red); font-weight: 700; }
+    .matrix-note {
+      display: flex;
+      gap: 18px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    /* Analysis / observations box */
+    .box {
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+    .box.analysis { background: var(--accent-dim); border-color: rgba(14, 154, 126, 0.18); }
+    .box.observations { background: var(--blue-dim); border-color: rgba(59, 111, 214, 0.18); }
+    .box-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .box.analysis .box-label { color: var(--accent); }
+    .box.observations .box-label { color: var(--blue); }
+    .box p + p { margin-top: 8px; }
+    .box strong { color: var(--text); font-weight: 600; }
+
+    /* Data tables */
+    .table-wrap { overflow-x: auto; margin-bottom: 12px; }
+    table.data {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.data th {
+      text-align: left;
+      padding: 10px 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      background: var(--bg-elevated);
+    }
+    table.data th.right { text-align: right; }
+    table.data th.center { text-align: center; }
+    table.data td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.data td.num { font-family: var(--mono); text-align: right; }
+    table.data td.center { text-align: center; }
+    table.data td.muted { color: var(--text-muted); }
+    table.data td.pos { color: var(--accent); font-weight: 500; }
+    table.data td.neg { color: var(--red); font-weight: 500; }
+    table.data td.neg-bold { color: var(--red); font-weight: 700; }
+    table.data tr.highlight td { background: rgba(14, 154, 126, 0.05); }
+    table.data tr.highlight td:first-child { border-left: 3px solid var(--accent); }
+    table.data td[rowspan] { vertical-align: middle; font-weight: 600; border-right: 1px solid var(--border); }
+
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+    }
+    .status-dot::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .table-caption {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Comparison chips (phase 0) */
+    .chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chip {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .chip.reject { background: var(--red-dim); }
+    .chip.anchor { background: var(--accent-dim); }
+    .chip.secondary { background: var(--amber-dim); }
+    .chip-head {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .chip.reject .chip-head { color: var(--red); }
+    .chip.anchor .chip-head { color: var(--accent); }
+    .chip.secondary .chip-head { color: var(--amber); }
+    .chip-body { color: var(--text-dim); }
+
+    /* Carry-forward highlight */
+    .carry {
+      margin-top: 14px;
+      padding: 14px 18px;
+      border: 1px dashed rgba(14, 154, 126, 0.35);
+      border-radius: var(--radius-sm);
+      background: rgba(14, 154, 126, 0.03);
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+    .carry strong { color: var(--text); font-weight: 600; }
+    .carry .accent { color: var(--accent); font-weight: 600; }
+
+    /* Run meta row */
+    .run-meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .run-meta span strong { color: var(--text); font-weight: 600; }
+
+    @media (max-width: 880px) {
+      body { padding: 32px 20px 60px; }
+      .brief { grid-template-columns: repeat(2, 1fr); }
+      .brief-stat + .brief-stat:nth-child(3)::before { display: none; }
+      .matrix { grid-template-columns: 80px repeat(3, 1fr); }
+      .cell-acc { font-size: 14px; }
+      .phase-card { padding: 20px; }
+      .chips { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
+<style>
+  .rap-nav, .rap-nav * { box-sizing: border-box; }
+  .rap-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
+    padding: 6px 14px; height: 40px;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 12px; font-weight: 400; line-height: 1;
+    letter-spacing: 0; color: #1A1D26;
+  }
+  .rap-nav a {
+    text-decoration: none; color: #5A5E6E;
+    padding: 6px 10px; border-radius: 6px;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap; font-weight: 400;
+  }
+  .rap-nav a:hover { background: rgba(59, 111, 214, 0.08); color: #3B6FD6; }
+  .rap-nav .rap-nav-back {
+    color: #1A1D26; font-weight: 500;
+    border: 1px solid rgba(224, 226, 232, 0.9);
+    margin-right: 8px; padding: 5px 10px;
+  }
+  .rap-nav .rap-nav-back:hover { border-color: #3B6FD6; }
+  .rap-nav .rap-nav-current {
+    background: rgba(14, 154, 126, 0.1); color: #0E9A7E;
+    font-weight: 500; pointer-events: none;
+  }
+  @media (max-width: 720px) {
+    .rap-nav { font-size: 11px; padding: 6px 8px; }
+    .rap-nav a { padding: 5px 7px; }
+  }
+</style>
+<nav class="rap-nav">
+  <a class="rap-nav-back" href="index.html">&larr; 19 Apr Hub</a>
+  <a href="progress.html">Progress</a>
+  <a href="gaf_experiment_design.html">GAF Design</a>
+  <a class="rap-nav-current" href="safefl_results_p0_p1.html">FG Results</a>
+  <a href="safefl_windowed_bp.html">Windowed BP</a>
+</nav>
+<!-- ==== /RAPresentations nav ==== -->
+
+<nav class="breadcrumb">
+  <a href="index.html">&larr; 19 Apr Hub</a>
+  <span>/</span>
+  <span>FactorGraphs &mdash; P0 + P1 Results</span>
+</nav>
+
+<div class="page-header">
+  <h1>FactorGraphs &mdash; Phase 0 + Phase 1 Results</h1>
+  <p class="lede">
+    <strong>Phase 0</strong> picks the anchor (dataset &times; architecture) that will be used across every later phase.
+    <strong>Phase 1</strong> then asks whether any standard defence survives once we force it to operate on secure groups &mdash; the motivating experiment for the whole paper.
+    Both phases are complete; later phases are left out of this deck.
+  </p>
+</div>
+
+<div class="brief">
+  <div class="brief-stat">
+    <div class="brief-stat-label">Status</div>
+    <div class="brief-stat-value accent">34 / 34 runs complete</div>
+  </div>
+  <div class="brief-stat">
+    <div class="brief-stat-label">Anchor</div>
+    <div class="brief-stat-value">CIFAR-10 &times; ResNet-18</div>
+  </div>
+  <div class="brief-stat">
+    <div class="brief-stat-label">Attack Signal</div>
+    <div class="brief-stat-value">&minus;16.98 pp under LF</div>
+  </div>
+  <div class="brief-stat">
+    <div class="brief-stat-label">Surviving Baselines</div>
+    <div class="brief-stat-value">0 of 3</div>
+  </div>
+</div>
+
+<!-- ============ PHASE 0 ============ -->
+<div class="phase-card">
+  <div class="phase-head">
+    <span class="phase-badge anchor">Phase 0</span>
+    <div class="phase-title">Baseline Landscape &mdash; Anchor Selection</div>
+  </div>
+  <div class="phase-question">Which dataset &times; architecture pair produces a meaningful testbed? &mdash; FedAvg only, no defence.</div>
+
+  <div class="takeaway pass">
+    <div class="takeaway-icon">&#10003;</div>
+    <div class="takeaway-text">
+      <span class="takeaway-label">Anchor chosen</span>
+      <strong>CIFAR-10 + ResNet-18</strong> &mdash; highest clean accuracy (68.67%) paired with a <strong>16.98 pp drop</strong> under label flipping to 51.69%. The only combo with an unambiguous attack signal.
+    </div>
+  </div>
+
+  <div class="run-meta">
+    <span>Runs: <strong>18</strong></span>
+    <span>Fixed: <strong>&beta;=0, n<sub>workers</sub>=500, n<sub>byz</sub>=50 (10%)</strong></span>
+    <span>Attack: Label Flipping</span>
+  </div>
+
+  <div class="label">Run Matrix &mdash; Final ACC / &Delta; under LF</div>
+  <div class="matrix">
+    <div></div>
+    <div class="matrix-colh">MobileNetV3</div>
+    <div class="matrix-colh">ResNet-18</div>
+    <div class="matrix-colh">EfficientNet</div>
+
+    <div class="matrix-rowh">MNIST</div>
+    <div class="cell weak"><div class="cell-acc">98.01%</div><div class="cell-delta">&Delta; 1.19 pp</div></div>
+    <div class="cell weak"><div class="cell-acc">98.44%</div><div class="cell-delta">&Delta; 0.24 pp</div></div>
+    <div class="cell weak"><div class="cell-acc">98.39%</div><div class="cell-delta">&Delta; 0.12 pp</div></div>
+
+    <div class="matrix-rowh">FEMNIST</div>
+    <div class="cell"><div class="cell-acc">86.27%</div><div class="cell-delta">&Delta; 0.87 pp</div></div>
+    <div class="cell"><div class="cell-acc">87.15%</div><div class="cell-delta">&Delta; 1.07 pp</div></div>
+    <div class="cell"><div class="cell-acc">86.68%</div><div class="cell-delta">&Delta; &minus;0.04 pp</div></div>
+
+    <div class="matrix-rowh">CIFAR-10</div>
+    <div class="cell"><div class="cell-acc">60.78%</div><div class="cell-delta red">&Delta; 6.24 pp</div></div>
+    <div class="cell anchor"><div class="cell-acc">68.67%</div><div class="cell-delta red-bold">&Delta; 16.98 pp</div></div>
+    <div class="cell"><div class="cell-acc">60.99%</div><div class="cell-delta red">&Delta; 7.76 pp</div></div>
+  </div>
+  <div class="matrix-note">
+    <span>ACC = clean accuracy (FedAvg, no attack)</span>
+    <span>&Delta; = accuracy drop under LF</span>
+    <span>Greyed rows &mdash; rejected (see below)</span>
+  </div>
+
+  <div class="box analysis">
+    <div class="box-label">Results analysis</div>
+    <p><strong>MNIST</strong> &mdash; near-trivial at ~98% with drops of 0.12&ndash;1.19 pp at 500 rounds. Even at 10% Byzantine the signal is too small to differentiate defences.</p>
+    <p><strong>FEMNIST</strong> &mdash; moderate accuracy (86&ndash;87%) at 2000 rounds, but attack impact stays under 1.1 pp. The attack is barely visible.</p>
+    <p><strong>CIFAR-10 + ResNet-18</strong> &mdash; highest clean accuracy (68.67%) and a <strong>16.98 pp attack drop</strong> (68.67% &rarr; 51.69%). Unambiguous signal. CIFAR-10 with MobileNetV3 / EfficientNet also shows 5&ndash;8 pp drops, so the dataset is genuinely hard &mdash; it is the architecture choice that separates the anchor from the secondary combos.</p>
+  </div>
+
+  <div class="label">Detailed results &mdash; 18 experiments</div>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Architecture</th>
+          <th>Attack</th>
+          <th class="right">Rounds</th>
+          <th class="right">Final ACC</th>
+          <th class="right">Max ACC</th>
+          <th class="center">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="6">MNIST</td><td>MobileNetV3</td><td>No Attack</td><td class="num">500 / 500</td><td class="num">98.01%</td><td class="num">98.04%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>MobileNetV3</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">500 / 500</td><td class="num">96.82%</td><td class="num">97.96%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>ResNet-18</td><td>No Attack</td><td class="num">500 / 500</td><td class="num">98.44%</td><td class="num">98.44%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>ResNet-18</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">500 / 500</td><td class="num">98.20%</td><td class="num">98.20%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>EfficientNet</td><td>No Attack</td><td class="num">500 / 500</td><td class="num">98.39%</td><td class="num">98.47%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>EfficientNet</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">500 / 500</td><td class="num">98.27%</td><td class="num">98.27%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+
+        <tr><td rowspan="6">FEMNIST</td><td>MobileNetV3</td><td>No Attack</td><td class="num">2000 / 2000</td><td class="num">86.27%</td><td class="num">86.27%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>MobileNetV3</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">2000 / 2000</td><td class="num">85.40%</td><td class="num">85.93%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>ResNet-18</td><td>No Attack</td><td class="num">2000 / 2000</td><td class="num">87.15%</td><td class="num">87.15%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>ResNet-18</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">2000 / 2000</td><td class="num">86.08%</td><td class="num">86.92%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>EfficientNet</td><td>No Attack</td><td class="num">2000 / 2000</td><td class="num">86.68%</td><td class="num">87.24%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>EfficientNet</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">2000 / 2000</td><td class="num">86.72%</td><td class="num">86.98%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+
+        <tr><td rowspan="6">CIFAR-10</td><td>MobileNetV3</td><td>No Attack</td><td class="num">3000 / 3000</td><td class="num">60.78%</td><td class="num">62.94%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>MobileNetV3</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">3000 / 3000</td><td class="num">54.54%</td><td class="num">57.16%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>ResNet-18</td><td>No Attack</td><td class="num">3000 / 3000</td><td class="num">68.67%</td><td class="num">69.01%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr class="highlight"><td>ResNet-18</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">3000 / 3000</td><td class="num neg-bold">51.69%</td><td class="num">65.78%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>EfficientNet</td><td>No Attack</td><td class="num">3000 / 3000</td><td class="num">60.99%</td><td class="num">61.14%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+        <tr><td>EfficientNet</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">3000 / 3000</td><td class="num">53.23%</td><td class="num">55.46%</td><td class="center"><span class="status-dot">Done</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-caption">
+    Per-dataset mean &Delta; (n<sub>byz</sub>=50): MNIST 0.52 pp (500 rds) &middot; FEMNIST 0.63 pp (2000 rds) &middot; CIFAR-10 10.33 pp (3000 rds; ResNet-18 dominates at 16.98 pp).
+  </div>
+
+  <div class="label" style="margin-top: 22px;">Verdict</div>
+  <div class="chips">
+    <div class="chip reject">
+      <div class="chip-head">MNIST &mdash; rejected</div>
+      <div class="chip-body">~98% ACC, &Delta; &lt; 1.2 pp. Too easy to reveal defence differences.</div>
+    </div>
+    <div class="chip reject">
+      <div class="chip-head">FEMNIST &mdash; rejected</div>
+      <div class="chip-body">86&ndash;87% ACC, &Delta; &lt; 1.1 pp. Attack impact too small.</div>
+    </div>
+    <div class="chip anchor">
+      <div class="chip-head">CIFAR-10 + ResNet-18 &mdash; anchor</div>
+      <div class="chip-body">68.67% clean, 16.98 pp drop to 51.69%. Strongest, cleanest signal.</div>
+    </div>
+    <div class="chip secondary">
+      <div class="chip-head">CIFAR-10 + MobileNet / EfficientNet</div>
+      <div class="chip-body">~60% ACC, 5&ndash;8 pp drops. Available as secondary validation only.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHASE 1 ============ -->
+<div class="phase-card">
+  <div class="phase-head">
+    <span class="phase-badge problem">Phase 1</span>
+    <div class="phase-title">Establish the Problem &mdash; Grouping Failure</div>
+  </div>
+  <div class="phase-question">Do standard defences collapse when forced to operate on secure groups? &mdash; the motivating claim.</div>
+
+  <div class="takeaway fail">
+    <div class="takeaway-icon">&#10007;</div>
+    <div class="takeaway-text">
+      <span class="takeaway-label">No baseline survived grouping under attack</span>
+      All three defences either collapsed ungrouped, degraded under grouping, or failed to beat FedAvg.
+      <strong>Grouped Krum</strong> did recover from its ungrouped collapse (+24.52 pp) but still trails FedAvg's clean baseline. Carry-forward = <strong>FactorGraphs vs FedAvg only</strong>.
+    </div>
+  </div>
+
+  <div class="run-meta">
+    <span>Runs: <strong>16</strong></span>
+    <span>Anchor: <strong>CIFAR-10 + ResNet-18</strong></span>
+    <span>Fixed: <strong>&beta;=0, n<sub>byz</sub>=50, n<sub>iter</sub>=3000</strong></span>
+    <span>Defences: FedAvg, Krum, ShieldFL, SignGuard</span>
+  </div>
+
+  <div class="label">Full results &mdash; 4 defences &times; 2 modes &times; 2 scenarios</div>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Defence</th>
+          <th>Grouped</th>
+          <th>Attack</th>
+          <th class="right">Final ACC</th>
+          <th class="right">Max ACC</th>
+          <th class="right">Grouping &Delta;</th>
+          <th class="right">vs FedAvg &Delta;</th>
+          <th class="right">vs FA Clean &Delta;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="4"><strong>FedAvg</strong></td><td>No</td><td>Clean</td><td class="num">68.67%</td><td class="num">69.01%</td><td class="num muted">baseline</td><td class="num muted">baseline</td><td class="num muted">baseline</td></tr>
+        <tr><td>No</td><td>LF</td><td class="num">51.69%</td><td class="num">65.78%</td><td class="num muted">baseline</td><td class="num muted">baseline</td><td class="num neg">&minus;16.98 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">64.40%</td><td class="num">69.43%</td><td class="num neg">&minus;4.27 pp</td><td class="num muted">baseline</td><td class="num neg">&minus;4.27 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>LF</td><td class="num">61.83%</td><td class="num">64.64%</td><td class="num pos">+10.14 pp</td><td class="num muted">baseline</td><td class="num neg">&minus;6.84 pp</td></tr>
+
+        <tr><td rowspan="4"><strong>Krum</strong></td><td>No</td><td>Clean</td><td class="num">45.11%</td><td class="num">47.16%</td><td class="num muted">baseline</td><td class="num neg">&minus;23.56 pp</td><td class="num neg">&minus;23.56 pp</td></tr>
+        <tr><td>No</td><td>LF</td><td class="num">44.92%</td><td class="num">46.52%</td><td class="num muted">baseline</td><td class="num neg">&minus;6.77 pp</td><td class="num neg">&minus;23.75 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">66.40%</td><td class="num">68.57%</td><td class="num pos">+21.29 pp</td><td class="num pos">+2.00 pp</td><td class="num neg">&minus;2.27 pp</td></tr>
+        <tr class="highlight"><td>Yes (k=10)</td><td>LF</td><td class="num">69.44%</td><td class="num">71.00%</td><td class="num pos">+24.52 pp</td><td class="num pos">+7.61 pp</td><td class="num pos">+0.77 pp</td></tr>
+
+        <tr><td rowspan="4"><strong>ShieldFL</strong></td><td>No</td><td>Clean</td><td class="num">58.75%</td><td class="num">59.65%</td><td class="num muted">baseline</td><td class="num neg">&minus;9.92 pp</td><td class="num neg">&minus;9.92 pp</td></tr>
+        <tr><td>No</td><td>LF</td><td class="num">56.31%</td><td class="num">57.92%</td><td class="num muted">baseline</td><td class="num pos">+4.62 pp</td><td class="num neg">&minus;12.36 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">60.36%</td><td class="num">61.74%</td><td class="num pos">+1.61 pp</td><td class="num neg">&minus;4.04 pp</td><td class="num neg">&minus;8.31 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>LF</td><td class="num">57.34%</td><td class="num">58.47%</td><td class="num pos">+1.03 pp</td><td class="num neg">&minus;4.49 pp</td><td class="num neg">&minus;11.33 pp</td></tr>
+
+        <tr><td rowspan="4"><strong>SignGuard</strong></td><td>No</td><td>Clean</td><td class="num">68.17%</td><td class="num">69.61%</td><td class="num muted">baseline</td><td class="num neg">&minus;0.50 pp</td><td class="num neg">&minus;0.50 pp</td></tr>
+        <tr><td>No</td><td>LF</td><td class="num">63.12%</td><td class="num">64.39%</td><td class="num muted">baseline</td><td class="num pos">+11.43 pp</td><td class="num neg">&minus;5.55 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">67.97%</td><td class="num">69.80%</td><td class="num neg">&minus;0.20 pp</td><td class="num pos">+3.57 pp</td><td class="num neg">&minus;0.70 pp</td></tr>
+        <tr><td>Yes (k=10)</td><td>LF</td><td class="num">61.92%</td><td class="num">66.01%</td><td class="num neg">&minus;1.20 pp</td><td class="num pos">+0.09 pp</td><td class="num neg">&minus;6.75 pp</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-caption">
+    Grouping &Delta; = grouped &minus; ungrouped (same attack). vs FedAvg &Delta; = defence &minus; FedAvg at the same grouped/attack setting. vs FA Clean &Delta; = defence &minus; ungrouped-clean FedAvg (68.67%), the target a viable defence must approach.
+  </div>
+
+  <div class="box observations" style="margin-top: 18px;">
+    <div class="box-label">Observations</div>
+    <p><strong>FedAvg grouping (k=10):</strong> clean accuracy drops 4.27 pp (68.67% &rarr; 64.40%). Under LF, grouped FedAvg (61.83%) <em>outperforms</em> ungrouped (51.69%) by 10.14 pp &mdash; grouping alone buys attack resilience at the cost of clean accuracy.</p>
+    <p><strong>Krum &mdash; dramatic recovery with grouping:</strong> ungrouped Krum collapses at ~45% in both clean and attack settings because single-best gradient selection breaks down with 500 workers. Grouping rescues it: clean 66.40% (+21.29 pp), attack 69.44% (+24.52 pp). Grouped Krum is the highest-accuracy result in the phase &mdash; but only marginally beats the ungrouped-clean FedAvg target (+0.77 pp).</p>
+    <p><strong>ShieldFL:</strong> stuck at 56&ndash;61% across all four cells. Grouping adds a small lift (+1.61 pp clean, +1.03 pp attack), neither breaks nor rescues the defence.</p>
+    <p><strong>SignGuard:</strong> strongest ungrouped defence (68.17% clean, 63.12% attack). Grouping costs a marginal amount (&minus;0.20 pp clean, &minus;1.20 pp attack); grouped-best still reaches 69.80%.</p>
+  </div>
+
+  <div class="label" style="margin-top: 22px;">Carry-forward decision</div>
+  <div class="carry">
+    No baseline clears the "survives grouping <em>and</em> beats FedAvg under attack <em>and</em> approaches clean-FA accuracy" bar. Phase 4+ comparisons therefore reduce to
+    <span class="accent">FactorGraphs vs FedAvg</span>
+    only. The three collapsed defences are kept as <em>context</em> in the paper's Table 1 but not re-run in downstream sweeps.
+  </div>
+</div>
+
+</body>
+</html>

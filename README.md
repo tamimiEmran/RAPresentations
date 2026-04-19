@@ -13,7 +13,7 @@ Weekly research-assistant presentation archive.
     ├── index.html          # Topic hub (4 cards)
     ├── progress.html       # Pitfalls paper — revision progress
     ├── gaf_experiment_design.html
-    ├── safefl_experiment_plan.html
+    ├── safefl_results_p0_p1.html   # FactorGraphs — Phase 0 + Phase 1 results
     └── safefl_windowed_bp.html
 ```
 
