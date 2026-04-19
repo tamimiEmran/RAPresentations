@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision Progress — EGYR-D-25-04727R1</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #161616;
+    --muted: #6b6b6b;
+    --fade: #a8a8a8;
+    --rule: #ececec;
+    --rule-strong: #d0d0d0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
+    font-size: 18px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern", "liga", "onum";
+  }
+
+  .sans {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  .deck { position: relative; height: 100vh; width: 100vw; overflow: hidden; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8vh 10vw 10vh;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 280ms ease;
+  }
+
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  .inner { width: 100%; max-width: 860px; }
+
+  .eyebrow {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--fade);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: clamp(34px, 5vw, 54px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1.25rem;
+  }
+
+  h2 {
+    font-size: clamp(26px, 3vw, 36px);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.008em;
+    margin-bottom: 2rem;
+  }
+
+  .lede {
+    font-size: 21px;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 56ch;
+  }
+
+  .meta {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .meta span + span::before {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 2px;
+    background: var(--fade);
+    vertical-align: middle;
+    margin: 0 0.75em 2px;
+    border-radius: 50%;
+  }
+
+  /* Status table */
+  .status { margin-top: 0.5rem; }
+
+  .status-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 2rem;
+    padding: 1.35rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .status-row:last-child { border-bottom: none; }
+
+  .status-label { font-size: 20px; }
+
+  .status-sub {
+    display: block;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    font-family: "Inter", sans-serif;
+    line-height: 1.45;
+  }
+
+  .status-state {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Detail slides */
+  .comment {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.55;
+    margin-bottom: 2rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--rule-strong);
+    max-width: 62ch;
+  }
+
+  .action {
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 62ch;
+  }
+
+  .locations {
+    margin-top: 1.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.6rem;
+  }
+
+  .tag {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 4px 9px;
+    border: 1px solid var(--rule-strong);
+    color: var(--muted);
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Outstanding list */
+  .outstanding { margin-top: 0.5rem; }
+  .outstanding li {
+    list-style: none;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 2rem;
+    align-items: baseline;
+  }
+  .outstanding li:last-child { border-bottom: none; }
+  .outstanding .tag-col {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .outstanding .body { font-size: 17px; line-height: 1.55; }
+  .outstanding .note {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--muted);
+    font-size: 14px;
+    font-family: "Inter", sans-serif;
+  }
+
+  code {
+    font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    padding: 2px 6px;
+    background: #f5f5f5;
+    border-radius: 3px;
+    color: #333;
+  }
+
+  /* Chrome */
+  .chrome {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fade);
+    pointer-events: none;
+  }
+
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: var(--ink);
+    transition: width 280ms ease;
+    z-index: 100;
+  }
+
+  @media (max-width: 720px) {
+    .slide { padding: 5vh 6vw 8vh; }
+    .outstanding li { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+</style>
+</head>
+<body>
+<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
+<style>
+  .rap-nav, .rap-nav * { box-sizing: border-box; }
+  .rap-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
+    padding: 6px 14px; height: 40px;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 12px; font-weight: 400; line-height: 1;
+    letter-spacing: 0; color: #1A1D26;
+  }
+  .rap-nav a {
+    text-decoration: none; color: #5A5E6E;
+    padding: 6px 10px; border-radius: 6px;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap; font-weight: 400;
+  }
+  .rap-nav a:hover { background: rgba(59, 111, 214, 0.08); color: #3B6FD6; }
+  .rap-nav .rap-nav-back {
+    color: #1A1D26; font-weight: 500;
+    border: 1px solid rgba(224, 226, 232, 0.9);
+    margin-right: 8px; padding: 5px 10px;
+  }
+  .rap-nav .rap-nav-back:hover { border-color: #3B6FD6; }
+  .rap-nav .rap-nav-current {
+    background: rgba(14, 154, 126, 0.1); color: #0E9A7E;
+    font-weight: 500; pointer-events: none;
+  }
+  @media (max-width: 720px) {
+    .rap-nav { font-size: 11px; padding: 6px 8px; }
+    .rap-nav a { padding: 5px 7px; }
+  }
+</style>
+<nav class="rap-nav">
+  <a class="rap-nav-back" href="index.html">&larr; 19 Apr Hub</a>
+  <a class="rap-nav-current" href="progress.html">Progress</a>
+  <a href="gaf_experiment_design.html">GAF Design</a>
+  <a href="safefl_experiment_plan.html">FG Plan</a>
+  <a href="safefl_windowed_bp.html">Windowed BP</a>
+</nav>
+<!-- ==== /RAPresentations nav ==== -->
+<div class="deck" id="deck">
+  <div class="progress" id="progress"></div>
+
+  <!-- 1: Title -->
+  <section class="slide active">
+    <div class="inner">
+      <div class="eyebrow">Energy Reports — Revision Round 2</div>
+      <h1>Revision Progress</h1>
+      <p class="lede">Smart Grids and Machine Learning: Uncovering Pitfalls and Improving the Robustness of Models.</p>
+      <div class="meta">
+        <span>EGYR-D-25-04727R1</span><span>19 April 2026</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2: Status -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">At a glance</div>
+      <h2>Status of the response file</h2>
+      <div class="status">
+        <div class="status-row">
+          <div class="status-label">Editor-in-Chief
+            <span class="status-sub">One administrative item — institutional email and authorship confirmation.</span>
+          </div>
+          <div class="status-state">Pending</div>
+        </div>
+        <div class="status-row">
+          <div class="status-label">Reviewer 1
+            <span class="status-sub">No further queries. Courtesy acknowledgement to close.</span>
+          </div>
+          <div class="status-state">Optional</div>
+        </div>
+        <div class="status-row">
+          <div class="status-label">Reviewer 2
+            <span class="status-sub">Six substantive items — five drafted, one open (reproducibility of the screening process).</span>
+          </div>
+          <div class="status-state">5 / 6</div>
+        </div>
+        <div class="status-row">
+          <div class="status-label">Reviewer 3
+            <span class="status-sub">Recommends acceptance. Response drafted.</span>
+          </div>
+          <div class="status-state">Done</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3: R2.1 -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Reviewer 2 — Comment 1</div>
+      <h2>Split-before-scaling as a reporting requirement</h2>
+      <p class="comment">Can the split-before-scaling principle be translated into a concrete minimum reporting checklist or audit template for leakage-prone preprocessing?</p>
+      <p class="action">The preprocessing row of Table 3 now requires authors to report the split unit, the train/validation/test boundaries, and the preprocessing order. The existing rules — fit scalers only on the training set, no resampling of validation or test data — are retained. The structure of the best-practices table is unchanged.</p>
+      <div class="locations">
+        <span class="tag">Table 3 · Preprocessing</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4: R2.2 -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Reviewer 2 — Comment 2</div>
+      <h2>Cross-dataset benchmarking protocol</h2>
+      <p class="comment">Specify the key heterogeneity dimensions, robustness-related considerations, and the rules needed to ensure fair comparison.</p>
+      <p class="action">The dataset row of Table 3 now names the heterogeneity dimensions — sampling frequency, noise level, consumer profile, and class imbalance where relevant — and requires per-dataset reporting. The benchmarking row specifies identical task definition, split strategy, metric set, and dataset conditions for baseline comparison.</p>
+      <div class="locations">
+        <span class="tag">Table 3 · Dataset Selection</span>
+        <span class="tag">Table 3 · Model Evaluation</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5: R2.3 -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Reviewer 2 — Comment 3</div>
+      <h2>Intrinsic validation in unsupervised settings</h2>
+      <p class="comment">Does the manuscript recommend only Jaccard-based sensitivity analysis, or a broader family of intrinsic validation metrics?</p>
+      <p class="action">Section 3.3 positions Jaccard-based analysis as one instance of a broader family of intrinsic, label-free validation criteria. Clustering is covered by internal validity indices (Silhouette, Davies–Bouldin) and stability under perturbation; reconstruction-based detectors by the stability or separation of reconstruction-error distributions; threshold-based anomaly detection retains Jaccard as the worked example. Table 3's model-training row references intrinsic validation and sensitivity analysis matched to the task.</p>
+      <div class="locations">
+        <span class="tag">Section 3.3</span>
+        <span class="tag">Table 3 · Model Training</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6: R2.4 -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Reviewer 2 — Comment 4</div>
+      <h2>User-level differential privacy for time series</h2>
+      <p class="comment">Provide methodological guidance on user-level differential privacy in time-series smart-grid applications, and clarify the role of empirical privacy attacks.</p>
+      <p class="action">The protected unit is defined as one consumer's full trajectory over the reporting window, not isolated readings. Guidance requires bounding each user's contribution before aggregation, adding noise to aggregated statistics or model updates rather than individual readings, and reporting the cumulative (ε, δ) loss when users participate across multiple rounds. Empirical attacks such as membership inference are framed as stress tests alongside the formal DP analysis, not as substitutes.</p>
+      <div class="locations">
+        <span class="tag">Section 3.3</span>
+        <span class="tag">Model Evaluation &amp; Benchmarking</span>
+        <span class="tag">Table 3</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7: R2.6 -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Reviewer 2 — Comment 6</div>
+      <h2>Text and Figure 3 reconciled</h2>
+      <p class="comment">The main text and Figure 3 describe the screening logic inconsistently. Reconcile the two.</p>
+      <p class="action">The opening of Section 3 and the Figure 3 caption now describe a single sequence: 275 records identified; title- and abstract-level screening removes redundant or insufficiently illustrative records; 25 studies retained for detailed methodological review and qualitative synthesis. Earlier wording that introduced selection criteria not reflected in Figure 3 has been removed.</p>
+      <div class="locations">
+        <span class="tag">Section 3 · opening</span>
+        <span class="tag">Figure 3 · caption</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8: Reviewer 3 -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Reviewer 3</div>
+      <h2>Recommendation: accept</h2>
+      <p class="comment">The authors have appropriately addressed all criticisms raised during the initial review and have significantly improved the methodological depth and presentation quality of the paper.</p>
+      <p class="action">Response drafted to acknowledge the reassessment and to note that the revisions to study selection, the Section 3.3 methodology, and the figure quality resolve the earlier concerns. No further manuscript text is required for this comment.</p>
+    </div>
+  </section>
+
+  <!-- 9: Outstanding -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Open items</div>
+      <h2>Remaining before resubmission</h2>
+      <ul class="outstanding">
+        <li>
+          <div class="tag-col">Editor</div>
+          <div class="body">Institutional emails in the EM metadata and the manuscript; authorship confirmation link completed by every listed author.
+            <span class="note">Administrative, not a textual revision.</span>
+          </div>
+        </li>
+        <li>
+          <div class="tag-col">Reviewer 1</div>
+          <div class="body">Brief acknowledgement of the positive close. No manuscript change.
+            <span class="note">Optional.</span>
+          </div>
+        </li>
+        <li>
+          <div class="tag-col">R2 · 5</div>
+          <div class="body">Literature-screening reproducibility — databases, search strings, screening stages, and the criteria defining "highly-cited" and "archetypal" studies.
+            <span class="note">Response paragraph pending; point to the revised methods subsection.</span>
+          </div>
+        </li>
+        <li>
+          <div class="tag-col">Signature</div>
+          <div class="body">Replace the corresponding-author email placeholder with the official institutional address.
+            <span class="note">Ties to the editor's administrative item.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10: Close -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">Next</div>
+      <h2>Close the remaining items and assemble the clean copy</h2>
+      <p class="lede">Draft the R2.5 response against the revised screening methodology, clear the editor's administrative block, and generate the clean copy with <code>\showrevisionmarksfalse</code>.</p>
+      <div class="meta">
+        <span>EGYR-D-25-04727R1</span><span>Revision round 2</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="chrome">
+    <div id="counter">01 / 10</div>
+    <div>← →</div>
+  </div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  let i = 0;
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    progress.style.width = ((i + 1) / slides.length * 100) + '%';
+    counter.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(slides.length - 1); }
+  });
+
+  document.addEventListener('click', (e) => {
+    const x = e.clientX / window.innerWidth;
+    if (x > 0.35) show(i + 1); else show(i - 1);
+  });
+
+  show(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RA Presentations</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #F8F9FB;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #F0F1F4;
+      --border: #E0E2E8;
+      --text: #1A1D26;
+      --text-dim: #5A5E6E;
+      --text-muted: #8E92A0;
+      --accent: #0E9A7E;
+      --accent-dim: rgba(14, 154, 126, 0.08);
+      --red: #D9453E;
+      --red-dim: rgba(217, 69, 62, 0.07);
+      --blue: #3B6FD6;
+      --blue-dim: rgba(59, 111, 214, 0.08);
+      --purple: #8B5CC4;
+      --purple-dim: rgba(139, 92, 196, 0.08);
+      --amber: #C88A1A;
+      --amber-dim: rgba(200, 138, 26, 0.08);
+      --teal: #0A7C8C;
+      --teal-dim: rgba(10, 124, 140, 0.08);
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 64px;
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .card:hover {
+      border-color: #C8CBD4;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .card-strip {
+      height: 4px;
+    }
+
+    .card.past .card-strip {
+      background: var(--bg-elevated);
+    }
+
+    .card-body {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+    }
+
+    .badge.past {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+    }
+
+    .card-date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .card.past .card-title {
+      color: var(--text-dim);
+    }
+
+    .card-subtitle {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .tag[data-color="teal"] { color: var(--accent); background: var(--accent-dim); }
+    .tag[data-color="amber"] { color: var(--amber); background: var(--amber-dim); }
+    .tag[data-color="blue"] { color: var(--blue); background: var(--blue-dim); }
+    .tag[data-color="purple"] { color: var(--purple); background: var(--purple-dim); }
+    .tag[data-color="red"] { color: var(--red); background: var(--red-dim); }
+    .tag[data-color="teal2"] { color: var(--teal); background: var(--teal-dim); }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .stat {
+      text-align: center;
+      position: relative;
+    }
+
+    .stat + .stat::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 2px;
+      bottom: 2px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .card.past .stat-value {
+      color: var(--text-dim);
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* Scheduled card */
+    .card.scheduled {
+      position: relative;
+      border-color: rgba(14, 154, 126, 0.25);
+    }
+
+    .card.scheduled:hover {
+      border-color: var(--accent);
+      box-shadow: 0 6px 20px rgba(14, 154, 126, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .card.scheduled .card-strip {
+      background: linear-gradient(90deg, var(--accent), rgba(14, 154, 126, 0.4));
+      height: 4px;
+    }
+
+    .badge.scheduled {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .detail-links {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .detail-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .detail-link:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: rgba(59, 111, 214, 0.04);
+    }
+
+    @media (max-width: 960px) {
+      body {
+        padding: 32px 24px;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-header">
+    <h1>RA Presentations</h1>
+    <p>Research Assistant &middot; Weekly presentation archive</p>
+  </div>
+
+  <div id="app"></div>
+
+  <script>
+    // ===== PRESENTATION REGISTRY =====
+    const PRESENTATIONS = [
+      {
+        id: '19april26',
+        title: '19 April 2026',
+        subtitle: 'Revision progress on a peer-reviewed paper plus three experiment-design briefs across the GAF and SAFEFL projects.',
+        file: '19april26/index.html',
+        assetsDir: '19April26',
+        status: 'scheduled',
+        tags: [
+          { label: 'Revision', color: 'red' },
+          { label: 'GAF', color: 'blue' },
+          { label: 'SAFEFL', color: 'purple' },
+          { label: 'Experiment Design', color: 'teal' },
+        ],
+        stats: [
+          { value: '4', label: 'Topics' },
+          { value: '2', label: 'Projects' },
+          { value: '1', label: 'Paper' },
+          { value: '3', label: 'Diagrams' },
+        ],
+        topics: [
+          { title: 'Revision Progress', file: '19april26/progress.html' },
+          { title: 'GAF Experiment Design', file: '19april26/gaf_experiment_design.html' },
+          { title: 'FactorGraphs Plan', file: '19april26/safefl_experiment_plan.html' },
+          { title: 'Windowed BP Redesign', file: '19april26/safefl_windowed_bp.html' },
+        ],
+      },
+    ];
+
+    // ===== DATE PARSING =====
+    function parseDateFromDir(dirName) {
+      const months = {
+        january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+        july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
+      };
+      const match = dirName.match(/^(\d{1,2})([A-Za-z]+)(\d{2,4})$/);
+      if (!match) return null;
+      const day = parseInt(match[1]);
+      const month = months[match[2].toLowerCase()];
+      if (month === undefined) return null;
+      const year = match[3].length === 2 ? 2000 + parseInt(match[3]) : parseInt(match[3]);
+      return new Date(year, month, day);
+    }
+
+    function formatDate(date) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    // ===== RENDERING =====
+    function render() {
+      const app = document.getElementById('app');
+      const enriched = PRESENTATIONS.map(p => ({
+        ...p,
+        date: parseDateFromDir(p.assetsDir),
+      })).sort((a, b) => (b.date || 0) - (a.date || 0));
+
+      const scheduled = enriched.filter(p => p.status === 'scheduled');
+      const past = enriched.filter(p => p.status === 'past');
+
+      let html = '';
+      if (scheduled.length) html += renderSection(scheduled, {
+        title: 'Upcoming',
+        subtitle: 'Scheduled for presentation',
+        variant: 'scheduled',
+      });
+      if (past.length) html += renderSection(past, {
+        title: 'Past Presentations',
+        subtitle: 'Previously presented',
+        variant: 'past',
+      });
+      app.innerHTML = html;
+    }
+
+    function renderSection(items, opts) {
+      return `
+        <div class="section">
+          <div class="section-title">${opts.title}</div>
+          <div class="section-subtitle">${opts.subtitle}</div>
+          <div class="cards-grid">${items.map(p => renderCard(p, opts.variant)).join('')}</div>
+        </div>`;
+    }
+
+    function renderCard(p, variant) {
+      const dateStr = p.date ? formatDate(p.date) : 'Date TBD';
+      const tagsHtml = (p.tags || []).map(t =>
+        `<span class="tag" data-color="${t.color}">${t.label}</span>`
+      ).join('');
+      const statsHtml = (p.stats || []).map(s => `
+        <div class="stat">
+          <div class="stat-value">${s.value}</div>
+          <div class="stat-label">${s.label}</div>
+        </div>`).join('');
+      const topicsHtml = (p.topics || []).map(t =>
+        `<a href="${t.file}" class="detail-link" onclick="event.stopPropagation();">${t.title}</a>`
+      ).join('');
+      const badgeLabel = variant === 'scheduled' ? 'Scheduled' : 'Presented';
+
+      if (variant === 'scheduled') {
+        return `
+          <div class="card scheduled" style="cursor:pointer" onclick="if(event.target.closest('.detail-link'))return;window.location.href='${p.file}'">
+            <div class="card-strip"></div>
+            <div class="card-body">
+              <div class="card-top">
+                <span class="badge scheduled">${badgeLabel}</span>
+                <span class="card-date">${dateStr}</span>
+              </div>
+              <div class="card-title">${p.title}</div>
+              <div class="card-subtitle">${p.subtitle}</div>
+              <div class="card-tags">${tagsHtml}</div>
+              <div class="card-stats">${statsHtml}</div>
+              ${topicsHtml ? `<div class="detail-links">${topicsHtml}</div>` : ''}
+            </div>
+          </div>`;
+      }
+
+      return `
+        <a class="card past" href="${p.file}">
+          <div class="card-strip"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="badge past">${badgeLabel}</span>
+              <span class="card-date">${dateStr}</span>
+            </div>
+            <div class="card-title">${p.title}</div>
+            <div class="card-subtitle">${p.subtitle}</div>
+            <div class="card-tags">${tagsHtml}</div>
+            <div class="card-stats">${statsHtml}</div>
+          </div>
+        </a>`;
+    }
+
+    render();
+  </script>
+</body>
+
+</html>
