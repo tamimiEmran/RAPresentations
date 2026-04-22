@@ -260,7 +260,7 @@
 
   <div class="page-header">
     <h1>19 April 2026 Presentation</h1>
-    <p>Four topics: paper revision progress plus three experiment-design briefs across GAF and SAFEFL.</p>
+    <p>Three topics: pitfalls paper revision status, GAF 97-consumer holdout results, and a SAFEFL observation-function diagnosis.</p>
   </div>
 
   <div class="section">
@@ -274,34 +274,26 @@
       {
         n: '01',
         project: 'Pitfalls Paper',
-        title: 'Revision Progress',
-        subtitle: 'EGYR-D-25-04727R1 — status of the revision, reviewer responses, and outstanding items before resubmission.',
+        title: 'Revision 2 &mdash; All Six Comments Resolved',
+        subtitle: 'EGYR-D-25-04727R1, due 25 April. Reviewer 2\u2019s six requests closed: preprocessing checklist, cross-dataset benchmarking, intrinsic validation, user-level DP, reproducibility, figure-text consistency.',
         file: 'progress.html',
         color: 'red',
       },
       {
         n: '02',
         project: 'GAF',
-        title: 'Experiment Design Diagram',
-        subtitle: 'Visual plan of experimental variables, phases, sensitivity grids, run budget, and dependency flow.',
+        title: 'Experiment Design + 97-Consumer Holdout Results',
+        subtitle: 'End-to-end pipeline diagram plus holdout evaluation on 1,032,759 pairs \u2014 binary detection, 13-class identification, per-attack recall, specificity by consumer CV, and sample-size stability.',
         file: 'gaf_experiment_design.html',
         color: 'blue',
       },
       {
         n: '03',
         project: 'SAFEFL',
-        title: 'FactorGraphs &mdash; P0 + P1 Results',
-        subtitle: 'Phase 0 picks the CIFAR-10 + ResNet-18 anchor; Phase 1 shows no standard defence survives grouping &mdash; carry-forward is FactorGraphs vs FedAvg only.',
+        title: 'Observation-Function Investigation',
+        subtitle: 'Why SignGuard fails (Youden J = +0.008, indistinguishable from chance) and why cosine-median doesn\u2019t \u2014 after recapping the factor-graph memory crisis and the windowed-BP redesign that fixed it.',
         file: 'safefl_results_p0_p1.html',
         color: 'purple',
-      },
-      {
-        n: '04',
-        project: 'SAFEFL',
-        title: 'Windowed BP Redesign',
-        subtitle: 'From a memory crisis to the next bottleneck: windowed belief-propagation redesign and remaining blockers.',
-        file: 'safefl_windowed_bp.html',
-        color: 'teal',
       },
     ];
 

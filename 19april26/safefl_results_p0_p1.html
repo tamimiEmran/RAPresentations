@@ -3,8 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FactorGraphs &mdash; Phase 0 + Phase 1 Results</title>
+  <meta name="viewport" content="width=1920">
+  <title>Observation Function Investigation &mdash; Why SG Fails, Why Cosine-Median Doesn't</title>
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
@@ -29,399 +29,219 @@
       --purple-dim: rgba(139, 92, 196, 0.08);
       --amber: #C88A1A;
       --amber-dim: rgba(200, 138, 26, 0.08);
+      --teal: #0A7C8C;
+      --teal-dim: rgba(10, 124, 140, 0.08);
       --font: 'DM Sans', system-ui, sans-serif;
       --mono: 'JetBrains Mono', monospace;
       --radius: 10px;
       --radius-sm: 6px;
     }
 
-    html { scroll-behavior: smooth; }
-
     body {
       background: var(--bg);
       color: var(--text);
       font-family: var(--font);
-      line-height: 1.6;
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 48px 48px 80px;
+      padding: 40px 48px;
     }
 
-    /* Breadcrumb */
-    .breadcrumb {
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: var(--mono);
-    }
-    .breadcrumb a {
-      color: var(--text-dim);
-      text-decoration: none;
-      padding: 4px 10px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      transition: all 0.15s;
-    }
-    .breadcrumb a:hover {
-      color: var(--blue);
-      border-color: var(--blue);
-      background: rgba(59, 111, 214, 0.04);
-    }
-
-    /* Page header */
-    .page-header { margin-bottom: 28px; }
+    .page-header { margin-bottom: 36px; }
     .page-header h1 {
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.03em;
-      margin-bottom: 10px;
-    }
-    .lede {
-      font-size: 14.5px;
-      color: var(--text-dim);
-      max-width: 880px;
-      line-height: 1.65;
-    }
-    .lede strong { color: var(--text); font-weight: 600; }
-
-    /* Brief panel */
-    .brief {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      margin-bottom: 40px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-    }
-    .brief-stat {
-      padding: 4px 16px;
-      position: relative;
-      text-align: left;
-    }
-    .brief-stat + .brief-stat::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 4px;
-      bottom: 4px;
-      width: 1px;
-      background: var(--border);
-    }
-    .brief-stat-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-muted);
       margin-bottom: 4px;
-      font-weight: 500;
     }
-    .brief-stat-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .brief-stat-value.accent { color: var(--accent); }
+    .page-header p { font-size: 13px; color: var(--text-dim); }
 
-    /* Phase card */
-    .phase-card {
+    .section { margin-bottom: 32px; }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px 32px;
-      margin-bottom: 28px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
-    .phase-head {
+
+    .card-header {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      align-items: baseline;
+      gap: 10px;
       margin-bottom: 6px;
     }
-    .phase-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-    }
-    .phase-badge.anchor { background: var(--accent-dim); color: var(--accent); }
-    .phase-badge.problem { background: var(--red-dim); color: var(--red); }
-    .phase-title {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .phase-question {
+
+    .card-title {
       font-size: 14px;
-      color: var(--text-dim);
-      margin-bottom: 20px;
-      font-style: italic;
-    }
-
-    /* Key takeaway */
-    .takeaway {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 14px 18px;
-      border-radius: var(--radius-sm);
-      margin-bottom: 24px;
-      font-size: 14px;
-      line-height: 1.55;
-    }
-    .takeaway.pass { background: var(--accent-dim); border: 1px solid rgba(14, 154, 126, 0.22); }
-    .takeaway.fail { background: var(--red-dim); border: 1px solid rgba(217, 69, 62, 0.2); }
-    .takeaway-icon {
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 1px;
-    }
-    .takeaway.pass .takeaway-icon { background: var(--accent); color: #fff; }
-    .takeaway.fail .takeaway-icon { background: var(--red); color: #fff; }
-    .takeaway-text {
-      flex: 1;
-      color: var(--text-dim);
-    }
-    .takeaway-text strong { color: var(--text); font-weight: 600; }
-    .takeaway-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-right: 6px;
-    }
-    .takeaway.pass .takeaway-label { color: var(--accent); }
-    .takeaway.fail .takeaway-label { color: var(--red); }
-
-    /* Section sub-labels */
-    .label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    /* Phase 0 matrix */
-    .matrix {
-      display: grid;
-      grid-template-columns: 110px repeat(3, 1fr);
-      gap: 4px;
-      margin-bottom: 24px;
-    }
-    .matrix-colh,
-    .matrix-rowh {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-    }
-    .matrix-colh { justify-content: center; text-align: center; }
-    .matrix-rowh { font-size: 12.5px; color: var(--text); }
-    .cell {
-      background: var(--bg-elevated);
-      border-radius: 4px;
-      padding: 12px 10px;
-      text-align: center;
-      border: 1px solid transparent;
-    }
-    .cell.anchor {
-      background: rgba(14, 154, 126, 0.08);
-      border-color: rgba(14, 154, 126, 0.35);
-    }
-    .cell.weak { opacity: 0.55; }
-    .cell-acc {
-      font-family: var(--mono);
-      font-size: 17px;
       font-weight: 600;
       color: var(--text);
+      flex: 1;
     }
-    .cell.anchor .cell-acc { color: var(--accent); }
-    .cell-delta {
+
+    .card-stamp {
       font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 3px;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .cell-delta.red { color: var(--red); }
-    .cell-delta.red-bold { color: var(--red); font-weight: 700; }
-    .matrix-note {
+
+    .stamp-v1     { background: var(--blue-dim);   color: var(--blue);   }
+    .stamp-v2     { background: var(--accent-dim); color: var(--accent); }
+    .stamp-broken { background: var(--red-dim);    color: var(--red);    }
+    .stamp-warn   { background: var(--amber-dim);  color: var(--amber);  }
+    .stamp-data   { background: var(--purple-dim); color: var(--purple); }
+
+    .card-body { font-size: 13px; color: var(--text-dim); }
+    .card-body strong { color: var(--text); }
+    .card-body ul { margin: 8px 0 4px; padding-left: 20px; }
+    .card-body ul li { margin-bottom: 6px; }
+
+    .card-tags {
       display: flex;
-      gap: 18px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-      margin-bottom: 24px;
+      gap: 6px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
-
-    /* Analysis / observations box */
-    .box {
-      border: 1px solid transparent;
-      border-radius: var(--radius-sm);
-      padding: 16px 20px;
-      margin-bottom: 22px;
-      font-size: 13.5px;
-      line-height: 1.7;
+    .tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: var(--bg-elevated);
       color: var(--text-dim);
     }
-    .box.analysis { background: var(--accent-dim); border-color: rgba(14, 154, 126, 0.18); }
-    .box.observations { background: var(--blue-dim); border-color: rgba(59, 111, 214, 0.18); }
-    .box-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .box.analysis .box-label { color: var(--accent); }
-    .box.observations .box-label { color: var(--blue); }
-    .box p + p { margin-top: 8px; }
-    .box strong { color: var(--text); font-weight: 600; }
+    .tag-byz    { background: var(--red-dim);    color: var(--red);    }
+    .tag-mem    { background: var(--amber-dim);  color: var(--amber);  }
+    .tag-fg     { background: var(--purple-dim); color: var(--purple); }
+    .tag-fix    { background: var(--accent-dim); color: var(--accent); }
+    .tag-perf   { background: var(--teal-dim);   color: var(--teal);   }
+    .tag-design { background: var(--blue-dim);   color: var(--blue);   }
 
-    /* Data tables */
-    .table-wrap { overflow-x: auto; margin-bottom: 12px; }
-    table.data {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12.5px;
-    }
-    table.data th {
-      text-align: left;
-      padding: 10px 10px;
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      border-bottom: 2px solid var(--border);
-      white-space: nowrap;
-      background: var(--bg-elevated);
-    }
-    table.data th.right { text-align: right; }
-    table.data th.center { text-align: center; }
-    table.data td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-    table.data td.num { font-family: var(--mono); text-align: right; }
-    table.data td.center { text-align: center; }
-    table.data td.muted { color: var(--text-muted); }
-    table.data td.pos { color: var(--accent); font-weight: 500; }
-    table.data td.neg { color: var(--red); font-weight: 500; }
-    table.data td.neg-bold { color: var(--red); font-weight: 700; }
-    table.data tr.highlight td { background: rgba(14, 154, 126, 0.05); }
-    table.data tr.highlight td:first-child { border-left: 3px solid var(--accent); }
-    table.data td[rowspan] { vertical-align: middle; font-weight: 600; border-right: 1px solid var(--border); }
-
-    .status-dot {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--accent);
-    }
-    .status-dot::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .table-caption {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 8px;
-    }
-
-    /* Comparison chips (phase 0) */
-    .chips {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .chip {
-      padding: 10px 14px;
+    .note {
       border-radius: var(--radius-sm);
-      font-size: 12.5px;
-      line-height: 1.5;
-    }
-    .chip.reject { background: var(--red-dim); }
-    .chip.anchor { background: var(--accent-dim); }
-    .chip.secondary { background: var(--amber-dim); }
-    .chip-head {
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .chip.reject .chip-head { color: var(--red); }
-    .chip.anchor .chip-head { color: var(--accent); }
-    .chip.secondary .chip-head { color: var(--amber); }
-    .chip-body { color: var(--text-dim); }
-
-    /* Carry-forward highlight */
-    .carry {
-      margin-top: 14px;
-      padding: 14px 18px;
-      border: 1px dashed rgba(14, 154, 126, 0.35);
-      border-radius: var(--radius-sm);
-      background: rgba(14, 154, 126, 0.03);
-      font-size: 13.5px;
+      padding: 12px 16px;
+      margin-top: 12px;
+      font-size: 12px;
       color: var(--text-dim);
       line-height: 1.6;
     }
-    .carry strong { color: var(--text); font-weight: 600; }
-    .carry .accent { color: var(--accent); font-weight: 600; }
+    .note strong { color: var(--text); }
+    .note-good   { background: var(--accent-dim); border: 1px solid rgba(14,154,126,0.18); }
+    .note-good   .label { color: var(--accent); }
+    .note-bad    { background: var(--red-dim);    border: 1px solid rgba(217,69,62,0.18); }
+    .note-bad    .label { color: var(--red); }
+    .note-warn   { background: var(--amber-dim);  border: 1px solid rgba(200,138,26,0.18); }
+    .note-warn   .label { color: var(--amber); }
+    .note-info   { background: var(--blue-dim);   border: 1px solid rgba(59,111,214,0.18); }
+    .note-info   .label { color: var(--blue); }
+    .note .label { font-weight: 700; }
 
-    /* Run meta row */
-    .run-meta {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 18px;
+    table.data {
+      width: 100%;
+      margin-top: 12px;
+      border-collapse: collapse;
+      font-size: 12px;
     }
-    .run-meta span strong { color: var(--text); font-weight: 600; }
+    table.data th, table.data td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-family: var(--mono);
+    }
+    table.data th {
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg-elevated);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    table.data td.num { text-align: right; }
+    table.data td.bad  { color: var(--red); font-weight: 600; }
+    table.data td.good { color: var(--accent); font-weight: 600; }
+    table.data td.mid  { color: var(--amber); }
 
-    @media (max-width: 880px) {
-      body { padding: 32px 20px 60px; }
-      .brief { grid-template-columns: repeat(2, 1fr); }
-      .brief-stat + .brief-stat:nth-child(3)::before { display: none; }
-      .matrix { grid-template-columns: 80px repeat(3, 1fr); }
-      .cell-acc { font-size: 14px; }
-      .phase-card { padding: 20px; }
-      .chips { grid-template-columns: 1fr; }
+    .nums {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .nums-4 { grid-template-columns: repeat(4, 1fr); }
+    .num {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .num .k {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .num .v {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 2px;
+      font-family: var(--mono);
+    }
+    .num .v.bad  { color: var(--red); }
+    .num .v.good { color: var(--accent); }
+    .num .v.mid  { color: var(--amber); }
+
+    svg { display: block; margin: 14px auto 4px; }
+
+    code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg-elevated);
+      padding: 1px 6px;
+      border-radius: 3px;
+      color: var(--text);
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .compare .col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+    .compare .col h4 {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .compare .col h4.v1 { color: var(--blue); }
+    .compare .col h4.v2 { color: var(--accent); }
+    .compare .col h4.bad { color: var(--red); }
+    .compare .col p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -467,246 +287,1170 @@
   <a class="rap-nav-back" href="index.html">&larr; 19 Apr Hub</a>
   <a href="progress.html">Progress</a>
   <a href="gaf_experiment_design.html">GAF Design</a>
-  <a class="rap-nav-current" href="safefl_results_p0_p1.html">FG Results</a>
-  <a href="safefl_windowed_bp.html">Windowed BP</a>
+  <a class="rap-nav-current" href="safefl_results_p0_p1.html">SAFEFL Obs-Function</a>
 </nav>
 <!-- ==== /RAPresentations nav ==== -->
 
-<nav class="breadcrumb">
-  <a href="index.html">&larr; 19 Apr Hub</a>
-  <span>/</span>
-  <span>FactorGraphs &mdash; P0 + P1 Results</span>
-</nav>
+  <div class="page-header">
+    <h1>Observation Function Investigation: Why SignGuard Fails, Why Cosine-Median Doesn't</h1>
+    <p>Recap of the factor-graph memory crisis, measurement of the SignGuard observation quality, the mechanism behind its failure, and the cosine-median alternative.</p>
+  </div>
 
-<div class="page-header">
-  <h1>FactorGraphs &mdash; Phase 0 + Phase 1 Results</h1>
-  <p class="lede">
-    <strong>Phase 0</strong> picks the anchor (dataset &times; architecture) that will be used across every later phase.
-    <strong>Phase 1</strong> then asks whether any standard defence survives once we force it to operate on secure groups &mdash; the motivating experiment for the whole paper.
-    Both phases are complete; later phases are left out of this deck.
-  </p>
-</div>
+  <!-- ============================================================ -->
+  <!-- SECTION 1: Original OOM                                         -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">1. Original Design &mdash; Persistent Factor Graph OOMs at ~1300 Rounds</div>
 
-<div class="brief">
-  <div class="brief-stat">
-    <div class="brief-stat-label">Status</div>
-    <div class="brief-stat-value accent">34 / 34 runs complete</div>
-  </div>
-  <div class="brief-stat">
-    <div class="brief-stat-label">Anchor</div>
-    <div class="brief-stat-value">CIFAR-10 &times; ResNet-18</div>
-  </div>
-  <div class="brief-stat">
-    <div class="brief-stat-label">Attack Signal</div>
-    <div class="brief-stat-value">&minus;16.98 pp under LF</div>
-  </div>
-  <div class="brief-stat">
-    <div class="brief-stat-label">Surviving Baselines</div>
-    <div class="brief-stat-value">0 of 3</div>
-  </div>
-</div>
+    <div class="card" style="border-color: var(--red); border-width: 2px;">
+      <div class="card-header">
+        <div class="card-title">Factor count grows with round count; GPU memory does not</div>
+        <span class="card-stamp stamp-broken">v1 broken</span>
+      </div>
+      <div class="card-body">
+        Workers are binary latents <code>P(worker<sub>i</sub> = malicious)</code>. Each round's
+        secure-aggregation observation is added to the graph as a k-ary factor over the group's members.
+        The graph is never reset; BP runs over the accumulated structure.
+        At <code>n=500, group_size=10</code> the graph grows by ~50 factors per round.
+        <svg viewBox="0 0 940 200" width="100%" height="200">
+          <rect x="20"  y="30" width="140" height="140" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+          <text x="90"  y="50"  text-anchor="middle" font-size="11" fill="#5A5E6E">Round 1</text>
+          <text x="90"  y="110" text-anchor="middle" font-size="13" font-family="JetBrains Mono">~50 factors</text>
+          <text x="90"  y="130" text-anchor="middle" font-size="10" fill="#8E92A0">trivial</text>
 
-<!-- ============ PHASE 0 ============ -->
-<div class="phase-card">
-  <div class="phase-head">
-    <span class="phase-badge anchor">Phase 0</span>
-    <div class="phase-title">Baseline Landscape &mdash; Anchor Selection</div>
-  </div>
-  <div class="phase-question">Which dataset &times; architecture pair produces a meaningful testbed? &mdash; FedAvg only, no defence.</div>
+          <rect x="180" y="30" width="170" height="140" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+          <text x="265" y="50"  text-anchor="middle" font-size="11" fill="#5A5E6E">Round 100</text>
+          <text x="265" y="110" text-anchor="middle" font-size="13" font-family="JetBrains Mono">~5,000 factors</text>
+          <text x="265" y="130" text-anchor="middle" font-size="10" fill="#8E92A0">tractable</text>
 
-  <div class="takeaway pass">
-    <div class="takeaway-icon">&#10003;</div>
-    <div class="takeaway-text">
-      <span class="takeaway-label">Anchor chosen</span>
-      <strong>CIFAR-10 + ResNet-18</strong> &mdash; highest clean accuracy (68.67%) paired with a <strong>16.98 pp drop</strong> under label flipping to 51.69%. The only combo with an unambiguous attack signal.
+          <rect x="370" y="30" width="200" height="140" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+          <text x="470" y="50"  text-anchor="middle" font-size="11" fill="#5A5E6E">Round 1000</text>
+          <text x="470" y="110" text-anchor="middle" font-size="13" font-family="JetBrains Mono">~50,000 factors</text>
+          <text x="470" y="130" text-anchor="middle" font-size="10" fill="#8E92A0">strained</text>
+
+          <rect x="590" y="30" width="240" height="140" rx="8" fill="#F8F9FB" stroke="#D9453E"/>
+          <text x="710" y="50"  text-anchor="middle" font-size="11" fill="#D9453E">Round 1304</text>
+          <text x="710" y="110" text-anchor="middle" font-size="13" font-family="JetBrains Mono" fill="#D9453E">~65,000 factors</text>
+          <text x="710" y="130" text-anchor="middle" font-size="10" fill="#D9453E">OOM</text>
+
+          <line x1="160" y1="100" x2="179" y2="100" stroke="#8E92A0" stroke-width="1.2"/>
+          <line x1="350" y1="100" x2="369" y2="100" stroke="#8E92A0" stroke-width="1.2"/>
+          <line x1="570" y1="100" x2="589" y2="100" stroke="#D9453E"  stroke-width="1.2"/>
+        </svg>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-fg">factor graph</span>
+        <span class="tag tag-mem">memory</span>
+        <span class="tag tag-byz">persistent</span>
+      </div>
+    </div>
+
+    <div class="note note-bad">
+      <span class="label">Observed:</span> GPU OOM crash at round ~1304 on CIFAR10/ResNet18 with
+      <code>n=500, f=50, group_size=10, factorGraphs_num_iters=500</code>. Every round's factor-graph
+      JIT-recompile also fragments the JAX XLA allocator, producing a second OOM at round ~26 in some
+      configurations even when total factor count is small.
     </div>
   </div>
 
-  <div class="run-meta">
-    <span>Runs: <strong>18</strong></span>
-    <span>Fixed: <strong>&beta;=0, n<sub>workers</sub>=500, n<sub>byz</sub>=50 (10%)</strong></span>
-    <span>Attack: Label Flipping</span>
-  </div>
+  <!-- ============================================================ -->
+  <!-- SECTION 2: Windowed redesign                                    -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">2. The Redesign &mdash; Windowed BP + Seeded Priors</div>
 
-  <div class="label">Run Matrix &mdash; Final ACC / &Delta; under LF</div>
-  <div class="matrix">
-    <div></div>
-    <div class="matrix-colh">MobileNetV3</div>
-    <div class="matrix-colh">ResNet-18</div>
-    <div class="matrix-colh">EfficientNet</div>
+    <div class="card" style="border-color: var(--accent); border-width: 2px;">
+      <div class="card-header">
+        <div class="card-title">Sliding window of K rounds; older evidence collapsed into per-worker unary priors</div>
+        <span class="card-stamp stamp-v2">v2</span>
+      </div>
+      <div class="card-body">
+        Each round the factor graph is <strong>rebuilt from scratch</strong>. It contains
+        (a) N unary priors seeded from the posterior at round <code>t&minus;K</code> (the
+        <em>prior_snapshot</em>), and (b) <code>K &times; num_groups</code> k-ary factors from
+        the most recent K rounds of observations. Graph size is constant in time.
 
-    <div class="matrix-rowh">MNIST</div>
-    <div class="cell weak"><div class="cell-acc">98.01%</div><div class="cell-delta">&Delta; 1.19 pp</div></div>
-    <div class="cell weak"><div class="cell-acc">98.44%</div><div class="cell-delta">&Delta; 0.24 pp</div></div>
-    <div class="cell weak"><div class="cell-acc">98.39%</div><div class="cell-delta">&Delta; 0.12 pp</div></div>
-
-    <div class="matrix-rowh">FEMNIST</div>
-    <div class="cell"><div class="cell-acc">86.27%</div><div class="cell-delta">&Delta; 0.87 pp</div></div>
-    <div class="cell"><div class="cell-acc">87.15%</div><div class="cell-delta">&Delta; 1.07 pp</div></div>
-    <div class="cell"><div class="cell-acc">86.68%</div><div class="cell-delta">&Delta; &minus;0.04 pp</div></div>
-
-    <div class="matrix-rowh">CIFAR-10</div>
-    <div class="cell"><div class="cell-acc">60.78%</div><div class="cell-delta red">&Delta; 6.24 pp</div></div>
-    <div class="cell anchor"><div class="cell-acc">68.67%</div><div class="cell-delta red-bold">&Delta; 16.98 pp</div></div>
-    <div class="cell"><div class="cell-acc">60.99%</div><div class="cell-delta red">&Delta; 7.76 pp</div></div>
-  </div>
-  <div class="matrix-note">
-    <span>ACC = clean accuracy (FedAvg, no attack)</span>
-    <span>&Delta; = accuracy drop under LF</span>
-    <span>Greyed rows &mdash; rejected (see below)</span>
-  </div>
-
-  <div class="box analysis">
-    <div class="box-label">Results analysis</div>
-    <p><strong>MNIST</strong> &mdash; near-trivial at ~98% with drops of 0.12&ndash;1.19 pp at 500 rounds. Even at 10% Byzantine the signal is too small to differentiate defences.</p>
-    <p><strong>FEMNIST</strong> &mdash; moderate accuracy (86&ndash;87%) at 2000 rounds, but attack impact stays under 1.1 pp. The attack is barely visible.</p>
-    <p><strong>CIFAR-10 + ResNet-18</strong> &mdash; highest clean accuracy (68.67%) and a <strong>16.98 pp attack drop</strong> (68.67% &rarr; 51.69%). Unambiguous signal. CIFAR-10 with MobileNetV3 / EfficientNet also shows 5&ndash;8 pp drops, so the dataset is genuinely hard &mdash; it is the architecture choice that separates the anchor from the secondary combos.</p>
-  </div>
-
-  <div class="label">Detailed results &mdash; 18 experiments</div>
-  <div class="table-wrap">
-    <table class="data">
-      <thead>
-        <tr>
-          <th>Dataset</th>
-          <th>Architecture</th>
-          <th>Attack</th>
-          <th class="right">Rounds</th>
-          <th class="right">Final ACC</th>
-          <th class="right">Max ACC</th>
-          <th class="center">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td rowspan="6">MNIST</td><td>MobileNetV3</td><td>No Attack</td><td class="num">500 / 500</td><td class="num">98.01%</td><td class="num">98.04%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>MobileNetV3</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">500 / 500</td><td class="num">96.82%</td><td class="num">97.96%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>ResNet-18</td><td>No Attack</td><td class="num">500 / 500</td><td class="num">98.44%</td><td class="num">98.44%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>ResNet-18</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">500 / 500</td><td class="num">98.20%</td><td class="num">98.20%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>EfficientNet</td><td>No Attack</td><td class="num">500 / 500</td><td class="num">98.39%</td><td class="num">98.47%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>EfficientNet</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">500 / 500</td><td class="num">98.27%</td><td class="num">98.27%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-
-        <tr><td rowspan="6">FEMNIST</td><td>MobileNetV3</td><td>No Attack</td><td class="num">2000 / 2000</td><td class="num">86.27%</td><td class="num">86.27%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>MobileNetV3</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">2000 / 2000</td><td class="num">85.40%</td><td class="num">85.93%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>ResNet-18</td><td>No Attack</td><td class="num">2000 / 2000</td><td class="num">87.15%</td><td class="num">87.15%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>ResNet-18</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">2000 / 2000</td><td class="num">86.08%</td><td class="num">86.92%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>EfficientNet</td><td>No Attack</td><td class="num">2000 / 2000</td><td class="num">86.68%</td><td class="num">87.24%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>EfficientNet</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">2000 / 2000</td><td class="num">86.72%</td><td class="num">86.98%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-
-        <tr><td rowspan="6">CIFAR-10</td><td>MobileNetV3</td><td>No Attack</td><td class="num">3000 / 3000</td><td class="num">60.78%</td><td class="num">62.94%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>MobileNetV3</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">3000 / 3000</td><td class="num">54.54%</td><td class="num">57.16%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>ResNet-18</td><td>No Attack</td><td class="num">3000 / 3000</td><td class="num">68.67%</td><td class="num">69.01%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr class="highlight"><td>ResNet-18</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">3000 / 3000</td><td class="num neg-bold">51.69%</td><td class="num">65.78%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>EfficientNet</td><td>No Attack</td><td class="num">3000 / 3000</td><td class="num">60.99%</td><td class="num">61.14%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-        <tr><td>EfficientNet</td><td>LF (n<sub>byz</sub>=50)</td><td class="num">3000 / 3000</td><td class="num">53.23%</td><td class="num">55.46%</td><td class="center"><span class="status-dot">Done</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="table-caption">
-    Per-dataset mean &Delta; (n<sub>byz</sub>=50): MNIST 0.52 pp (500 rds) &middot; FEMNIST 0.63 pp (2000 rds) &middot; CIFAR-10 10.33 pp (3000 rds; ResNet-18 dominates at 16.98 pp).
-  </div>
-
-  <div class="label" style="margin-top: 22px;">Verdict</div>
-  <div class="chips">
-    <div class="chip reject">
-      <div class="chip-head">MNIST &mdash; rejected</div>
-      <div class="chip-body">~98% ACC, &Delta; &lt; 1.2 pp. Too easy to reveal defence differences.</div>
+        <div class="compare">
+          <div class="col">
+            <h4 class="v1">v1 &mdash; persistent graph</h4>
+            <p>
+              Factors: <code>O(t &middot; num_groups)</code><br>
+              Evidence retention: all rounds at full weight<br>
+              Memory: <span style="color: var(--red)">unbounded</span><br>
+              OOM: round ~1304
+            </p>
+          </div>
+          <div class="col">
+            <h4 class="v2">v2 &mdash; windowed + priors</h4>
+            <p>
+              Factors: <code>O(K &middot; num_groups)</code><br>
+              Evidence retention: K recent at full weight, older summarized<br>
+              Memory: <span style="color: var(--accent)">bounded (K=10)</span><br>
+              OOM: &mdash;
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-fix">K=10 window</span>
+        <span class="tag tag-fix">prior_snapshot</span>
+        <span class="tag tag-design">O(1) memory/round</span>
+      </div>
     </div>
-    <div class="chip reject">
-      <div class="chip-head">FEMNIST &mdash; rejected</div>
-      <div class="chip-body">86&ndash;87% ACC, &Delta; &lt; 1.1 pp. Attack impact too small.</div>
-    </div>
-    <div class="chip anchor">
-      <div class="chip-head">CIFAR-10 + ResNet-18 &mdash; anchor</div>
-      <div class="chip-body">68.67% clean, 16.98 pp drop to 51.69%. Strongest, cleanest signal.</div>
-    </div>
-    <div class="chip secondary">
-      <div class="chip-head">CIFAR-10 + MobileNet / EfficientNet</div>
-      <div class="chip-body">~60% ACC, 5&ndash;8 pp drops. Available as secondary validation only.</div>
-    </div>
-  </div>
-</div>
 
-<!-- ============ PHASE 1 ============ -->
-<div class="phase-card">
-  <div class="phase-head">
-    <span class="phase-badge problem">Phase 1</span>
-    <div class="phase-title">Establish the Problem &mdash; Grouping Failure</div>
-  </div>
-  <div class="phase-question">Do standard defences collapse when forced to operate on secure groups? &mdash; the motivating claim.</div>
-
-  <div class="takeaway fail">
-    <div class="takeaway-icon">&#10007;</div>
-    <div class="takeaway-text">
-      <span class="takeaway-label">No baseline survived grouping under attack</span>
-      All three defences either collapsed ungrouped, degraded under grouping, or failed to beat FedAvg.
-      <strong>Grouped Krum</strong> did recover from its ungrouped collapse (+24.52 pp) but still trails FedAvg's clean baseline. Carry-forward = <strong>FactorGraphs vs FedAvg only</strong>.
+    <div class="note note-warn">
+      <span class="label">Caveat:</span> the memory crisis is solved but the detection quality
+      problem is not &mdash; the redesign changed <em>where</em> evidence is kept, not the
+      informativeness of individual observations. Investigating that is what the rest of this deck is about.
     </div>
   </div>
 
-  <div class="run-meta">
-    <span>Runs: <strong>16</strong></span>
-    <span>Anchor: <strong>CIFAR-10 + ResNet-18</strong></span>
-    <span>Fixed: <strong>&beta;=0, n<sub>byz</sub>=50, n<sub>iter</sub>=3000</strong></span>
-    <span>Defences: FedAvg, Krum, ShieldFL, SignGuard</span>
+  <!-- ============================================================ -->
+  <!-- SECTION 3: Youden J primer                                      -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">3. Yardstick &mdash; Youden J in 30 Seconds</div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">J is the gap between flag rate on malicious groups and flag rate on benign groups</div>
+      </div>
+      <div class="card-body">
+        Formally <code>J = TPR + TNR &minus; 1 = P(flag | malicious) &minus; P(flag | benign)</code>.
+        Range <code>[0, 1]</code> for any informative detector. Three anchor points:
+
+        <svg viewBox="0 0 940 240" width="100%" height="240">
+          <!-- Panel 1: J = 0 -->
+          <g>
+            <rect x="20" y="30" width="290" height="190" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="165" y="50" text-anchor="middle" font-size="12" fill="#5A5E6E" font-weight="600">J = 0.00 &mdash; blind</text>
+            <text x="165" y="65" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">P(flag) matches under both hypotheses</text>
+
+            <rect x="80"  y="140" width="50" height="40" fill="#3B6FD6"/>
+            <rect x="200" y="140" width="50" height="40" fill="#D9453E" opacity="0.85"/>
+
+            <text x="105" y="195" text-anchor="middle" font-size="10" fill="#3B6FD6">benign</text>
+            <text x="225" y="195" text-anchor="middle" font-size="10" fill="#D9453E">malicious</text>
+            <text x="105" y="210" text-anchor="middle" font-size="10" fill="#5A5E6E" font-family="JetBrains Mono">0.40</text>
+            <text x="225" y="210" text-anchor="middle" font-size="10" fill="#5A5E6E" font-family="JetBrains Mono">0.40</text>
+
+            <text x="165" y="105" text-anchor="middle" font-size="10" fill="#8E92A0" font-style="italic">no gap &rarr; observations are noise</text>
+          </g>
+
+          <!-- Panel 2: J = 0.40 -->
+          <g>
+            <rect x="335" y="30" width="290" height="190" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="480" y="50" text-anchor="middle" font-size="12" fill="#5A5E6E" font-weight="600">J = 0.40 &mdash; informative</text>
+            <text x="480" y="65" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">TPR = 0.60, TNR = 0.80</text>
+
+            <rect x="395" y="160" width="50" height="20" fill="#3B6FD6"/>
+            <rect x="515" y="120" width="50" height="60" fill="#D9453E" opacity="0.85"/>
+
+            <text x="420" y="195" text-anchor="middle" font-size="10" fill="#3B6FD6">benign</text>
+            <text x="540" y="195" text-anchor="middle" font-size="10" fill="#D9453E">malicious</text>
+            <text x="420" y="210" text-anchor="middle" font-size="10" fill="#5A5E6E" font-family="JetBrains Mono">0.20</text>
+            <text x="540" y="210" text-anchor="middle" font-size="10" fill="#5A5E6E" font-family="JetBrains Mono">0.60</text>
+
+            <!-- gap arrow between bar tops -->
+            <line x1="470" y1="120" x2="470" y2="160" stroke="#0E9A7E" stroke-width="2"/>
+            <polygon points="467,120 473,120 470,114" fill="#0E9A7E"/>
+            <polygon points="467,160 473,160 470,166" fill="#0E9A7E"/>
+            <text x="480" y="105" text-anchor="middle" font-size="11" fill="#0E9A7E" font-family="JetBrains Mono">gap = J = 0.40</text>
+          </g>
+
+          <!-- Panel 3: J = 1 -->
+          <g>
+            <rect x="650" y="30" width="290" height="190" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="795" y="50" text-anchor="middle" font-size="12" fill="#5A5E6E" font-weight="600">J = 1.00 &mdash; perfect</text>
+            <text x="795" y="65" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">TPR = 1.00, TNR = 1.00</text>
+
+            <rect x="710" y="179" width="50" height="1"  fill="#3B6FD6"/>
+            <rect x="830" y="80"  width="50" height="100" fill="#D9453E" opacity="0.85"/>
+
+            <text x="735" y="195" text-anchor="middle" font-size="10" fill="#3B6FD6">benign</text>
+            <text x="855" y="195" text-anchor="middle" font-size="10" fill="#D9453E">malicious</text>
+            <text x="735" y="210" text-anchor="middle" font-size="10" fill="#5A5E6E" font-family="JetBrains Mono">0.00</text>
+            <text x="855" y="210" text-anchor="middle" font-size="10" fill="#5A5E6E" font-family="JetBrains Mono">1.00</text>
+
+            <text x="795" y="105" text-anchor="middle" font-size="11" fill="#0E9A7E" font-family="JetBrains Mono">gap = 1.00</text>
+          </g>
+
+          <text x="480" y="235" text-anchor="middle" font-size="10" fill="#8E92A0" font-style="italic">bar height = P(flag = 1 | true label)</text>
+        </svg>
+
+        <div class="note note-info">
+          <span class="label">How to read it:</span> if a classifier flags malicious and benign groups
+          at the same rate, it is not using ground truth at all &mdash; J = 0. Anything below 0 means
+          it is actively anti-correlated (you would do better by flipping its outputs). The reported
+          J for SignGuard in the next section is <code>+0.008</code>.
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-design">primer</span>
+      </div>
+    </div>
   </div>
 
-  <div class="label">Full results &mdash; 4 defences &times; 2 modes &times; 2 scenarios</div>
-  <div class="table-wrap">
-    <table class="data">
-      <thead>
-        <tr>
-          <th>Defence</th>
-          <th>Grouped</th>
-          <th>Attack</th>
-          <th class="right">Final ACC</th>
-          <th class="right">Max ACC</th>
-          <th class="right">Grouping &Delta;</th>
-          <th class="right">vs FedAvg &Delta;</th>
-          <th class="right">vs FA Clean &Delta;</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td rowspan="4"><strong>FedAvg</strong></td><td>No</td><td>Clean</td><td class="num">68.67%</td><td class="num">69.01%</td><td class="num muted">baseline</td><td class="num muted">baseline</td><td class="num muted">baseline</td></tr>
-        <tr><td>No</td><td>LF</td><td class="num">51.69%</td><td class="num">65.78%</td><td class="num muted">baseline</td><td class="num muted">baseline</td><td class="num neg">&minus;16.98 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">64.40%</td><td class="num">69.43%</td><td class="num neg">&minus;4.27 pp</td><td class="num muted">baseline</td><td class="num neg">&minus;4.27 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>LF</td><td class="num">61.83%</td><td class="num">64.64%</td><td class="num pos">+10.14 pp</td><td class="num muted">baseline</td><td class="num neg">&minus;6.84 pp</td></tr>
+  <!-- ============================================================ -->
+  <!-- SECTION 4: SG is random                                         -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">4. Measuring SignGuard &mdash; It Is Near-Random</div>
 
-        <tr><td rowspan="4"><strong>Krum</strong></td><td>No</td><td>Clean</td><td class="num">45.11%</td><td class="num">47.16%</td><td class="num muted">baseline</td><td class="num neg">&minus;23.56 pp</td><td class="num neg">&minus;23.56 pp</td></tr>
-        <tr><td>No</td><td>LF</td><td class="num">44.92%</td><td class="num">46.52%</td><td class="num muted">baseline</td><td class="num neg">&minus;6.77 pp</td><td class="num neg">&minus;23.75 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">66.40%</td><td class="num">68.57%</td><td class="num pos">+21.29 pp</td><td class="num pos">+2.00 pp</td><td class="num neg">&minus;2.27 pp</td></tr>
-        <tr class="highlight"><td>Yes (k=10)</td><td>LF</td><td class="num">69.44%</td><td class="num">71.00%</td><td class="num pos">+24.52 pp</td><td class="num pos">+7.61 pp</td><td class="num pos">+0.77 pp</td></tr>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Empirical TPR/TNR from 1,583 rounds of factorGraphs with SG as observation function</div>
+        <span class="card-stamp stamp-data">measured</span>
+      </div>
+      <div class="card-body">
+        Config: <code>CIFAR10, ResNet18, n=500, f=50, group_size=10, byz_type=label_flipping_attack</code>,
+        default <code>factorGraphs</code> hyperparameters (<code>tpr=tnr=0.6</code>). Ground truth is
+        <code>numberOfMal &gt; 0</code> per group; predicted label is SG's binary flag.
+        Computed from <code>observation_scores.csv</code>.
 
-        <tr><td rowspan="4"><strong>ShieldFL</strong></td><td>No</td><td>Clean</td><td class="num">58.75%</td><td class="num">59.65%</td><td class="num muted">baseline</td><td class="num neg">&minus;9.92 pp</td><td class="num neg">&minus;9.92 pp</td></tr>
-        <tr><td>No</td><td>LF</td><td class="num">56.31%</td><td class="num">57.92%</td><td class="num muted">baseline</td><td class="num pos">+4.62 pp</td><td class="num neg">&minus;12.36 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">60.36%</td><td class="num">61.74%</td><td class="num pos">+1.61 pp</td><td class="num neg">&minus;4.04 pp</td><td class="num neg">&minus;8.31 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>LF</td><td class="num">57.34%</td><td class="num">58.47%</td><td class="num pos">+1.03 pp</td><td class="num neg">&minus;4.49 pp</td><td class="num neg">&minus;11.33 pp</td></tr>
+        <div class="nums">
+          <div class="num">
+            <div class="k">TPR</div>
+            <div class="v mid">0.409</div>
+          </div>
+          <div class="num">
+            <div class="k">TNR</div>
+            <div class="v mid">0.598</div>
+          </div>
+          <div class="num">
+            <div class="k">Youden J</div>
+            <div class="v bad">+0.008</div>
+          </div>
+        </div>
 
-        <tr><td rowspan="4"><strong>SignGuard</strong></td><td>No</td><td>Clean</td><td class="num">68.17%</td><td class="num">69.61%</td><td class="num muted">baseline</td><td class="num neg">&minus;0.50 pp</td><td class="num neg">&minus;0.50 pp</td></tr>
-        <tr><td>No</td><td>LF</td><td class="num">63.12%</td><td class="num">64.39%</td><td class="num muted">baseline</td><td class="num pos">+11.43 pp</td><td class="num neg">&minus;5.55 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>Clean</td><td class="num">67.97%</td><td class="num">69.80%</td><td class="num neg">&minus;0.20 pp</td><td class="num pos">+3.57 pp</td><td class="num neg">&minus;0.70 pp</td></tr>
-        <tr><td>Yes (k=10)</td><td>LF</td><td class="num">61.92%</td><td class="num">66.01%</td><td class="num neg">&minus;1.20 pp</td><td class="num pos">+0.09 pp</td><td class="num neg">&minus;6.75 pp</td></tr>
-      </tbody>
-    </table>
+        <p style="margin-top: 14px;">
+          A useful classifier has <code>tpr + tnr &gt; 1</code> by a margin. SG sits at
+          <code>1.008</code> &mdash; statistically indistinguishable from chance.
+        </p>
+
+        <p style="margin-top: 10px;"><strong>Stratified flag rate by number of malicious members:</strong></p>
+        <table class="data">
+          <thead>
+            <tr>
+              <th>k = numberOfMal</th>
+              <th class="num">n groups</th>
+              <th class="num">P(flag=1)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>0 (pure benign)</td><td class="num">27,350</td><td class="num">0.402</td></tr>
+            <tr><td>1</td><td class="num">30,959</td><td class="num">0.404</td></tr>
+            <tr><td>2</td><td class="num">15,435</td><td class="num">0.416</td></tr>
+            <tr><td>3</td><td class="num">4,431</td><td class="num">0.420</td></tr>
+            <tr><td>4</td><td class="num">858</td><td class="num">0.417</td></tr>
+            <tr><td>5</td><td class="num">107</td><td class="num">0.439</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 10px;">
+          Flag rate varies by <strong>3.7 percentage points</strong> across six ground-truth levels
+          from clean to highly-malicious. A usable detector should show a clear monotone rise;
+          this is flat to within noise.
+        </p>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-byz">label_flipping</span>
+        <span class="tag tag-data">1,583 rounds</span>
+        <span class="tag tag-data">79,150 obs</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">The quality does not change with training progress</div>
+        <span class="card-stamp stamp-data">drift</span>
+      </div>
+      <div class="card-body">
+        <code>tpr+tnr</code> in 100-round bins stays between <code>0.97</code> and <code>1.05</code>
+        across the entire run. No warm-up artifact, no degradation, no slow improvement &mdash;
+        just stable noise.
+        <svg viewBox="0 0 940 180" width="100%" height="180">
+          <!-- Axes -->
+          <line x1="60" y1="20"  x2="60"  y2="150" stroke="#5A5E6E"/>
+          <line x1="60" y1="150" x2="910" y2="150" stroke="#5A5E6E"/>
+          <text x="20" y="155" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0.90</text>
+          <text x="20" y="88"  font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1.00</text>
+          <text x="20" y="25"  font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1.10</text>
+          <text x="60" y="172" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0</text>
+          <text x="910" y="172" text-anchor="end" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1583</text>
+          <!-- Reference line at 1.0 (blind threshold) -->
+          <line x1="60" y1="88" x2="910" y2="88" stroke="#D9453E" stroke-dasharray="3,3" opacity="0.6"/>
+          <text x="900" y="84" text-anchor="end" font-size="9" fill="#D9453E" font-family="JetBrains Mono">blind threshold (1.0)</text>
+
+          <!-- Data points -->
+          <g fill="#C88A1A">
+            <!-- Mapping tpr+tnr from drift table, rounds 0-1599. y = 150 - (val - 0.9) * 650  -->
+            <circle cx="115"  cy="94"  r="3"/><!-- 0.99  -->
+            <circle cx="170"  cy="92"  r="3"/><!-- 0.994 -->
+            <circle cx="225"  cy="92"  r="3"/><!-- 0.994 -->
+            <circle cx="280"  cy="105" r="3"/><!-- 0.973 -->
+            <circle cx="335"  cy="82"  r="3"/><!-- 1.011 -->
+            <circle cx="390"  cy="87"  r="3"/><!-- 1.002 -->
+            <circle cx="445"  cy="91"  r="3"/><!-- 0.995 -->
+            <circle cx="500"  cy="85"  r="3"/><!-- 1.005 -->
+            <circle cx="555"  cy="82"  r="3"/><!-- 1.009 -->
+            <circle cx="610"  cy="83"  r="3"/><!-- 1.008 -->
+            <circle cx="665"  cy="78"  r="3"/><!-- 1.014 -->
+            <circle cx="720"  cy="80"  r="3"/><!-- 1.011 -->
+            <circle cx="775"  cy="68"  r="3"/><!-- 1.031 -->
+            <circle cx="830"  cy="72"  r="3"/><!-- 1.022 -->
+            <circle cx="880"  cy="57"  r="3"/><!-- 1.048 -->
+          </g>
+          <polyline fill="none" stroke="#C88A1A" stroke-width="1.2" opacity="0.5"
+            points="115,94 170,92 225,92 280,105 335,82 390,87 445,91 500,85 555,82 610,83 665,78 720,80 775,68 830,72 880,57"/>
+          <text x="485" y="15" text-anchor="middle" font-size="11" fill="#5A5E6E">SG tpr+tnr across training (100-round bins)</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: var(--red);">
+      <div class="card-header">
+        <div class="card-title">Consequence: SG-based aggregation does not beat no-defense</div>
+        <span class="card-stamp stamp-broken">observed</span>
+      </div>
+      <div class="card-body">
+        From <code>cloudExperimentsResults/</code>, same CIFAR10/ResNet18 config, last-10-test-points mean:
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Setup</th>
+              <th>Aggregation</th>
+              <th>Attack</th>
+              <th class="num">Test accuracy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>f=50, group_size=10</td>
+              <td>fedavg</td>
+              <td>label_flipping</td>
+              <td class="num mid">0.592</td>
+            </tr>
+            <tr>
+              <td>f=50, group_size=10</td>
+              <td>SignGuard</td>
+              <td>label_flipping</td>
+              <td class="num bad">0.580</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 10px;">
+          SG is marginally <em>worse</em> than no-defense FedAvg under the same attack.
+          The Youden-J number above explains why: the classifier is feeding random flags
+          to BP, which then drops random groups.
+        </p>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-byz">label_flipping</span>
+        <span class="tag tag-perf">accuracy gap</span>
+      </div>
+    </div>
   </div>
-  <div class="table-caption">
-    Grouping &Delta; = grouped &minus; ungrouped (same attack). vs FedAvg &Delta; = defence &minus; FedAvg at the same grouped/attack setting. vs FA Clean &Delta; = defence &minus; ungrouped-clean FedAvg (68.67%), the target a viable defence must approach.
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5: Dilution diagram                                     -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">5. Why &mdash; The Dilution Mechanism at group_size = 10</div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">A single malicious worker is ~10% of its group's gradient sum</div>
+      </div>
+      <div class="card-body">
+        At <code>n=500, f=50</code>, malicious fraction is <code>p=0.10</code>. With
+        <code>group_size=10</code>, the probability that a random group contains at least one
+        malicious worker is:
+        <div style="text-align: center; margin: 10px 0; font-family: var(--mono); font-size: 13px;">
+          P(&ge;1 mal) = 1 &minus; (1 &minus; 0.10)<sup>10</sup> = <strong>0.651</strong>
+        </div>
+
+        Two consequences:
+
+        <ul>
+          <li><strong>65% of groups contain at least one malicious member</strong> each round.</li>
+          <li>In every such group, the malicious direction is a ~10% minority of the summed gradient.</li>
+        </ul>
+
+        <svg viewBox="0 0 940 260" width="100%" height="260">
+          <!-- Left panel: benign-majority group sum -->
+          <g>
+            <rect x="20" y="30" width="260" height="200" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="150" y="50" text-anchor="middle" font-size="11" fill="#5A5E6E">pure-benign group (k=0)</text>
+            <text x="150" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">10 benign workers</text>
+
+            <!-- 10 benign arrows -->
+            <g stroke="#3B6FD6" stroke-width="1.5">
+              <line x1="90"  y1="130" x2="130" y2="120" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="135" x2="132" y2="125" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="140" x2="135" y2="130" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="145" x2="138" y2="135" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="150" x2="141" y2="140" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="155" x2="144" y2="145" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="160" x2="147" y2="150" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="165" x2="150" y2="155" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="170" x2="153" y2="160" marker-end="url(#arrB)"/>
+              <line x1="90"  y1="175" x2="156" y2="165" marker-end="url(#arrB)"/>
+            </g>
+            <!-- Sum arrow -->
+            <line x1="180" y1="150" x2="260" y2="120" stroke="#1A1D26" stroke-width="3" marker-end="url(#arrBlack)"/>
+            <text x="220" y="205" text-anchor="middle" font-size="11" fill="#1A1D26" font-family="JetBrains Mono">sum = benign direction</text>
+          </g>
+
+          <!-- Right panel: one mal -->
+          <g>
+            <rect x="320" y="30" width="260" height="200" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="450" y="50" text-anchor="middle" font-size="11" fill="#5A5E6E">mal-containing group (k=1)</text>
+            <text x="450" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">9 benign + 1 malicious</text>
+
+            <g stroke="#3B6FD6" stroke-width="1.5">
+              <line x1="390" y1="130" x2="430" y2="120" marker-end="url(#arrB)"/>
+              <line x1="390" y1="135" x2="432" y2="125" marker-end="url(#arrB)"/>
+              <line x1="390" y1="140" x2="435" y2="130" marker-end="url(#arrB)"/>
+              <line x1="390" y1="145" x2="438" y2="135" marker-end="url(#arrB)"/>
+              <line x1="390" y1="150" x2="441" y2="140" marker-end="url(#arrB)"/>
+              <line x1="390" y1="155" x2="444" y2="145" marker-end="url(#arrB)"/>
+              <line x1="390" y1="160" x2="447" y2="150" marker-end="url(#arrB)"/>
+              <line x1="390" y1="165" x2="450" y2="155" marker-end="url(#arrB)"/>
+              <line x1="390" y1="170" x2="453" y2="160" marker-end="url(#arrB)"/>
+            </g>
+            <g stroke="#D9453E" stroke-width="1.8">
+              <line x1="390" y1="175" x2="360" y2="195" marker-end="url(#arrR)"/>
+            </g>
+            <!-- Sum arrow: only slightly tilted vs left panel -->
+            <line x1="480" y1="152" x2="558" y2="125" stroke="#1A1D26" stroke-width="3" marker-end="url(#arrBlack)"/>
+            <text x="520" y="205" text-anchor="middle" font-size="11" fill="#1A1D26" font-family="JetBrains Mono">sum ≈ benign direction</text>
+            <text x="520" y="220" text-anchor="middle" font-size="10" fill="#D9453E">(only ~10% tilt)</text>
+          </g>
+
+          <!-- Right of that: the KMeans view -->
+          <g>
+            <rect x="620" y="30" width="300" height="200" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="770" y="50" text-anchor="middle" font-size="11" fill="#5A5E6E">SG&rsquo;s view: 50 group sums</text>
+            <text x="770" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">~33 k&ge;1 vs ~17 k=0</text>
+
+            <!-- cluster of points, mostly overlapping -->
+            <g>
+              <!-- "k=0" points in blue (17) -->
+              <circle cx="670"  cy="120" r="4" fill="#3B6FD6"/>
+              <circle cx="688"  cy="115" r="4" fill="#3B6FD6"/>
+              <circle cx="680"  cy="135" r="4" fill="#3B6FD6"/>
+              <circle cx="702"  cy="128" r="4" fill="#3B6FD6"/>
+              <circle cx="695"  cy="142" r="4" fill="#3B6FD6"/>
+              <circle cx="712"  cy="118" r="4" fill="#3B6FD6"/>
+              <circle cx="720"  cy="138" r="4" fill="#3B6FD6"/>
+              <circle cx="730"  cy="122" r="4" fill="#3B6FD6"/>
+              <circle cx="740"  cy="145" r="4" fill="#3B6FD6"/>
+              <circle cx="750"  cy="128" r="4" fill="#3B6FD6"/>
+              <circle cx="760"  cy="140" r="4" fill="#3B6FD6"/>
+              <circle cx="770"  cy="122" r="4" fill="#3B6FD6"/>
+              <circle cx="780"  cy="135" r="4" fill="#3B6FD6"/>
+              <circle cx="790"  cy="125" r="4" fill="#3B6FD6"/>
+              <circle cx="800"  cy="142" r="4" fill="#3B6FD6"/>
+              <circle cx="810"  cy="130" r="4" fill="#3B6FD6"/>
+              <circle cx="818"  cy="138" r="4" fill="#3B6FD6"/>
+
+              <!-- "k>=1" points in amber (33), slightly offset but overlapping -->
+              <circle cx="678"  cy="140" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="690"  cy="148" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="700"  cy="148" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="710"  cy="155" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="715"  cy="135" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="720"  cy="158" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="728"  cy="148" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="733"  cy="160" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="741"  cy="128" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="750"  cy="155" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="758"  cy="165" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="766"  cy="148" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="773"  cy="158" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="782"  cy="150" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="790"  cy="162" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="798"  cy="155" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="806"  cy="166" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="814"  cy="160" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="735"  cy="110" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="745"  cy="118" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="755"  cy="112" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="762"  cy="118" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="772"  cy="108" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="782"  cy="115" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="790"  cy="108" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="800"  cy="118" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="700"  cy="170" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="712"  cy="175" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="722"  cy="170" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="733"  cy="180" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="744"  cy="175" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="756"  cy="180" r="4" fill="#C88A1A" opacity="0.75"/>
+              <circle cx="766"  cy="172" r="4" fill="#C88A1A" opacity="0.75"/>
+            </g>
+
+            <text x="770" y="205" text-anchor="middle" font-size="10" fill="#8E92A0">two clouds overlap; majority cluster is mal-containing</text>
+            <text x="770" y="220" text-anchor="middle" font-size="10" fill="#D9453E">SG flags the minority &rarr; it flags benign groups ~half the time</text>
+          </g>
+
+          <defs>
+            <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#3B6FD6"/>
+            </marker>
+            <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#D9453E"/>
+            </marker>
+            <marker id="arrBlack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#1A1D26"/>
+            </marker>
+          </defs>
+        </svg>
+
+        <div class="note note-bad">
+          <span class="label">The failure in one sentence:</span> SG's KMeans-majority heuristic assumes
+          the mal-containing side is the <em>minority</em>. At <code>group_size &times; p_mal = 1.0</code>,
+          the mal-containing side is the <em>majority</em>, and the heuristic flags whichever small cluster
+          randomly happens to separate &mdash; independent of ground truth.
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-byz">saturation</span>
+        <span class="tag tag-design">group_size=10</span>
+      </div>
+    </div>
   </div>
 
-  <div class="box observations" style="margin-top: 18px;">
-    <div class="box-label">Observations</div>
-    <p><strong>FedAvg grouping (k=10):</strong> clean accuracy drops 4.27 pp (68.67% &rarr; 64.40%). Under LF, grouped FedAvg (61.83%) <em>outperforms</em> ungrouped (51.69%) by 10.14 pp &mdash; grouping alone buys attack resilience at the cost of clean accuracy.</p>
-    <p><strong>Krum &mdash; dramatic recovery with grouping:</strong> ungrouped Krum collapses at ~45% in both clean and attack settings because single-best gradient selection breaks down with 500 workers. Grouping rescues it: clean 66.40% (+21.29 pp), attack 69.44% (+24.52 pp). Grouped Krum is the highest-accuracy result in the phase &mdash; but only marginally beats the ungrouped-clean FedAvg target (+0.77 pp).</p>
-    <p><strong>ShieldFL:</strong> stuck at 56&ndash;61% across all four cells. Grouping adds a small lift (+1.61 pp clean, +1.03 pp attack), neither breaks nor rescues the defence.</p>
-    <p><strong>SignGuard:</strong> strongest ungrouped defence (68.17% clean, 63.12% attack). Grouping costs a marginal amount (&minus;0.20 pp clean, &minus;1.20 pp attack); grouped-best still reaches 69.80%.</p>
+  <!-- ============================================================ -->
+  <!-- SECTION 6: Cosine-median results                                -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">6. Cosine-Median Observation &mdash; Monotonically Improves With Training</div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">The algorithm, one round</div>
+      </div>
+      <div class="card-body">
+        Each round has three steps: <strong>(1)</strong> compute the coordinate-wise median of the
+        50 bucket-sum gradients to get a single reference vector; <strong>(2)</strong> score every
+        bucket by cosine similarity to that reference; <strong>(3)</strong> flag the lower tail of
+        scores using a <code>median &minus; 1.5 &middot; MAD</code> cutoff. Flagged buckets are
+        dropped; the rest are averaged and applied as the global update.
+
+        <svg viewBox="0 0 940 260" width="100%" height="260">
+          <defs>
+            <marker id="mfArrBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#3B6FD6"/>
+            </marker>
+            <marker id="mfArrAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#C88A1A"/>
+            </marker>
+            <marker id="mfArrBlack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#1A1D26"/>
+            </marker>
+            <marker id="mfArrFlow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#8E92A0"/>
+            </marker>
+          </defs>
+
+          <!-- ===== Stage 1: coordinate-wise median ===== -->
+          <rect x="20" y="30" width="290" height="200" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+          <text x="165" y="50" text-anchor="middle" font-size="12" fill="#5A5E6E" font-weight="600">1. compute median reference</text>
+          <text x="165" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">50 bucket sums &rarr; 1 vector (coord-wise median)</text>
+
+          <!-- 5 representative bucket arrows from (165,200) -->
+          <g stroke-width="1.4">
+            <line x1="165" y1="200" x2="120" y2="130" stroke="#3B6FD6" marker-end="url(#mfArrBlue)"/>
+            <line x1="165" y1="200" x2="145" y2="110" stroke="#3B6FD6" marker-end="url(#mfArrBlue)"/>
+            <line x1="165" y1="200" x2="170" y2="100" stroke="#3B6FD6" marker-end="url(#mfArrBlue)"/>
+            <line x1="165" y1="200" x2="195" y2="115" stroke="#3B6FD6" marker-end="url(#mfArrBlue)"/>
+            <line x1="165" y1="200" x2="220" y2="150" stroke="#C88A1A" stroke-dasharray="3,2" marker-end="url(#mfArrAmber)"/>
+          </g>
+          <!-- bold median (not pulled by the outlier) -->
+          <line x1="165" y1="200" x2="168" y2="95" stroke="#1A1D26" stroke-width="3" marker-end="url(#mfArrBlack)"/>
+          <text x="168" y="86" text-anchor="middle" font-size="10" fill="#1A1D26" font-family="JetBrains Mono">ref</text>
+          <text x="240" y="160" font-size="9" fill="#C88A1A" font-style="italic">outlier bucket</text>
+
+          <!-- Flow arrow to stage 2 -->
+          <line x1="310" y1="130" x2="330" y2="130" stroke="#8E92A0" stroke-width="1.2" marker-end="url(#mfArrFlow)"/>
+
+          <!-- ===== Stage 2: cosine similarity ===== -->
+          <rect x="335" y="30" width="290" height="200" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+          <text x="480" y="50" text-anchor="middle" font-size="12" fill="#5A5E6E" font-weight="600">2. score each bucket</text>
+          <text x="480" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">score_g = cos(g, ref)</text>
+
+          <!-- origin + reference -->
+          <line x1="480" y1="200" x2="480" y2="95" stroke="#1A1D26" stroke-width="3" marker-end="url(#mfArrBlack)"/>
+          <text x="488" y="90" font-size="10" fill="#1A1D26" font-family="JetBrains Mono">ref</text>
+
+          <!-- "nearby" bucket: small angle, high cos -->
+          <line x1="480" y1="200" x2="515" y2="115" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#mfArrBlue)"/>
+          <text x="524" y="122" font-size="10" fill="#3B6FD6" font-family="JetBrains Mono">g&#x2081;</text>
+          <path d="M 480 150 A 50 50 0 0 1 497 135" fill="none" stroke="#0E9A7E" stroke-width="1"/>
+          <text x="514" y="150" font-size="9" fill="#0E9A7E" font-family="JetBrains Mono">cos &#x2248; 0.95</text>
+
+          <!-- "far" bucket: wide angle, low cos -->
+          <line x1="480" y1="200" x2="410" y2="155" stroke="#C88A1A" stroke-width="1.5" marker-end="url(#mfArrAmber)"/>
+          <text x="402" y="150" font-size="10" fill="#C88A1A" font-family="JetBrains Mono">g&#x2082;</text>
+          <path d="M 480 150 A 50 50 0 0 0 440 170" fill="none" stroke="#D9453E" stroke-width="1"/>
+          <text x="420" y="190" font-size="9" fill="#D9453E" font-family="JetBrains Mono">cos &#x2248; 0.55</text>
+
+          <!-- Flow arrow to stage 3 -->
+          <line x1="625" y1="130" x2="645" y2="130" stroke="#8E92A0" stroke-width="1.2" marker-end="url(#mfArrFlow)"/>
+
+          <!-- ===== Stage 3: threshold ===== -->
+          <rect x="650" y="30" width="290" height="200" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+          <text x="795" y="50" text-anchor="middle" font-size="12" fill="#5A5E6E" font-weight="600">3. flag lower tail</text>
+          <text x="795" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">threshold = median &minus; 1.5 &middot; MAD</text>
+
+          <!-- histogram axes -->
+          <line x1="680" y1="200" x2="920" y2="200" stroke="#5A5E6E"/>
+          <line x1="680" y1="200" x2="680" y2="100" stroke="#5A5E6E"/>
+          <text x="675" y="212" text-anchor="end" font-size="8" fill="#8E92A0" font-family="JetBrains Mono">low</text>
+          <text x="920" y="212" text-anchor="end" font-size="8" fill="#8E92A0" font-family="JetBrains Mono">high cos</text>
+
+          <!-- histogram bars (right-skewed: most near high cos, small tail at low) -->
+          <!-- threshold at x = 720 -->
+          <g>
+            <rect x="690" y="190" width="20" height="10" fill="#D9453E" opacity="0.85"/>
+            <rect x="712" y="178" width="20" height="22" fill="#D9453E" opacity="0.6"/>
+            <rect x="734" y="170" width="20" height="30" fill="#3B6FD6"/>
+            <rect x="756" y="158" width="20" height="42" fill="#3B6FD6"/>
+            <rect x="778" y="145" width="20" height="55" fill="#3B6FD6"/>
+            <rect x="800" y="130" width="20" height="70" fill="#3B6FD6"/>
+            <rect x="822" y="120" width="20" height="80" fill="#3B6FD6"/>
+            <rect x="844" y="135" width="20" height="65" fill="#3B6FD6"/>
+            <rect x="866" y="155" width="20" height="45" fill="#3B6FD6"/>
+            <rect x="888" y="175" width="20" height="25" fill="#3B6FD6"/>
+          </g>
+          <!-- threshold line -->
+          <line x1="725" y1="100" x2="725" y2="200" stroke="#0E9A7E" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="725" y="93"  text-anchor="middle" font-size="9" fill="#0E9A7E" font-family="JetBrains Mono">threshold</text>
+
+          <!-- labels -->
+          <text x="710" y="222" text-anchor="middle" font-size="9" fill="#D9453E" font-family="JetBrains Mono">flag (drop)</text>
+          <text x="825" y="222" text-anchor="middle" font-size="9" fill="#3B6FD6" font-family="JetBrains Mono">keep (average)</text>
+        </svg>
+
+        <div class="note note-info">
+          <span class="label">Key property:</span> the reference vector never depends on a clean server
+          dataset &mdash; it is derived from the bucket sums themselves. The robust median absorbs mal-contaminated
+          buckets without being pulled off course, because every bucket is &gt;90% benign by
+          construction of <code>group_size=10, p_mal=0.10</code>.
+        </div>
+
+        <div class="note" style="background: var(--bg-elevated); border: 1px solid var(--border);">
+          <span class="label" style="color: var(--text);">Inspired by:</span>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+            Grouped by which of our two constraints &mdash;
+            <span style="color: var(--amber); font-weight: 600;">bucketed (group-level) inputs</span>
+            and
+            <span style="color: var(--purple); font-weight: 600;">privacy-preserving / secure aggregation</span>
+            &mdash; each paper directly addresses.
+          </div>
+
+          <!-- Group 1: Bucketing-aware -->
+          <div style="margin-top: 12px; border-left: 3px solid var(--amber); padding: 6px 0 6px 12px;">
+            <div style="font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--amber); letter-spacing: 0.06em; font-weight: 700; margin-bottom: 4px;">
+              bucketed inputs &nbsp;&#x2022;&nbsp; privacy: not addressed
+            </div>
+            <ul style="margin: 2px 0 0; padding-left: 20px; font-size: 12px;">
+              <li>
+                Karimireddy, He, Jaggi.
+                <em>Byzantine-Robust Learning on Heterogeneous Datasets via Bucketing.</em>
+                <strong>ICLR 2022.</strong>
+                <a href="https://arxiv.org/abs/2006.09365" style="color: var(--blue);">arxiv.org/abs/2006.09365</a>
+                &mdash; establishes operating on bucketed (aggregated) gradients as the primitive for Byzantine robustness.
+                Bucket size is tuned for variance reduction, not privacy; but the server-sees-only-bucket-means pattern is the same one we rely on.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Group 2: Privacy-aware -->
+          <div style="margin-top: 10px; border-left: 3px solid var(--purple); padding: 6px 0 6px 12px;">
+            <div style="font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.06em; font-weight: 700; margin-bottom: 4px;">
+              secure aggregation &nbsp;&#x2022;&nbsp; bucketing: per-worker, not group-level
+            </div>
+            <ul style="margin: 2px 0 0; padding-left: 20px; font-size: 12px;">
+              <li>
+                Ma, Ma, Jiang, Liu, Li, Yiu, Luo.
+                <em>ShieldFL: Mitigating Model Poisoning Attacks in Privacy-Preserving Federated Learning.</em>
+                <strong>IEEE TIFS 2022.</strong>
+                <a href="https://ieeexplore.ieee.org/document/9762272" style="color: var(--blue);">ieeexplore.ieee.org/document/9762272</a>
+                &mdash; cosine-similarity filtering under secure aggregation; closest analogue to our privacy constraint.
+                Operates per-worker (not bucketed), uses two-trapdoor homomorphic encryption to compute cosines without exposing individual gradients.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Group 3: Neither constraint (foundational primitives) -->
+          <div style="margin-top: 10px; border-left: 3px solid var(--text-muted); padding: 6px 0 6px 12px;">
+            <div style="font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.06em; font-weight: 700; margin-bottom: 4px;">
+              foundational primitives &nbsp;&#x2022;&nbsp; per-worker, no privacy layer
+            </div>
+            <ul style="margin: 2px 0 0; padding-left: 20px; font-size: 12px;">
+              <li>
+                Yin, Chen, Kannan, Bartlett.
+                <em>Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates.</em>
+                <strong>ICML 2018.</strong>
+                <a href="https://arxiv.org/abs/1803.01498" style="color: var(--blue);">arxiv.org/abs/1803.01498</a>
+                &mdash; coordinate-wise median / trimmed mean as robust aggregators. Source of the median primitive itself.
+              </li>
+              <li>
+                Cao, Fang, Liu, Gong.
+                <em>FLTrust: Byzantine-robust Federated Learning via Trust Bootstrapping.</em>
+                <strong>NDSS 2021.</strong>
+                <a href="https://arxiv.org/abs/2012.13995" style="color: var(--blue);">arxiv.org/abs/2012.13995</a>
+                &mdash; cosine similarity of client updates against a reference direction.
+                Uses a clean server dataset (which we do not have); motivated the cosine-to-reference primitive we replaced with a data-derived median reference.
+              </li>
+              <li>
+                Karimireddy, He, Jaggi.
+                <em>Learning from History for Byzantine Robust Optimization.</em>
+                <strong>ICML 2021.</strong>
+                <a href="https://arxiv.org/abs/2012.10333" style="color: var(--blue);">arxiv.org/abs/2012.10333</a>
+                &mdash; CCLIP: using an aggregated-reference direction as the clipping anchor for robust optimization.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-design">algorithm</span>
+        <span class="tag tag-fix">reference-based</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">2,010 rounds, same config as above, SG replaced by cosine-vs-coordinate-wise-median</div>
+        <span class="card-stamp stamp-data">measured</span>
+      </div>
+      <div class="card-body">
+        <code>median_filter</code> aggregation rule. Per round: compute the coordinate-wise
+        median of the 50 bucket sums as the reference; score each bucket by cosine similarity to
+        that reference; flag the lower tail via <code>robust_mad</code>.
+        Strat&shy;ifi&shy;ca&shy;tion against ground truth <code>numberOfMal</code>:
+
+        <table class="data">
+          <thead>
+            <tr>
+              <th>k = numberOfMal</th>
+              <th class="num">n groups</th>
+              <th class="num">P(flag=1)</th>
+              <th>vs SG at same k</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>0 (pure benign)</td><td class="num">34,802</td><td class="num">0.126</td><td class="good">fewer FPs (0.402 &rarr; 0.126)</td></tr>
+            <tr><td>1</td><td class="num">39,246</td><td class="num">0.154</td><td>similar</td></tr>
+            <tr><td>2</td><td class="num">19,599</td><td class="num">0.273</td><td class="good">more flagged</td></tr>
+            <tr><td>3</td><td class="num">5,649</td><td class="num">0.502</td><td class="good">monotone rise</td></tr>
+            <tr><td>4</td><td class="num">1,088</td><td class="num">0.679</td><td class="good">clear signal</td></tr>
+            <tr><td>5</td><td class="num">143</td><td class="num">0.783</td><td class="good">strong</td></tr>
+            <tr><td>6</td><td class="num">12</td><td class="num">1.000</td><td class="good">all flagged</td></tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top: 10px;">
+          Monotone rise across <code>k</code>, sixty-six percentage-point spread from k=0 to k=5,
+          versus SG's four. This is a usable signal, although it weights k=1 only modestly above k=0
+          (most mal-containing groups in practice are k=1).
+        </p>
+
+        <div class="nums">
+          <div class="num">
+            <div class="k">Youden J (overall)</div>
+            <div class="v mid">+0.10</div>
+          </div>
+          <div class="num">
+            <div class="k">Youden J (late &mdash; round 1500+)</div>
+            <div class="v good">+0.18</div>
+          </div>
+          <div class="num">
+            <div class="k">J for SG (same config)</div>
+            <div class="v bad">+0.01</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-byz">label_flipping</span>
+        <span class="tag tag-data">2,010 rounds</span>
+        <span class="tag tag-fix">replaced SG</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Youden J climbs monotonically with training &mdash; the opposite of SG's flat trajectory</div>
+        <span class="card-stamp stamp-data">drift</span>
+      </div>
+      <div class="card-body">
+        Rolling <code>tpr+tnr</code> in 200-round bins, <code>robust_mad k=1.5</code> threshold:
+
+        <svg viewBox="0 0 940 200" width="100%" height="200">
+          <line x1="60" y1="20"  x2="60"  y2="170" stroke="#5A5E6E"/>
+          <line x1="60" y1="170" x2="910" y2="170" stroke="#5A5E6E"/>
+          <text x="20" y="175" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1.00</text>
+          <text x="20" y="130" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1.05</text>
+          <text x="20" y="85"  font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1.10</text>
+          <text x="20" y="40"  font-size="10" fill="#8E92A0" font-family="JetBrains Mono">1.20</text>
+          <text x="60" y="188" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">round 0</text>
+          <text x="910" y="188" text-anchor="end" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">round 2010</text>
+
+          <!-- Blind threshold -->
+          <line x1="60" y1="170" x2="910" y2="170" stroke="#D9453E" stroke-dasharray="3,3" opacity="0.5"/>
+
+          <!-- SG trajectory (flat ~1.01, orange dashed) -->
+          <polyline fill="none" stroke="#C88A1A" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.85"
+            points="120,166 200,165 280,165 360,166 440,164 520,163 600,164 680,163 760,162 840,160"/>
+          <text x="850" y="160" font-size="10" fill="#C88A1A" font-family="JetBrains Mono">SG</text>
+
+          <!-- Cosine-median trajectory (climbs from ~1.01 to ~1.19) -->
+          <polyline fill="none" stroke="#0E9A7E" stroke-width="2"
+            points="120,161 200,151 280,125 360,121 440,95 520,80 600,72 680,60 760,48 840,38"/>
+          <g fill="#0E9A7E">
+            <circle cx="120" cy="161" r="3"/>
+            <circle cx="200" cy="151" r="3"/>
+            <circle cx="280" cy="125" r="3"/>
+            <circle cx="360" cy="121" r="3"/>
+            <circle cx="440" cy="95"  r="3"/>
+            <circle cx="520" cy="80"  r="3"/>
+            <circle cx="600" cy="72"  r="3"/>
+            <circle cx="680" cy="60"  r="3"/>
+            <circle cx="760" cy="48"  r="3"/>
+            <circle cx="840" cy="38"  r="3"/>
+          </g>
+          <text x="850" y="38" font-size="10" fill="#0E9A7E" font-family="JetBrains Mono">cos_median</text>
+
+          <text x="485" y="14" text-anchor="middle" font-size="11" fill="#5A5E6E">tpr+tnr vs training progress</text>
+          <text x="485" y="196" text-anchor="middle" font-size="10" fill="#8E92A0" font-style="italic">200-round bins, same attack, same config</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Why it improves with rounds: benign direction stabilizes while the attack does not</div>
+      </div>
+      <div class="card-body">
+        The detector is a direction-based comparison. As training progresses the benign loss
+        surface flattens near a minimum, so <strong>benign gradient norms shrink</strong> and
+        <strong>their directions stabilize</strong>. Malicious (label-flipped) gradients don't share
+        the same convergence &mdash; they keep a consistent "wrong" direction with bounded norm.
+        The cosine gap between mal-containing group sums and the coordinate-wise median therefore widens
+        over time.
+
+        <svg viewBox="0 0 940 220" width="100%" height="220">
+          <!-- Left: early training -->
+          <g>
+            <rect x="20" y="30" width="260" height="170" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="150" y="50" text-anchor="middle" font-size="11" fill="#5A5E6E">early training</text>
+            <text x="150" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">large, noisy gradients</text>
+            <circle cx="150" cy="140" r="3" fill="#5A5E6E"/>
+            <!-- messy bunch of arrows -->
+            <g stroke="#3B6FD6" stroke-width="1.4" opacity="0.85">
+              <line x1="150" y1="140" x2="205" y2="90"  marker-end="url(#arrBb)"/>
+              <line x1="150" y1="140" x2="195" y2="100" marker-end="url(#arrBb)"/>
+              <line x1="150" y1="140" x2="215" y2="110" marker-end="url(#arrBb)"/>
+              <line x1="150" y1="140" x2="210" y2="125" marker-end="url(#arrBb)"/>
+            </g>
+            <g stroke="#D9453E" stroke-width="1.4" opacity="0.85">
+              <line x1="150" y1="140" x2="90"  y2="160" marker-end="url(#arrRr)"/>
+              <line x1="150" y1="140" x2="95"  y2="175" marker-end="url(#arrRr)"/>
+            </g>
+            <text x="150" y="192" text-anchor="middle" font-size="10" fill="#8E92A0">cosine gap: small</text>
+          </g>
+
+          <!-- middle: arrow -->
+          <g>
+            <line x1="290" y1="115" x2="340" y2="115" stroke="#8E92A0" stroke-width="1.2" marker-end="url(#arrG)"/>
+            <text x="315" y="105" text-anchor="middle" font-size="10" fill="#8E92A0">training progresses</text>
+          </g>
+
+          <!-- Right: late training -->
+          <g>
+            <rect x="350" y="30" width="260" height="170" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="480" y="50" text-anchor="middle" font-size="11" fill="#5A5E6E">late training</text>
+            <text x="480" y="66" text-anchor="middle" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">small, consistent benign</text>
+            <circle cx="480" cy="140" r="3" fill="#5A5E6E"/>
+            <!-- tight benign -->
+            <g stroke="#3B6FD6" stroke-width="1.4">
+              <line x1="480" y1="140" x2="510" y2="115" marker-end="url(#arrBb)"/>
+              <line x1="480" y1="140" x2="512" y2="120" marker-end="url(#arrBb)"/>
+              <line x1="480" y1="140" x2="508" y2="118" marker-end="url(#arrBb)"/>
+              <line x1="480" y1="140" x2="514" y2="122" marker-end="url(#arrBb)"/>
+            </g>
+            <!-- mal unchanged -->
+            <g stroke="#D9453E" stroke-width="1.4">
+              <line x1="480" y1="140" x2="420" y2="160" marker-end="url(#arrRr)"/>
+              <line x1="480" y1="140" x2="425" y2="175" marker-end="url(#arrRr)"/>
+            </g>
+            <text x="480" y="192" text-anchor="middle" font-size="10" fill="#0E9A7E">cosine gap: large</text>
+          </g>
+
+          <!-- Right: schematic plot of magnitudes over time -->
+          <g>
+            <rect x="640" y="30" width="280" height="170" rx="8" fill="#F8F9FB" stroke="#E0E2E8"/>
+            <text x="780" y="50" text-anchor="middle" font-size="11" fill="#5A5E6E">gradient magnitude over rounds</text>
+            <line x1="670" y1="170" x2="900" y2="170" stroke="#5A5E6E"/>
+            <line x1="670" y1="70"  x2="670" y2="170" stroke="#5A5E6E"/>
+            <text x="665" y="175" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono">0</text>
+            <text x="685" y="187" font-size="9" fill="#8E92A0" font-family="JetBrains Mono">round</text>
+
+            <!-- benign curve -->
+            <path d="M670,80 Q760,130 900,160" fill="none" stroke="#3B6FD6" stroke-width="2"/>
+            <text x="760" y="100" fill="#3B6FD6" font-size="10" font-family="JetBrains Mono">benign &darr;</text>
+
+            <!-- mal flat -->
+            <line x1="670" y1="110" x2="900" y2="110" stroke="#D9453E" stroke-width="2" stroke-dasharray="4,3"/>
+            <text x="760" y="135" fill="#D9453E" font-size="10" font-family="JetBrains Mono">malicious &asymp; flat</text>
+          </g>
+
+          <defs>
+            <marker id="arrBb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#3B6FD6"/>
+            </marker>
+            <marker id="arrRr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#D9453E"/>
+            </marker>
+            <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#8E92A0"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-design">training-phase SNR</span>
+        <span class="tag tag-fix">direction-based</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: var(--accent);">
+      <div class="card-header">
+        <div class="card-title">Detection gain translates to training: median_filter nearly closes the attack gap</div>
+        <span class="card-stamp stamp-data">measured</span>
+      </div>
+      <div class="card-body">
+        From <code>round_results.csv</code> for the <code>median_filter</code> run (2,400 rounds;
+        same CIFAR10/ResNet18/<code>n=500, f=50, group_size=10</code> config):
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Setup</th>
+              <th>Aggregation</th>
+              <th>Attack</th>
+              <th class="num">Last-10 mean acc</th>
+              <th class="num">Final acc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>f=50, group_size=10</td>
+              <td>fedavg</td>
+              <td>label_flipping</td>
+              <td class="num mid">0.592</td>
+              <td class="num">0.618</td>
+            </tr>
+            <tr>
+              <td>f=50, group_size=10</td>
+              <td>SignGuard</td>
+              <td>label_flipping</td>
+              <td class="num bad">0.580</td>
+              <td class="num">0.619</td>
+            </tr>
+            <tr style="background: var(--accent-dim);">
+              <td>f=50, group_size=10</td>
+              <td><strong>median_filter</strong></td>
+              <td>label_flipping</td>
+              <td class="num good"><strong>0.650</strong></td>
+              <td class="num"><strong>0.686</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="nums">
+          <div class="num">
+            <div class="k">vs SignGuard</div>
+            <div class="v good">+7.0 pp</div>
+          </div>
+          <div class="num">
+            <div class="k">vs fedavg no-defense</div>
+            <div class="v good">+5.8 pp</div>
+          </div>
+          <div class="num">
+            <div class="k">final acc</div>
+            <div class="v good">0.686</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-perf">accuracy gap closed</span>
+        <span class="tag tag-data">2,400 rounds</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Accuracy and Youden J climb together</div>
+      </div>
+      <div class="card-body">
+        The same training-phase dynamic that lifts detection quality (the drift plot above)
+        produces monotone accuracy improvement. Accuracy at successive snapshots:
+        <svg viewBox="0 0 940 180" width="100%" height="180">
+          <line x1="60" y1="20"  x2="60"  y2="150" stroke="#5A5E6E"/>
+          <line x1="60" y1="150" x2="910" y2="150" stroke="#5A5E6E"/>
+          <text x="20" y="155" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0.10</text>
+          <text x="20" y="110" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0.30</text>
+          <text x="20" y="65"  font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0.50</text>
+          <text x="20" y="25"  font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0.70</text>
+          <text x="60" y="172" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">0</text>
+          <text x="910" y="172" text-anchor="end" font-size="10" fill="#8E92A0" font-family="JetBrains Mono">2400</text>
+
+          <!-- reference: SG last-10 mean 0.580 -->
+          <line x1="60" y1="72" x2="910" y2="72" stroke="#D9453E" stroke-dasharray="3,3" opacity="0.5"/>
+          <text x="900" y="68" text-anchor="end" font-size="9" fill="#D9453E" font-family="JetBrains Mono">SG last-10 mean 0.580</text>
+
+          <!-- accuracy curve for median_filter; x = 60 + round * 850/2400, y = 150 - (acc-0.10)*225 -->
+          <polyline fill="none" stroke="#0E9A7E" stroke-width="2"
+            points="60,150 95,135 148,116 237,103 325,89 414,78 502,69 591,60 679,44 768,29 874,24 910,17"/>
+          <g fill="#0E9A7E">
+            <circle cx="60"  cy="150" r="3"/>
+            <circle cx="95"  cy="135" r="3"/>
+            <circle cx="148" cy="116" r="3"/>
+            <circle cx="237" cy="103" r="3"/>
+            <circle cx="325" cy="89"  r="3"/>
+            <circle cx="414" cy="78"  r="3"/>
+            <circle cx="502" cy="69"  r="3"/>
+            <circle cx="591" cy="60"  r="3"/>
+            <circle cx="679" cy="44"  r="3"/>
+            <circle cx="768" cy="29"  r="3"/>
+            <circle cx="874" cy="24"  r="3"/>
+            <circle cx="910" cy="17"  r="3"/>
+          </g>
+
+          <text x="485" y="14" text-anchor="middle" font-size="11" fill="#5A5E6E">median_filter test accuracy across training</text>
+        </svg>
+        <div class="note note-good">
+          <span class="label">Reading the numbers:</span> median_filter starts at chance (~0.10),
+          crosses the SG ceiling (~0.58) around round 2000, and finishes at 0.686 despite 10%
+          of workers being adversarial. SG sits essentially flat at ~0.58 across the whole run
+          in the separate cloud experiment, confirming that the gain is coming from the
+          observation layer, not BP or training tricks.
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-perf">monotone</span>
+        <span class="tag tag-fix">no BP</span>
+      </div>
+    </div>
+
   </div>
 
-  <div class="label" style="margin-top: 22px;">Carry-forward decision</div>
-  <div class="carry">
-    No baseline clears the "survives grouping <em>and</em> beats FedAvg under attack <em>and</em> approaches clean-FA accuracy" bar. Phase 4+ comparisons therefore reduce to
-    <span class="accent">FactorGraphs vs FedAvg</span>
-    only. The three collapsed defences are kept as <em>context</em> in the paper's Table 1 but not re-run in downstream sweeps.
+  <!-- ============================================================ -->
+  <!-- SECTION 7: Future directions                                    -->
+  <!-- ============================================================ -->
+  <div class="section">
+    <div class="section-title">7. Future Directions &mdash; Backdoor and the Role of the Factor Graph</div>
+
+    <!-- Card 1: Hypothesis matrix -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Which detector works for which attack</div>
+        <span class="card-stamp stamp-warn">hypothesis</span>
+      </div>
+      <div class="card-body">
+        Measurements in Sections 3&ndash;6 cover <code>label_flipping_attack</code> only.
+        Other categories behave differently by construction:
+
+        <table class="data">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="num">Label Flipping &mdash; direction attack</th>
+              <th class="num">Backdoor &mdash; magnitude attack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>cos_median</strong> (scale-invariant)</td>
+              <td class="good">J = +0.19 &nbsp; (measured)</td>
+              <td class="bad">blind by construction &nbsp; <em>(hyp.)</em></td>
+            </tr>
+            <tr>
+              <td><strong>SignGuard</strong> (norm + sign filter)</td>
+              <td class="bad">J = +0.008 &nbsp; (measured)</td>
+              <td class="good">designed for this &nbsp; <em>(hyp.)</em></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note note-info">
+          <span class="label">Literature:</span> Karimireddy et al. ICLR 2022 evaluates BF, LF,
+          Mimic, IPM, ALIE &mdash; <strong>no backdoor / targeted attack</strong>.
+          <blockquote style="margin: 8px 0 2px 0; padding: 6px 12px; border-left: 3px solid var(--blue); background: var(--bg-card); font-style: italic; font-size: 12px;">
+            &ldquo;However, this is a challenging and open problem (Sun et al., 2019; Wang et al., 2020).&rdquo;
+            <span style="display: block; margin-top: 4px; font-size: 10px; font-style: normal; color: var(--text-muted); font-family: var(--mono);">
+              &mdash; Karimireddy, He, Jaggi, ICLR 2022, Section 2
+            </span>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Research paths -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Research paths</div>
+        <span class="card-stamp stamp-warn">open</span>
+      </div>
+      <div class="card-body">
+        <div class="compare" style="grid-template-columns: 1fr 1fr 1fr;">
+          <div class="col">
+            <h4 class="v1">A &mdash; reconcile</h4>
+            <p>
+              Ensemble cos_median + SG, BP integrates both as parallel factors. Unified defense across direction and magnitude attacks.
+              <br><br>
+              <em>Stronger claim. Harder to validate.</em>
+            </p>
+          </div>
+          <div class="col">
+            <h4 class="bad">B &mdash; narrow to backdoor</h4>
+            <p style="margin-bottom: 6px;">
+              Frame paper as &ldquo;Byzantine-robust FL under SA for backdoor.&rdquo;
+              The gap spans <strong>both</strong> primary lineages of prior work, neither of which evaluates backdoor:
+            </p>
+            <ul style="margin: 0 0 8px; padding-left: 18px; font-size: 11.5px;">
+              <li><strong>bucketing</strong> &mdash; Karimireddy 2022 (see quote above): backdoor is an explicit scope exclusion.</li>
+              <li><strong>privacy / SA</strong> &mdash; ShieldFL, BREA, ByzSecAgg, RFLPA: focus on model-poisoning attacks; targeted / backdoor under SA is uncharacterized.</li>
+            </ul>
+            <p style="margin: 0 0 4px; font-weight: 600; color: var(--text);">Limitations to own:</p>
+            <ul style="margin: 0; padding-left: 18px; font-size: 11.5px;">
+              <li>no unified detector &mdash; attack category picks the observation function.</li>
+              <li>detection quality is training-phase dependent (J starts near 0).</li>
+              <li>backdoor claim is hypothesis; gating experiment below.</li>
+            </ul>
+            <p style="margin-top: 6px;"><em>Cleaner. Narrower.</em></p>
+          </div>
+          <div class="col">
+            <h4 style="color: var(--amber); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">C &mdash; ease constraints</h4>
+            <p>
+              Relax a problem parameter to simplify detection. Two knobs &mdash; both have costs:
+            </p>
+            <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 12px;">
+              <li><strong>lower nbyz</strong> &mdash; LF barely degrades FedAvg without any defense at low attack rates; removes the motivation for the defense itself.</li>
+              <li><strong>smaller group_size</strong> &mdash; restores per-group signal, but group_size=10 is already thin anonymity for 500 workers; smaller raises collusion risk.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="note note-warn" style="margin-top: 10px;">
+          <span class="label">Gating experiment for A vs B:</span> SG vs cos_median on backdoor (same config, swap <code>byz_type</code>). Decides whether A is feasible (both detectors contribute) or B is forced (one dominates).
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
 </body>
 </html>

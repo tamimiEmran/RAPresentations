@@ -10,11 +10,11 @@ Weekly research-assistant presentation archive.
 .
 ├── index.html              # Dashboard — registry of all presentations
 └── 19april26/              # 19 April 2026 presentation
-    ├── index.html          # Topic hub (4 cards)
-    ├── progress.html       # Pitfalls paper — revision progress
-    ├── gaf_experiment_design.html
-    ├── safefl_results_p0_p1.html   # FactorGraphs — Phase 0 + Phase 1 results
-    └── safefl_windowed_bp.html
+    ├── index.html          # Topic hub (3 cards)
+    ├── progress.html       # Pitfalls paper — Revision 2 progress
+    ├── gaf_experiment_design.html   # GAF design + 97-consumer holdout results
+    ├── safefl_results_p0_p1.html    # SAFEFL — observation-function investigation
+    └── safefl_windowed_bp.html      # (unlisted) earlier windowed-BP redesign deck
 ```
 
 Each topic page has a fixed top nav for back-to-hub and cross-topic navigation.
