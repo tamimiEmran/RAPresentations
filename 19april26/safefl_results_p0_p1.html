@@ -247,49 +247,6 @@
 </head>
 
 <body>
-<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
-<style>
-  .rap-nav, .rap-nav * { box-sizing: border-box; }
-  .rap-nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
-    display: flex; align-items: center; gap: 4px;
-    background: rgba(255, 255, 255, 0.92);
-    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
-    padding: 6px 14px; height: 40px;
-    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-    font-size: 12px; font-weight: 400; line-height: 1;
-    letter-spacing: 0; color: #1A1D26;
-  }
-  .rap-nav a {
-    text-decoration: none; color: #5A5E6E;
-    padding: 6px 10px; border-radius: 6px;
-    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
-    white-space: nowrap; font-weight: 400;
-  }
-  .rap-nav a:hover { background: rgba(59, 111, 214, 0.08); color: #3B6FD6; }
-  .rap-nav .rap-nav-back {
-    color: #1A1D26; font-weight: 500;
-    border: 1px solid rgba(224, 226, 232, 0.9);
-    margin-right: 8px; padding: 5px 10px;
-  }
-  .rap-nav .rap-nav-back:hover { border-color: #3B6FD6; }
-  .rap-nav .rap-nav-current {
-    background: rgba(14, 154, 126, 0.1); color: #0E9A7E;
-    font-weight: 500; pointer-events: none;
-  }
-  @media (max-width: 720px) {
-    .rap-nav { font-size: 11px; padding: 6px 8px; }
-    .rap-nav a { padding: 5px 7px; }
-  }
-</style>
-<nav class="rap-nav">
-  <a class="rap-nav-back" href="index.html">&larr; 19 Apr Hub</a>
-  <a href="progress.html">Progress</a>
-  <a href="gaf_experiment_design.html">GAF Design</a>
-  <a class="rap-nav-current" href="safefl_results_p0_p1.html">SAFEFL Obs-Function</a>
-</nav>
-<!-- ==== /RAPresentations nav ==== -->
 
   <div class="page-header">
     <h1>Observation Function Investigation: Why SignGuard Fails, Why Cosine-Median Doesn't</h1>
