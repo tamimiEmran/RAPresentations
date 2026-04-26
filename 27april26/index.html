@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>27 April 2026 &mdash; RA Presentations</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #F8F9FB;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #F0F1F4;
+      --border: #E0E2E8;
+      --text: #1A1D26;
+      --text-dim: #5A5E6E;
+      --text-muted: #8E92A0;
+      --accent: #0E9A7E;
+      --accent-dim: rgba(14, 154, 126, 0.08);
+      --red: #D9453E;
+      --red-dim: rgba(217, 69, 62, 0.07);
+      --blue: #3B6FD6;
+      --blue-dim: rgba(59, 111, 214, 0.08);
+      --purple: #8B5CC4;
+      --purple-dim: rgba(139, 92, 196, 0.08);
+      --amber: #C88A1A;
+      --amber-dim: rgba(200, 138, 26, 0.08);
+      --teal: #0A7C8C;
+      --teal-dim: rgba(10, 124, 140, 0.08);
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 64px;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: var(--mono);
+    }
+
+    .breadcrumb a {
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: rgba(59, 111, 214, 0.04);
+    }
+
+    .breadcrumb .sep {
+      color: var(--text-muted);
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    /* ===== Article status cards (informational, non-clickable) ===== */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 20px;
+    }
+
+    .status-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-strip {
+      height: 4px;
+    }
+
+    .status-card[data-color="red"] .status-strip { background: var(--red); }
+    .status-card[data-color="teal"] .status-strip { background: var(--accent); }
+    .status-card[data-color="amber"] .status-strip { background: var(--amber); }
+
+    .status-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .status-project {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+    }
+
+    .status-card[data-color="red"] .status-pill {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+
+    .status-card[data-color="teal"] .status-pill {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .status-card[data-color="amber"] .status-pill {
+      background: var(--amber-dim);
+      color: var(--amber);
+    }
+
+    .status-headline {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .status-paper {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .status-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .status-meta .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meta-chip {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      background: var(--bg-elevated);
+      color: var(--text-dim);
+    }
+
+    .meta-chip.highlight {
+      background: var(--amber-dim);
+      color: var(--amber);
+    }
+
+    .pdf-button {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 5px 11px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .pdf-button:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: rgba(59, 111, 214, 0.04);
+    }
+
+    .pdf-button svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    /* ===== Topic cards (clickable, navigation) ===== */
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 20px;
+    }
+
+    .topic-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .topic-card:hover {
+      border-color: currentColor;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .topic-strip {
+      height: 4px;
+    }
+
+    .topic-card[data-color="blue"] .topic-strip { background: var(--blue); }
+    .topic-card[data-color="teal"] .topic-strip { background: var(--accent); }
+
+    .topic-card[data-color="blue"] { color: var(--blue); }
+    .topic-card[data-color="teal"] { color: var(--accent); }
+
+    .topic-body {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      color: var(--text);
+    }
+
+    .topic-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .topic-number {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+    }
+
+    .topic-project {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+    }
+
+    .topic-card[data-color="blue"] .topic-project { background: var(--blue-dim); color: var(--blue); }
+    .topic-card[data-color="teal"] .topic-project { background: var(--accent-dim); color: var(--accent); }
+
+    .topic-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .topic-subtitle {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    .topic-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .topic-arrow-label {
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .topic-arrow-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .topic-card:hover .topic-arrow-icon {
+      transform: translateX(4px);
+    }
+
+    @media (max-width: 960px) {
+      body { padding: 32px 24px; }
+      .topics-grid,
+      .status-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="breadcrumb">
+    <a href="../index.html">&larr; All Presentations</a>
+    <span class="sep">/</span>
+    <span>27 April 2026</span>
+  </nav>
+
+  <div class="page-header">
+    <h1>27 April 2026 Presentation</h1>
+    <p>GAF pipeline and experiment-design diagrams, plus current status of two papers in review.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Article Status</div>
+    <div class="section-subtitle">Where the two papers stand as of this week</div>
+    <div class="status-grid">
+
+      <div class="status-card" data-color="red">
+        <div class="status-strip"></div>
+        <div class="status-body">
+          <div class="status-top">
+            <span class="status-project">Pitfalls Paper</span>
+            <span class="status-pill">Submitted</span>
+          </div>
+          <div class="status-headline">Second review submitted</div>
+          <div class="status-paper">Revision 2 returned to the journal after addressing all six reviewer comments.</div>
+          <div class="status-meta">
+            <div class="chips">
+              <span class="meta-chip">Round 2</span>
+            </div>
+            <a class="pdf-button" href="pitfalls.pdf" target="_blank" rel="noopener">
+              View PDF
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-card" data-color="teal">
+        <div class="status-strip"></div>
+        <div class="status-body">
+          <div class="status-top">
+            <span class="status-project">FL Review</span>
+            <span class="status-pill">Under Review</span>
+          </div>
+          <div class="status-headline">Submitted to Artificial Intelligence Review</div>
+          <div class="status-paper">Manuscript already with the editorial team &mdash; awaiting reviewer assignment.</div>
+          <div class="status-meta">
+            <div class="chips">
+              <span class="meta-chip">Springer Nature</span>
+              <span class="meta-chip highlight">IF 14</span>
+            </div>
+            <a class="pdf-button" href="flreview.pdf" target="_blank" rel="noopener">
+              View PDF
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-card" data-color="amber">
+        <div class="status-strip"></div>
+        <div class="status-body">
+          <div class="status-top">
+            <span class="status-project">GAF / LLM-ML</span>
+            <span class="status-pill">Draft</span>
+          </div>
+          <div class="status-headline">LLM &amp; ML manuscript</div>
+          <div class="status-paper">Working draft of the article behind the two diagrams below &mdash; LLM inference pipeline plus the experiment design.</div>
+          <div class="status-meta">
+            <div class="chips">
+              <span class="meta-chip">In preparation</span>
+            </div>
+            <a class="pdf-button" href="gaf_llm_ml.pdf" target="_blank" rel="noopener">
+              View PDF
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Topics</div>
+    <div class="section-subtitle">Click any card to open the diagram</div>
+    <div class="topics-grid">
+
+      <a class="topic-card" data-color="blue" href="llm_pipeline_diagram.html">
+        <div class="topic-strip"></div>
+        <div class="topic-body">
+          <div class="topic-top">
+            <span class="topic-number">01</span>
+            <span class="topic-project">GAF</span>
+          </div>
+          <div class="topic-title">LLM Inference Pipeline</div>
+          <div class="topic-subtitle">End-to-end visual diagram of the LLM call: input data sources, prompt-as-contract structure, multi-modality routing, resume-on-failure logic, and output storage.</div>
+          <div class="topic-arrow">
+            <span class="topic-arrow-label">Open topic</span>
+            <svg class="topic-arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </div>
+      </a>
+
+      <a class="topic-card" data-color="teal" href="experiment_design_diagram.html">
+        <div class="topic-strip"></div>
+        <div class="topic-body">
+          <div class="topic-top">
+            <span class="topic-number">02</span>
+            <span class="topic-project">GAF</span>
+          </div>
+          <div class="topic-title">Experiment Design Diagram</div>
+          <div class="topic-subtitle">Full experiment-design walkthrough including the LLM-augmented pipeline, evaluation protocol, and per-block result tables for current GAF runs.</div>
+          <div class="topic-arrow">
+            <span class="topic-arrow-label">Open topic</span>
+            <svg class="topic-arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</body>
+
+</html>

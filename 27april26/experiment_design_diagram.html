@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>Experiment Design — Visual Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #F8F9FB; font-family: 'DM Sans', system-ui, sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 20px; gap: 40px;
+    }
+    svg text { font-family: 'DM Sans', system-ui, sans-serif; }
+    svg .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ===== Results section ===== */
+    .results { width: 100%; max-width: 1120px; }
+    .results-header { text-align: center; margin-bottom: 24px; }
+    .results-title {
+      font-size: 20px; font-weight: 700; color: #1A1D26;
+      letter-spacing: -0.5px; margin: 0;
+    }
+    .results-subtitle {
+      font-size: 11px; color: #8E92A0; margin-top: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .card {
+      background: #fff; border: 1px solid #E0E2E8; border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      padding: 22px 26px; margin-bottom: 18px;
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 14px; gap: 16px; flex-wrap: wrap;
+    }
+    .card-title { font-size: 14px; font-weight: 700; margin: 0; }
+    .card-subtitle { font-size: 10px; color: #8E92A0; margin: 4px 0 0; }
+    .card-meta {
+      font-size: 10px; color: #8E92A0;
+      font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+    }
+    .metrics-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .metrics-table th {
+      text-align: right; padding: 8px 6px; color: #8E92A0;
+      font-weight: 600; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 2px solid #E0E2E8;
+    }
+    .metrics-table th.t-left { text-align: left; }
+    .metrics-table td {
+      padding: 10px 6px; text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      color: #1A1D26; border-bottom: 1px solid #F0F1F4;
+    }
+    .metrics-table td.t-left {
+      text-align: left;
+      font-family: 'DM Sans', system-ui, sans-serif; font-weight: 600;
+    }
+    .metrics-table tr:last-child td { border-bottom: none; }
+    .row-llm { background: rgba(200,138,26,0.04); }
+    .row-llm td { color: #C88A1A; }
+    .row-overall td { border-top: 2px solid #E0E2E8; font-weight: 700; }
+    .takeaway {
+      font-size: 10px; color: #5A5E6E; line-height: 1.55;
+      margin: 14px 0 0; padding-top: 10px;
+      border-top: 1px dashed #E0E2E8;
+    }
+    .bar-grid { display: flex; flex-direction: column; gap: 5px; }
+    .bar-row {
+      display: grid; grid-template-columns: 150px 1fr 56px;
+      gap: 12px; align-items: center;
+    }
+    .bar-label {
+      font-size: 10px; color: #1A1D26;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .bar-track {
+      height: 10px; background: #F0F1F4;
+      border-radius: 5px; overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 5px; }
+    .bar-value {
+      font-size: 10px; text-align: right;
+      font-family: 'JetBrains Mono', monospace; color: #1A1D26;
+    }
+  </style>
+</head>
+<body>
+
+<svg width="1120" height="1020" viewBox="0 0 1120 1020" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- arrowhead -->
+    <marker id="arrow-right" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-down" viewBox="0 0 7 10" refX="3.5" refY="10" markerWidth="7" markerHeight="10">
+      <path d="M 0 0 L 7 0 L 3.5 10 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-down-left" viewBox="0 0 10 10" refX="0" refY="10" markerWidth="10" markerHeight="10">
+      <path d="M 10 0 L 10 8 L 0 10 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-down-right" viewBox="0 0 10 10" refX="10" refY="10" markerWidth="10" markerHeight="10">
+      <path d="M 0 0 L 0 8 L 10 10 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-blue-right" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#3B6FD6"/>
+    </marker>
+    <marker id="arrow-blue-down" viewBox="0 0 7 10" refX="3.5" refY="10" markerWidth="7" markerHeight="10">
+      <path d="M 0 0 L 7 0 L 3.5 10 z" fill="#3B6FD6"/>
+    </marker>
+    <marker id="arrow-green-down" viewBox="0 0 7 10" refX="3.5" refY="10" markerWidth="7" markerHeight="10">
+      <path d="M 0 0 L 7 0 L 3.5 10 z" fill="#0E9A7E"/>
+    </marker>
+    <!-- rounded rect filter for subtle shadow -->
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="108%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- ============================================================ -->
+  <!-- TITLE                                                         -->
+  <!-- ============================================================ -->
+  <text x="560" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1A1D26" letter-spacing="-0.5">Experiment Design &mdash; Data Split &amp; Evaluation Flow</text>
+  <text x="560" y="52" text-anchor="middle" font-size="11" fill="#8E92A0" class="mono">324 consumers &middot; 39 months &middot; 824-feature contextual pairs</text>
+
+  <!-- ============================================================ -->
+  <!-- TOP: ALL CONSUMERS                                            -->
+  <!-- ============================================================ -->
+  <rect x="360" y="74" width="400" height="54" rx="10" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="560" y="97" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1D26">324 Consumers (UCI Smart Meter)</text>
+  <text x="560" y="114" text-anchor="middle" font-size="10" fill="#8E92A0" class="mono">Split into development and evaluation cohorts</text>
+
+  <!-- Split arrows -->
+  <line x1="465" y1="128" x2="285" y2="170" stroke="#8E92A0" stroke-width="1.5" marker-end="url(#arrow-down-left)"/>
+  <line x1="655" y1="128" x2="835" y2="170" stroke="#8E92A0" stroke-width="1.5" marker-end="url(#arrow-down-right)"/>
+
+  <!-- ============================================================ -->
+  <!-- LEFT BRANCH: 70% ML DEVELOPMENT                               -->
+  <!-- ============================================================ -->
+  <!-- Main box -->
+  <rect x="50" y="174" width="460" height="54" rx="10" fill="rgba(59,111,214,0.08)" stroke="#3B6FD6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="280" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#3B6FD6">70% &mdash; ML Development Set</text>
+  <text x="280" y="216" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">227 consumers for training, tuning, and internal checks</text>
+
+  <!-- Arrow down to pair construction -->
+  <line x1="280" y1="228" x2="280" y2="262" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#arrow-blue-down)"/>
+
+  <!-- Pair construction box (left) -->
+  <rect x="90" y="266" width="370" height="68" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="275" y="286" text-anchor="middle" font-size="11" font-weight="600" fill="#1A1D26">Pair Construction (per consumer-month)</text>
+  <!-- mini flow inside -->
+  <rect x="108" y="296" width="90" height="28" rx="5" fill="rgba(14,154,126,0.08)"/>
+  <text x="153" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#0E9A7E">Week 0 (7d)</text>
+  <text x="214" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">+</text>
+  <rect x="230" y="296" width="90" height="28" rx="5" fill="rgba(59,111,214,0.08)"/>
+  <text x="275" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#3B6FD6">Query Day</text>
+  <text x="336" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">&times;13</text>
+  <rect x="352" y="296" width="90" height="28" rx="5" fill="rgba(139,92,196,0.08)"/>
+  <text x="397" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#8B5CC4">scenarios</text>
+
+  <!-- Arrow down to 80/10/10 -->
+  <line x1="280" y1="334" x2="280" y2="368" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#arrow-blue-down)"/>
+
+  <!-- Consumer-level split label -->
+  <rect x="140" y="370" width="280" height="24" rx="12" fill="rgba(59,111,214,0.12)"/>
+  <text x="280" y="386" text-anchor="middle" font-size="10" font-weight="600" fill="#3B6FD6" class="mono">Consumer-level split &middot; no leakage</text>
+
+  <!-- Arrow down to 3 boxes -->
+  <line x1="280" y1="394" x2="280" y2="418" stroke="#8E92A0" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="120" y1="418" x2="430" y2="418" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="120" y1="418" x2="120" y2="438" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="275" y1="418" x2="275" y2="438" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="430" y1="418" x2="430" y2="438" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+
+  <!-- Train box -->
+  <rect x="55" y="442" width="130" height="56" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="120" y="462" text-anchor="middle" font-size="12" font-weight="700" fill="#3B6FD6">Train</text>
+  <text x="120" y="480" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">80% (~182)</text>
+  <text x="120" y="492" text-anchor="middle" font-size="9" fill="#8E92A0">Model fitting</text>
+
+  <!-- Val box -->
+  <rect x="210" y="442" width="130" height="56" rx="8" fill="#fff" stroke="#C88A1A" filter="url(#shadow)"/>
+  <text x="275" y="462" text-anchor="middle" font-size="12" font-weight="700" fill="#C88A1A">Val</text>
+  <text x="275" y="480" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">10% (~23)</text>
+  <text x="275" y="492" text-anchor="middle" font-size="9" fill="#8E92A0">Tuning + threshold</text>
+
+  <!-- Internal Test box -->
+  <rect x="365" y="442" width="130" height="56" rx="8" fill="#fff" stroke="#8B5CC4" filter="url(#shadow)"/>
+  <text x="430" y="462" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5CC4">Int. Test</text>
+  <text x="430" y="480" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">10% (~22)</text>
+  <text x="430" y="492" text-anchor="middle" font-size="9" fill="#8E92A0">Sanity check</text>
+
+  <!-- Arrow from Train/Val down to Trained Models -->
+  <line x1="120" y1="498" x2="120" y2="530" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="275" y1="498" x2="275" y2="530" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="120" y1="530" x2="275" y2="530" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="197" y1="530" x2="197" y2="554" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#arrow-blue-down)"/>
+
+  <!-- Trained ML Models output box -->
+  <rect x="107" y="558" width="180" height="44" rx="8" fill="#3B6FD6" filter="url(#shadow)"/>
+  <text x="197" y="577" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">Trained ML Models</text>
+  <text x="197" y="593" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" class="mono">CatBoost &middot; XGB &middot; RF &middot; LOF</text>
+
+  <!-- ============================================================ -->
+  <!-- RIGHT BRANCH: 30% EVALUATION HOLDOUT                          -->
+  <!-- ============================================================ -->
+  <!-- Main box -->
+  <rect x="610" y="174" width="460" height="54" rx="10" fill="rgba(14,154,126,0.08)" stroke="#0E9A7E" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="840" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#0E9A7E">30% &mdash; Evaluation Holdout</text>
+  <text x="840" y="216" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">97 consumers reserved for ML vs LLM comparison</text>
+
+  <!-- Arrow down to pair construction -->
+  <line x1="840" y1="228" x2="840" y2="262" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- Pair construction box (right) -->
+  <rect x="640" y="266" width="370" height="68" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="825" y="286" text-anchor="middle" font-size="11" font-weight="600" fill="#1A1D26">Pair Construction (per consumer-month)</text>
+  <!-- mini flow inside -->
+  <rect x="658" y="296" width="90" height="28" rx="5" fill="rgba(14,154,126,0.08)"/>
+  <text x="703" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#0E9A7E">Week 0 (7d)</text>
+  <text x="764" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">+</text>
+  <rect x="780" y="296" width="90" height="28" rx="5" fill="rgba(59,111,214,0.08)"/>
+  <text x="825" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#3B6FD6">Query Day</text>
+  <text x="886" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">&times;13</text>
+  <rect x="902" y="296" width="90" height="28" rx="5" fill="rgba(139,92,196,0.08)"/>
+  <text x="947" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#8B5CC4">scenarios</text>
+
+  <!-- Arrow down to subsets -->
+  <line x1="825" y1="334" x2="825" y2="366" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- Full holdout pairs box -->
+  <rect x="650" y="370" width="350" height="42" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="825" y="390" text-anchor="middle" font-size="11" font-weight="600" fill="#1A1D26">All Holdout Pairs</text>
+  <text x="825" y="405" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Same evaluation rows used for both ML and LLM</text>
+
+  <!-- Arrow down to subset selection -->
+  <line x1="825" y1="412" x2="825" y2="430" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="720" y1="430" x2="930" y2="430" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="720" y1="430" x2="720" y2="448" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="930" y1="430" x2="930" y2="448" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+
+  <!-- Subset 1 -->
+  <rect x="625" y="452" width="190" height="54" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="720" y="472" text-anchor="middle" font-size="11" font-weight="600" fill="#3B6FD6">Subset 1: Random</text>
+  <text x="720" y="489" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">1,000 objects &times; 13 = 13K rows</text>
+  <text x="720" y="502" text-anchor="middle" font-size="8" fill="#8E92A0">General-population baseline</text>
+
+  <!-- Subset 2 -->
+  <rect x="835" y="452" width="190" height="54" rx="8" fill="#fff" stroke="#D9453E" filter="url(#shadow)"/>
+  <text x="930" y="472" text-anchor="middle" font-size="11" font-weight="600" fill="#D9453E">Subset 2: High CV</text>
+  <text x="930" y="489" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">1,000 objects &times; 13 = 13K rows</text>
+  <text x="930" y="502" text-anchor="middle" font-size="8" fill="#8E92A0">High-variability stress test</text>
+
+  <!-- Merge arrows to evaluation zone -->
+  <line x1="720" y1="504" x2="720" y2="544" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="930" y1="504" x2="930" y2="544" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="720" y1="544" x2="930" y2="544" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="825" y1="544" x2="825" y2="572" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- ============================================================ -->
+  <!-- EVALUATION ZONE (bottom)                                      -->
+  <!-- ============================================================ -->
+  <!-- Big evaluation box -->
+  <rect x="300" y="576" width="700" height="214" rx="12" fill="rgba(14,154,126,0.04)" stroke="#0E9A7E" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="650" y="598" text-anchor="middle" font-size="13" font-weight="700" fill="#0E9A7E">Evaluation Zone (30% Holdout Only)</text>
+
+  <!-- Cross-over arrow: trained ML models → evaluation zone -->
+  <path d="M 287 580 Q 322 580 350 602" stroke="#3B6FD6" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+  <line x1="197" y1="602" x2="197" y2="646" stroke="#3B6FD6" stroke-width="1.5"/>
+  <line x1="197" y1="646" x2="346" y2="646" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#arrow-blue-right)"/>
+
+  <!-- ML evaluation card -->
+  <rect x="350" y="616" width="270" height="86" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="485" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="#3B6FD6">ML Baselines</text>
+  <text x="485" y="654" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">CatBoost &middot; XGBoost</text>
+  <text x="485" y="668" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">RandomForest &middot; LOF</text>
+  <text x="485" y="688" text-anchor="middle" font-size="9" fill="#8E92A0">Trained on the development cohort</text>
+
+  <!-- LLM evaluation card -->
+  <rect x="650" y="616" width="320" height="86" rx="8" fill="#fff" stroke="#C88A1A" filter="url(#shadow)"/>
+  <text x="810" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="#C88A1A">4 Vision LLMs</text>
+  <text x="810" y="654" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">Gemini 3.1 Pro &middot; Gemini 3 Flash</text>
+  <text x="810" y="668" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">Qwen3-VL-32B &middot; Qwen3-VL-8B</text>
+  <text x="810" y="688" text-anchor="middle" font-size="9" fill="#8E92A0">Zero-shot visual prompting</text>
+
+  <!-- VS badge -->
+  <rect x="625" y="640" width="30" height="22" rx="11" fill="#F0F1F4" stroke="#E0E2E8"/>
+  <text x="640" y="655" text-anchor="middle" font-size="10" font-weight="700" fill="#8E92A0" class="mono">vs</text>
+
+  <!-- Arrows down to comparison -->
+  <line x1="485" y1="702" x2="485" y2="732" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="810" y1="702" x2="810" y2="732" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="485" y1="732" x2="810" y2="732" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="650" y1="732" x2="650" y2="756" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- Results comparison box -->
+  <rect x="470" y="756" width="360" height="40" rx="8" fill="#0E9A7E" filter="url(#shadow)"/>
+  <text x="650" y="780" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Head-to-Head Comparison</text>
+
+  <!-- ============================================================ -->
+  <!-- BOTTOM: OUTPUTS                                               -->
+  <!-- ============================================================ -->
+  <line x1="650" y1="796" x2="650" y2="812" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="425" y1="812" x2="875" y2="812" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="425" y1="812" x2="425" y2="824" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="650" y1="812" x2="650" y2="824" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="875" y1="812" x2="875" y2="824" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+
+  <!-- Output boxes -->
+  <rect x="335" y="824" width="180" height="50" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="425" y="844" text-anchor="middle" font-size="10" font-weight="600" fill="#3B6FD6">Binary Detection</text>
+  <text x="425" y="860" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Bal. Acc &middot; F1 &middot; Specificity</text>
+
+  <rect x="535" y="824" width="230" height="50" rx="8" fill="#fff" stroke="#8B5CC4" filter="url(#shadow)"/>
+  <text x="650" y="844" text-anchor="middle" font-size="10" font-weight="600" fill="#8B5CC4">13-Class Identification</text>
+  <text x="650" y="860" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Macro F1 &middot; Per-attack breakdown</text>
+
+  <rect x="785" y="824" width="180" height="50" rx="8" fill="#fff" stroke="#C88A1A" filter="url(#shadow)"/>
+  <text x="875" y="844" text-anchor="middle" font-size="10" font-weight="600" fill="#C88A1A">Explainability</text>
+  <text x="875" y="860" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Behavior F1 &middot; Expert eval</text>
+
+  <!-- ============================================================ -->
+  <!-- ANNOTATIONS                                                   -->
+  <!-- ============================================================ -->
+  <!-- No leakage callout on left -->
+  <rect x="42" y="522" width="220" height="40" rx="8" fill="rgba(217,69,62,0.06)" stroke="rgba(217,69,62,0.25)" filter="url(#shadow)"/>
+  <rect x="56" y="536" width="10" height="10" rx="2" fill="#D9453E"/>
+  <text x="156" y="539" text-anchor="middle" font-size="9" font-weight="600" fill="#D9453E">No consumer overlap across</text>
+  <text x="156" y="551" text-anchor="middle" font-size="9" font-weight="600" fill="#D9453E">train, val, and internal test</text>
+
+  <!-- "Models cross over" annotation -->
+  <rect x="42" y="614" width="250" height="42" rx="6" fill="rgba(59,111,214,0.06)" stroke="rgba(59,111,214,0.2)"/>
+  <text x="167" y="631" text-anchor="middle" font-size="9" font-weight="500" fill="#3B6FD6">Trained models are then applied to the</text>
+  <text x="167" y="644" text-anchor="middle" font-size="9" font-weight="500" fill="#3B6FD6">30% holdout that was never used in training</text>
+
+  <!-- Pair construction callout -->
+  <rect x="250" y="914" width="700" height="68" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="600" y="932" text-anchor="middle" font-size="10" font-weight="600" fill="#1A1D26">Pair = Week 0 reference (7 clean days) + 1 query day from Weeks 1&ndash;3</text>
+  <text x="600" y="949" text-anchor="middle" font-size="9" fill="#8E92A0">Reference week remains clean; attacks are applied only to the query day.</text>
+  <text x="600" y="963" text-anchor="middle" font-size="9" fill="#8E92A0">Same contextual evidence supports ML feature vectors and LLM visual prompts.</text>
+  <text x="600" y="976" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Per consumer-month: 21 query days &times; 13 scenarios = 273 pairs</text>
+
+</svg>
+
+<!-- ============================================================ -->
+<!-- RESULTS SECTION                                               -->
+<!-- ============================================================ -->
+<section class="results">
+
+  <div class="results-header">
+    <h1 class="results-title">Results &mdash; 97-Consumer Holdout Evaluation</h1>
+    <p class="results-subtitle">1,032,759 pairs &middot; 953,316 theft / 79,443 clean &middot; 13 scenarios &middot; refit on train+val &middot; run 2026-04-19</p>
+  </div>
+
+  <!-- ===== Card 1: Binary Detection ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#3B6FD6;">Binary Detection &mdash; Theft vs Clean</h2>
+        <p class="card-subtitle">Threshold tuned on val for maximum F1; metrics computed on full holdout.</p>
+      </div>
+      <span class="card-meta">~12:1 imbalance (theft:clean)</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Model</th>
+          <th>AUC&#8209;ROC</th><th>Bal. Acc</th><th>F1</th><th>Recall</th><th>Specificity</th><th>Precision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="t-left">CatBoost</td>
+          <td><strong>0.986</strong></td><td>0.860</td><td><strong>0.982</strong></td><td><strong>0.987</strong></td><td>0.733</td><td>0.978</td>
+        </tr>
+        <tr>
+          <td class="t-left">XGBoost</td>
+          <td><strong>0.986</strong></td><td><strong>0.870</strong></td><td><strong>0.982</strong></td><td>0.984</td><td><strong>0.755</strong></td><td><strong>0.980</strong></td>
+        </tr>
+        <tr>
+          <td class="t-left">RandomForest</td>
+          <td>0.977</td><td>0.822</td><td>0.977</td><td>0.982</td><td>0.663</td><td>0.972</td>
+        </tr>
+        <tr>
+          <td class="t-left" style="color:#5A5E6E;">LOF (unsupervised)</td>
+          <td style="color:#5A5E6E;">0.628</td><td style="color:#5A5E6E;">0.549</td><td style="color:#5A5E6E;">0.282</td><td style="color:#5A5E6E;">0.165</td><td style="color:#5A5E6E;"><strong>0.933</strong></td><td style="color:#5A5E6E;">0.967</td>
+        </tr>
+        <tr class="row-llm"><td class="t-left">Gemini 3.1 Pro</td><td colspan="6" style="text-align:center; font-style:italic;">awaiting LLM evaluation</td></tr>
+        <tr class="row-llm"><td class="t-left">Gemini 3 Flash</td><td colspan="6" style="text-align:center; font-style:italic;">awaiting LLM evaluation</td></tr>
+        <tr class="row-llm"><td class="t-left">Qwen3-VL-32B</td><td colspan="6" style="text-align:center; font-style:italic;">awaiting LLM evaluation</td></tr>
+        <tr class="row-llm"><td class="t-left">Qwen3-VL-8B</td><td colspan="6" style="text-align:center; font-style:italic;">awaiting LLM evaluation</td></tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#3B6FD6;">Takeaway:</strong> Tree ensembles converge to AUC&nbsp;~0.98 with near-identical recall;
+      they differentiate primarily on specificity (XGBoost edges CatBoost by ~2&nbsp;pp). LOF&apos;s high specificity but
+      very low recall is the inverse trade-off &mdash; useful as a complementary outlier signal, not a primary detector.
+    </p>
+  </div>
+
+  <!-- ===== Card 2: 13-Class Identification ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#8B5CC4;">13-Class Identification &mdash; Which Attack?</h2>
+        <p class="card-subtitle">CatBoost multiclass; per-class F1 sorted worst &rarr; best.</p>
+      </div>
+      <span class="card-meta">Macro F1: <strong style="color:#8B5CC4;">0.881</strong> &middot; Bal. Acc: 0.881</span>
+    </div>
+    <div class="bar-grid">
+      <div class="bar-row"><span class="bar-label">attack4</span><div class="bar-track"><div class="bar-fill" style="width:72.9%; background:#D9453E;"></div></div><span class="bar-value">0.729</span></div>
+      <div class="bar-row"><span class="bar-label">attack1</span><div class="bar-track"><div class="bar-fill" style="width:73.9%; background:#D9453E;"></div></div><span class="bar-value">0.739</span></div>
+      <div class="bar-row"><span class="bar-label">original (clean)</span><div class="bar-track"><div class="bar-fill" style="width:74.4%; background:#D9453E;"></div></div><span class="bar-value">0.744</span></div>
+      <div class="bar-row"><span class="bar-label">attack12</span><div class="bar-track"><div class="bar-fill" style="width:81.3%; background:#C88A1A;"></div></div><span class="bar-value">0.813</span></div>
+      <div class="bar-row"><span class="bar-label">attack6</span><div class="bar-track"><div class="bar-fill" style="width:83.0%; background:#C88A1A;"></div></div><span class="bar-value">0.830</span></div>
+      <div class="bar-row"><span class="bar-label">attack7</span><div class="bar-track"><div class="bar-fill" style="width:86.0%; background:#C88A1A;"></div></div><span class="bar-value">0.860</span></div>
+      <div class="bar-row"><span class="bar-label">attack3</span><div class="bar-track"><div class="bar-fill" style="width:92.5%; background:#0E9A7E;"></div></div><span class="bar-value">0.925</span></div>
+      <div class="bar-row"><span class="bar-label">attack5</span><div class="bar-track"><div class="bar-fill" style="width:93.8%; background:#0E9A7E;"></div></div><span class="bar-value">0.938</span></div>
+      <div class="bar-row"><span class="bar-label">attack10</span><div class="bar-track"><div class="bar-fill" style="width:93.9%; background:#0E9A7E;"></div></div><span class="bar-value">0.939</span></div>
+      <div class="bar-row"><span class="bar-label">attack0</span><div class="bar-track"><div class="bar-fill" style="width:97.0%; background:#0E9A7E;"></div></div><span class="bar-value">0.970</span></div>
+      <div class="bar-row"><span class="bar-label">attack9</span><div class="bar-track"><div class="bar-fill" style="width:98.0%; background:#0E9A7E;"></div></div><span class="bar-value">0.980</span></div>
+      <div class="bar-row"><span class="bar-label">attack2</span><div class="bar-track"><div class="bar-fill" style="width:98.5%; background:#0E9A7E;"></div></div><span class="bar-value">0.985</span></div>
+      <div class="bar-row"><span class="bar-label">attackieee</span><div class="bar-track"><div class="bar-fill" style="width:99.5%; background:#0E9A7E;"></div></div><span class="bar-value">0.995</span></div>
+    </div>
+    <p class="takeaway">
+      <strong style="color:#8B5CC4;">Takeaway:</strong> Three classes are visibly harder than the rest &mdash;
+      <em>attack4</em>, <em>attack1</em>, and the clean baseline confuse with each other (low-amplitude or
+      shape-preserving manipulations look like noisy normal usage). The other 10 attack types reach F1 above 0.81.
+    </p>
+  </div>
+
+  <!-- ===== Card 3: Per-Attack Binary Recall ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#3B6FD6;">Per-Attack Recall &mdash; Binary CatBoost</h2>
+        <p class="card-subtitle">Fraction of attack rows correctly flagged as theft (binary head, not multiclass).</p>
+      </div>
+      <span class="card-meta">79,443 rows per scenario</span>
+    </div>
+    <div class="bar-grid">
+      <div class="bar-row"><span class="bar-label">attack4</span><div class="bar-track"><div class="bar-fill" style="width:89.1%; background:#D9453E;"></div></div><span class="bar-value">0.891</span></div>
+      <div class="bar-row"><span class="bar-label">attack6</span><div class="bar-track"><div class="bar-fill" style="width:97.7%; background:#C88A1A;"></div></div><span class="bar-value">0.977</span></div>
+      <div class="bar-row"><span class="bar-label">attack10</span><div class="bar-track"><div class="bar-fill" style="width:98.7%; background:#0E9A7E;"></div></div><span class="bar-value">0.987</span></div>
+      <div class="bar-row"><span class="bar-label">attack1</span><div class="bar-track"><div class="bar-fill" style="width:99.4%; background:#0E9A7E;"></div></div><span class="bar-value">0.994</span></div>
+      <div class="bar-row"><span class="bar-label">attack7</span><div class="bar-track"><div class="bar-fill" style="width:99.5%; background:#0E9A7E;"></div></div><span class="bar-value">0.995</span></div>
+      <div class="bar-row"><span class="bar-label">attack12</span><div class="bar-track"><div class="bar-fill" style="width:99.9%; background:#0E9A7E;"></div></div><span class="bar-value">0.999</span></div>
+      <div class="bar-row"><span class="bar-label">attack2</span><div class="bar-track"><div class="bar-fill" style="width:100.0%; background:#0E9A7E;"></div></div><span class="bar-value">1.000</span></div>
+      <div class="bar-row"><span class="bar-label">attack0 / 3 / 5 / 9 / ieee</span><div class="bar-track"><div class="bar-fill" style="width:100.0%; background:#0E9A7E;"></div></div><span class="bar-value">1.000</span></div>
+    </div>
+    <p class="takeaway">
+      <strong style="color:#3B6FD6;">Takeaway:</strong> Five scenarios are detected perfectly; <em>attack4</em>
+      is the hardest at 89% recall &mdash; consistent with its lowest multiclass F1 above, suggesting attack4
+      is genuinely close to clean usage in the feature space.
+    </p>
+  </div>
+
+  <!-- ===== Card 4: Specificity by CV Quartile ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#D9453E;">Specificity by Consumer Variability (CV)</h2>
+        <p class="card-subtitle">Clean rows only, grouped by per-consumer coefficient of variation.</p>
+      </div>
+      <span class="card-meta">Q1 = calmest 25% &middot; Q4 = noisiest 25%</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Quartile</th>
+          <th>CatBoost</th><th>XGBoost</th><th>RF</th><th>LOF</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="t-left">Q1 (low CV)</td><td>0.938</td><td>0.950</td><td>0.904</td><td>0.990</td></tr>
+        <tr><td class="t-left">Q2</td><td>0.692</td><td>0.705</td><td>0.658</td><td>0.978</td></tr>
+        <tr><td class="t-left">Q3</td><td>0.727</td><td>0.770</td><td>0.638</td><td>0.941</td></tr>
+        <tr><td class="t-left">Q4 (high CV)</td>
+          <td><strong style="color:#D9453E;">0.566</strong></td>
+          <td><strong style="color:#D9453E;">0.588</strong></td>
+          <td><strong style="color:#D9453E;">0.442</strong></td>
+          <td>0.822</td>
+        </tr>
+        <tr class="row-overall"><td class="t-left">Overall</td><td>0.733</td><td>0.755</td><td>0.663</td><td>0.933</td></tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#D9453E;">Takeaway:</strong> Specificity drops sharply on volatile consumers
+      (~37&nbsp;pp gap from Q1 to Q4 for CatBoost; ~46&nbsp;pp for RF). LOF degrades less but is dominated on recall.
+      Consumer variability is the dominant false-positive driver and a key axis to compare against the LLMs.
+    </p>
+  </div>
+
+  <!-- ===== Card 5: Sample-size stability (Binary) ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#3B6FD6;">Sample-Size Stability &mdash; Binary Balanced Accuracy</h2>
+        <p class="card-subtitle">Shuffle the holdout, take the first n rows, recompute the metric. Median across 10 random seeds; bands show min&ndash;max.</p>
+      </div>
+      <span class="card-meta">10 seeds &middot; n: 1 &rarr; 1M (log)</span>
+    </div>
+    <div style="display:flex; justify-content:center;">
+      <svg width="1040" height="320" viewBox="0 0 1040 320" xmlns="http://www.w3.org/2000/svg">
+        <text x="520" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#3B6FD6" font-family="'DM Sans', system-ui, sans-serif">Binary Balanced Accuracy &mdash; stabilization vs test set size</text>
+        <line x1="64" y1="272.0" x2="840" y2="272.0" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="275.0" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.0</text>
+        <line x1="64" y1="223.6" x2="840" y2="223.6" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="226.6" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.2</text>
+        <line x1="64" y1="175.2" x2="840" y2="175.2" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="178.2" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.4</text>
+        <line x1="64" y1="151.0" x2="840" y2="151.0" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="154.0" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.5</text>
+        <line x1="64" y1="126.8" x2="840" y2="126.8" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="129.8" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.6</text>
+        <line x1="64" y1="78.4" x2="840" y2="78.4" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="81.4" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.8</text>
+        <line x1="64" y1="30.0" x2="840" y2="30.0" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="33.0" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">1.0</text>
+        <line x1="64.0" y1="30" x2="64.0" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="64.0" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">1</text>
+        <line x1="193.3" y1="30" x2="193.3" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="193.3" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">10</text>
+        <line x1="322.7" y1="30" x2="322.7" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="322.7" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">100</text>
+        <line x1="452.0" y1="30" x2="452.0" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="452.0" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">1K</text>
+        <line x1="581.3" y1="30" x2="581.3" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="581.3" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">10K</text>
+        <line x1="710.7" y1="30" x2="710.7" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="710.7" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">100K</text>
+        <line x1="840.0" y1="30" x2="840.0" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="840.0" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">1M</text>
+        <line x1="64" y1="272" x2="840" y2="272" stroke="#1A1D26" stroke-width="1"/>
+        <line x1="64" y1="30" x2="64" y2="272" stroke="#1A1D26" stroke-width="1"/>
+        <text x="452" y="312" text-anchor="middle" font-size="10" font-weight="600" fill="#5A5E6E">Test set size&nbsp;(n) &mdash; log scale</text>
+        <text x="14" y="151" text-anchor="middle" font-size="10" font-weight="600" fill="#5A5E6E" transform="rotate(-90 14 151)">Balanced accuracy</text>
+        <path d="M 102.9,30.0 L 125.7,30.0 L 154.4,30.0 L 173.3,30.0 L 193.3,30.0 L 216.1,30.0 L 232.3,30.0 L 255.0,30.0 L 283.7,30.0 L 302.6,31.8 L 322.7,31.3 L 345.4,31.7 L 361.6,31.9 L 384.4,46.7 L 413.1,52.8 L 432.0,54.4 L 452.0,57.5 L 474.8,58.4 L 490.9,58.1 L 513.7,58.5 L 542.4,59.6 L 561.3,60.6 L 581.3,61.3 L 604.1,60.9 L 620.3,61.8 L 643.0,61.9 L 671.7,62.2 L 690.6,62.7 L 710.7,62.7 L 733.4,63.2 L 749.6,63.0 L 772.4,63.4 L 801.1,63.4 L 820.0,63.7 L 840.0,63.9 L 840.0,64.0 L 820.0,64.1 L 801.1,64.2 L 772.4,64.3 L 749.6,64.1 L 733.4,64.3 L 710.7,64.5 L 690.6,64.4 L 671.7,64.6 L 643.0,64.9 L 620.3,66.5 L 604.1,67.3 L 581.3,68.1 L 561.3,70.6 L 542.4,70.9 L 513.7,73.8 L 490.9,75.6 L 474.8,76.8 L 452.0,78.2 L 432.0,82.6 L 413.1,82.0 L 384.4,81.8 L 361.6,85.0 L 345.4,99.5 L 322.7,105.3 L 302.6,101.2 L 283.7,119.2 L 255.0,155.7 L 232.3,157.7 L 216.1,159.6 L 193.3,151.0 L 173.3,151.0 L 154.4,151.0 L 125.7,151.0 L 102.9,151.0 Z" fill="#3B6FD6" fill-opacity="0.10" stroke="none"/>
+        <path d="M 102.9,30.0 L 125.7,30.0 L 154.4,30.0 L 173.3,30.0 L 193.3,30.0 L 216.1,30.0 L 232.3,30.0 L 255.0,30.0 L 283.7,30.0 L 302.6,31.8 L 322.7,31.3 L 345.4,31.7 L 361.6,31.9 L 384.4,47.8 L 413.1,50.4 L 432.0,52.4 L 452.0,56.9 L 474.8,52.3 L 490.9,52.6 L 513.7,56.8 L 542.4,56.8 L 561.3,59.4 L 581.3,59.0 L 604.1,59.0 L 620.3,59.4 L 643.0,59.1 L 671.7,60.4 L 690.6,60.3 L 710.7,60.5 L 733.4,60.7 L 749.6,60.9 L 772.4,60.9 L 801.1,61.1 L 820.0,61.3 L 840.0,61.5 L 840.0,61.6 L 820.0,61.6 L 801.1,61.7 L 772.4,61.7 L 749.6,61.9 L 733.4,62.0 L 710.7,62.5 L 690.6,62.8 L 671.7,62.6 L 643.0,62.7 L 620.3,63.1 L 604.1,63.7 L 581.3,64.8 L 561.3,68.2 L 542.4,68.4 L 513.7,70.2 L 490.9,70.6 L 474.8,73.4 L 452.0,76.5 L 432.0,80.4 L 413.1,82.5 L 384.4,82.2 L 361.6,85.7 L 345.4,86.7 L 322.7,91.8 L 302.6,92.4 L 283.7,102.0 L 255.0,125.4 L 232.3,97.2 L 216.1,159.6 L 193.3,151.0 L 173.3,151.0 L 154.4,151.0 L 125.7,151.0 L 102.9,151.0 Z" fill="#0E9A7E" fill-opacity="0.10" stroke="none"/>
+        <path d="M 102.9,30.0 L 125.7,30.0 L 154.4,30.0 L 173.3,30.0 L 193.3,30.0 L 216.1,54.5 L 232.3,80.4 L 255.0,62.5 L 283.7,51.5 L 302.6,63.7 L 322.7,58.9 L 345.4,63.3 L 361.6,67.2 L 384.4,65.5 L 413.1,69.4 L 432.0,69.4 L 452.0,72.8 L 474.8,70.9 L 490.9,71.8 L 513.7,72.2 L 542.4,73.2 L 561.3,72.1 L 581.3,72.6 L 604.1,72.5 L 620.3,73.1 L 643.0,72.5 L 671.7,72.7 L 690.6,72.9 L 710.7,72.7 L 733.4,73.0 L 749.6,72.8 L 772.4,72.9 L 801.1,73.0 L 820.0,73.0 L 840.0,73.0" fill="none" stroke="#C88A1A" stroke-width="1.6"/>
+        <path d="M 102.9,151.0 L 125.7,151.0 L 154.4,151.0 L 173.3,140.9 L 193.3,124.1 L 216.1,132.3 L 232.3,130.2 L 255.0,129.2 L 283.7,133.7 L 302.6,139.2 L 322.7,141.3 L 345.4,141.0 L 361.6,139.5 L 384.4,137.6 L 413.1,137.4 L 432.0,138.8 L 452.0,138.3 L 474.8,137.5 L 490.9,139.5 L 513.7,138.4 L 542.4,138.9 L 561.3,139.1 L 581.3,139.1 L 604.1,139.0 L 620.3,139.0 L 643.0,139.0 L 671.7,138.9 L 690.6,139.0 L 710.7,139.0 L 733.4,139.0 L 749.6,139.1 L 772.4,139.1 L 801.1,139.1 L 820.0,139.2 L 840.0,139.1" fill="none" stroke="#8B5CC4" stroke-width="1.6"/>
+        <path d="M 102.9,30.0 L 125.7,30.0 L 154.4,30.0 L 173.3,30.0 L 193.3,30.0 L 216.1,54.5 L 232.3,80.4 L 255.0,54.6 L 283.7,62.1 L 302.6,67.3 L 322.7,60.5 L 345.4,60.3 L 361.6,68.4 L 384.4,66.7 L 413.1,60.5 L 432.0,63.4 L 452.0,66.1 L 474.8,65.2 L 490.9,63.8 L 513.7,63.9 L 542.4,64.1 L 561.3,62.9 L 581.3,63.6 L 604.1,63.2 L 620.3,63.9 L 643.0,63.7 L 671.7,63.7 L 690.6,63.7 L 710.7,63.6 L 733.4,63.8 L 749.6,63.8 L 772.4,63.9 L 801.1,64.0 L 820.0,63.9 L 840.0,63.9" fill="none" stroke="#3B6FD6" stroke-width="1.6"/>
+        <path d="M 102.9,30.0 L 125.7,30.0 L 154.4,30.0 L 173.3,30.0 L 193.3,30.0 L 216.1,54.5 L 232.3,80.4 L 255.0,54.6 L 283.7,50.0 L 302.6,53.9 L 322.7,51.6 L 345.4,60.7 L 361.6,62.2 L 384.4,60.8 L 413.1,60.5 L 432.0,62.0 L 452.0,62.5 L 474.8,58.9 L 490.9,62.2 L 513.7,58.6 L 542.4,60.9 L 561.3,60.8 L 581.3,60.9 L 604.1,61.0 L 620.3,61.9 L 643.0,61.0 L 671.7,61.1 L 690.6,61.1 L 710.7,61.0 L 733.4,61.2 L 749.6,61.1 L 772.4,61.3 L 801.1,61.4 L 820.0,61.5 L 840.0,61.5" fill="none" stroke="#0E9A7E" stroke-width="1.6"/>
+        <circle cx="840.0" cy="63.9" r="3" fill="#3B6FD6"/>
+        <circle cx="840.0" cy="61.5" r="3" fill="#0E9A7E"/>
+        <circle cx="840.0" cy="73.0" r="3" fill="#C88A1A"/>
+        <circle cx="840.0" cy="139.1" r="3" fill="#8B5CC4"/>
+        <line x1="854" y1="42" x2="872" y2="42" stroke="#3B6FD6" stroke-width="2"/>
+        <text x="878" y="45" font-size="10" font-weight="600" fill="#1A1D26">CatBoost</text>
+        <text x="878" y="56" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">final 0.860</text>
+        <line x1="854" y1="80" x2="872" y2="80" stroke="#0E9A7E" stroke-width="2"/>
+        <text x="878" y="83" font-size="10" font-weight="600" fill="#1A1D26">XGBoost</text>
+        <text x="878" y="94" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">final 0.870</text>
+        <line x1="854" y1="118" x2="872" y2="118" stroke="#C88A1A" stroke-width="2"/>
+        <text x="878" y="121" font-size="10" font-weight="600" fill="#1A1D26">RandomForest</text>
+        <text x="878" y="132" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">final 0.822</text>
+        <line x1="854" y1="156" x2="872" y2="156" stroke="#8B5CC4" stroke-width="2"/>
+        <text x="878" y="159" font-size="10" font-weight="600" fill="#1A1D26">LOF</text>
+        <text x="878" y="170" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">final 0.549</text>
+        <text x="878" y="200" font-size="9" fill="#5A5E6E">shaded bands:</text>
+        <text x="878" y="212" font-size="9" fill="#5A5E6E">min&ndash;max for CatBoost</text>
+        <text x="878" y="224" font-size="9" fill="#5A5E6E">and XGBoost only</text>
+      </svg>
+    </div>
+    <p class="takeaway">
+      <strong style="color:#3B6FD6;">Takeaway:</strong> All four binary models reach their asymptotic balanced accuracy
+      by <strong>n &asymp; 1,000</strong>; the seed-to-seed range tightens to within &plusmn;0.015 by <strong>n &asymp; 10,000</strong>
+      (~1% of the holdout) and within &plusmn;0.005 by <strong>n &asymp; 100,000</strong>. A test set of <em>~10K rows</em>
+      already gives a reliable point estimate &mdash; the remaining ~99% of the holdout sharpens it but does not change the ranking of models.
+    </p>
+  </div>
+
+  <!-- ===== Card 6: Sample-size stability (Multiclass) ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#8B5CC4;">Sample-Size Stability &mdash; Multiclass Macro-F1</h2>
+        <p class="card-subtitle">Same sweep applied to the 13-class CatBoost model. Macro-F1 with <code>zero_division=0</code> for unseen classes at small n.</p>
+      </div>
+      <span class="card-meta">10 seeds &middot; n: 1 &rarr; 1M (log)</span>
+    </div>
+    <div style="display:flex; justify-content:center;">
+      <svg width="1040" height="320" viewBox="0 0 1040 320" xmlns="http://www.w3.org/2000/svg">
+        <text x="520" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#8B5CC4" font-family="'DM Sans', system-ui, sans-serif">Multiclass Macro-F1 &mdash; stabilization vs test set size</text>
+        <line x1="64" y1="272.0" x2="840" y2="272.0" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="275.0" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.0</text>
+        <line x1="64" y1="223.6" x2="840" y2="223.6" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="226.6" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.2</text>
+        <line x1="64" y1="175.2" x2="840" y2="175.2" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="178.2" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.4</text>
+        <line x1="64" y1="151.0" x2="840" y2="151.0" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="154.0" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.5</text>
+        <line x1="64" y1="126.8" x2="840" y2="126.8" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="129.8" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.6</text>
+        <line x1="64" y1="78.4" x2="840" y2="78.4" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="81.4" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">0.8</text>
+        <line x1="64" y1="30.0" x2="840" y2="30.0" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="56" y="33.0" text-anchor="end" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">1.0</text>
+        <line x1="64.0" y1="30" x2="64.0" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="64.0" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">1</text>
+        <line x1="193.3" y1="30" x2="193.3" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="193.3" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">10</text>
+        <line x1="322.7" y1="30" x2="322.7" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="322.7" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">100</text>
+        <line x1="452.0" y1="30" x2="452.0" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="452.0" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">1K</text>
+        <line x1="581.3" y1="30" x2="581.3" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="581.3" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">10K</text>
+        <line x1="710.7" y1="30" x2="710.7" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="710.7" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">100K</text>
+        <line x1="840.0" y1="30" x2="840.0" y2="272" stroke="#E0E2E8" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="840.0" y="286.0" text-anchor="middle" font-size="9" fill="#5A5E6E" font-family="JetBrains Mono, monospace">1M</text>
+        <line x1="64" y1="272" x2="840" y2="272" stroke="#1A1D26" stroke-width="1"/>
+        <line x1="64" y1="30" x2="64" y2="272" stroke="#1A1D26" stroke-width="1"/>
+        <text x="452" y="312" text-anchor="middle" font-size="10" font-weight="600" fill="#5A5E6E">Test set size&nbsp;(n) &mdash; log scale</text>
+        <text x="14" y="151" text-anchor="middle" font-size="10" font-weight="600" fill="#5A5E6E" transform="rotate(-90 14 151)">Macro-F1</text>
+        <path d="M 64.0,253.4 L 102.9,234.8 L 125.7,216.2 L 154.4,178.9 L 173.3,160.3 L 193.3,104.5 L 216.1,85.8 L 232.3,67.2 L 255.0,48.8 L 283.7,47.4 L 302.6,48.6 L 322.7,49.5 L 345.4,49.3 L 361.6,54.4 L 384.4,53.7 L 413.1,53.6 L 432.0,55.6 L 452.0,55.4 L 474.8,55.1 L 490.9,57.4 L 513.7,57.1 L 542.4,56.5 L 561.3,57.2 L 581.3,57.0 L 604.1,57.8 L 620.3,58.0 L 643.0,58.1 L 671.7,58.3 L 690.6,58.5 L 710.7,58.5 L 733.4,58.7 L 749.6,58.7 L 772.4,58.6 L 801.1,58.7 L 820.0,58.8 L 840.0,58.9 L 840.0,58.9 L 820.0,58.9 L 801.1,58.9 L 772.4,58.9 L 749.6,59.1 L 733.4,59.2 L 710.7,59.2 L 690.6,59.3 L 671.7,59.4 L 643.0,59.8 L 620.3,59.5 L 604.1,60.2 L 581.3,60.5 L 561.3,60.8 L 542.4,61.4 L 513.7,61.7 L 490.9,62.7 L 474.8,63.9 L 452.0,65.6 L 432.0,63.3 L 413.1,63.1 L 384.4,62.6 L 361.6,62.4 L 345.4,65.6 L 322.7,73.3 L 302.6,88.3 L 283.7,91.6 L 255.0,110.2 L 232.3,148.6 L 216.1,175.8 L 193.3,228.6 L 173.3,231.7 L 154.4,228.6 L 125.7,253.4 L 102.9,253.4 L 64.0,253.4 Z" fill="#8B5CC4" fill-opacity="0.12" stroke="none"/>
+        <path d="M 64.0,253.4 L 102.9,234.8 L 125.7,216.2 L 154.4,197.5 L 173.3,169.6 L 193.3,137.0 L 216.1,104.5 L 232.3,91.0 L 255.0,61.2 L 283.7,55.3 L 302.6,55.1 L 322.7,55.9 L 345.4,58.9 L 361.6,56.6 L 384.4,56.7 L 413.1,56.9 L 432.0,57.5 L 452.0,57.8 L 474.8,57.9 L 490.9,57.5 L 513.7,57.4 L 542.4,57.7 L 561.3,58.1 L 581.3,58.3 L 604.1,58.4 L 620.3,58.3 L 643.0,58.4 L 671.7,58.5 L 690.6,58.6 L 710.7,58.6 L 733.4,58.7 L 749.6,58.8 L 772.4,58.7 L 801.1,58.8 L 820.0,58.8 L 840.0,58.9 L 840.0,58.9 L 820.0,58.9 L 801.1,58.8 L 772.4,58.9 L 749.6,59.0 L 733.4,59.0 L 710.7,58.9 L 690.6,58.9 L 671.7,58.8 L 643.0,58.8 L 620.3,58.9 L 604.1,58.8 L 581.3,59.3 L 561.3,60.1 L 542.4,60.2 L 513.7,60.0 L 490.9,59.8 L 474.8,60.2 L 452.0,59.9 L 432.0,61.9 L 413.1,61.0 L 384.4,60.2 L 361.6,60.7 L 345.4,64.5 L 322.7,61.5 L 302.6,60.2 L 283.7,65.3 L 255.0,78.2 L 232.3,111.5 L 216.1,125.9 L 193.3,172.4 L 173.3,193.8 L 154.4,216.2 L 125.7,234.8 L 102.9,248.7 L 64.0,253.4 Z" fill="#8B5CC4" fill-opacity="0.18" stroke="none"/>
+        <path d="M 64.0,253.4 L 102.9,234.8 L 125.7,225.5 L 154.4,200.6 L 173.3,178.9 L 193.3,152.9 L 216.1,115.0 L 232.3,97.6 L 255.0,66.6 L 283.7,59.7 L 302.6,56.6 L 322.7,57.9 L 345.4,60.6 L 361.6,57.3 L 384.4,58.6 L 413.1,59.9 L 432.0,59.2 L 452.0,58.9 L 474.8,58.5 L 490.9,58.2 L 513.7,59.1 L 542.4,58.5 L 561.3,58.5 L 581.3,58.7 L 604.1,58.6 L 620.3,58.6 L 643.0,58.6 L 671.7,58.6 L 690.6,58.8 L 710.7,58.8 L 733.4,58.8 L 749.6,58.8 L 772.4,58.8 L 801.1,58.8 L 820.0,58.8 L 840.0,58.9" fill="none" stroke="#8B5CC4" stroke-width="2"/>
+        <circle cx="840.0" cy="58.9" r="3.5" fill="#8B5CC4"/>
+        <line x1="64" y1="58.9" x2="840" y2="58.9" stroke="#8B5CC4" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+        <rect x="854" y="36" width="18" height="12" fill="#8B5CC4" fill-opacity="0.18" stroke="#8B5CC4" stroke-opacity="0.6"/>
+        <text x="878" y="45" font-size="10" font-weight="600" fill="#1A1D26">CatBoost (13 classes)</text>
+        <text x="878" y="58" font-size="9" fill="#5A5E6E">light band: min&ndash;max</text>
+        <text x="878" y="70" font-size="9" fill="#5A5E6E">dark band: p25&ndash;p75</text>
+        <text x="878" y="88" font-size="9" fill="#8E92A0" font-family="JetBrains Mono, monospace">final 0.881</text>
+      </svg>
+    </div>
+    <p class="takeaway">
+      <strong style="color:#8B5CC4;">Takeaway:</strong> Macro-F1 climbs steeply through the small-n region because the
+      metric needs at least one row per class to be well-defined &mdash; below n &asymp; 30, several of the 13 classes
+      are absent and contribute zero. The median crosses its asymptote (~0.88) by <strong>n &asymp; 50</strong>, the
+      inter-seed band tightens to &plusmn;0.02 by <strong>n &asymp; 1,000</strong>, and to &plusmn;0.003 by
+      <strong>n &asymp; 100,000</strong>. So <em>~1K rows</em> is enough to declare a stable macro-F1.
+    </p>
+  </div>
+
+  <!-- ===== Card 7: LLM Pilot Results — Qwen2.5-VL-7B Partial Subset ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#C88A1A;">LLM Pilot &mdash; Qwen2.5-VL-7B-Instruct</h2>
+        <p class="card-subtitle">Partial run on the 97-row moaz-subset (113 / 1,261 calls completed) &middot; <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">mode=both</code> (chart + stats + temporal + numeric series) &middot; prompt v1 (single merged chart)</p>
+      </div>
+      <span class="card-meta">10 clean / 103 attacks &middot; median 4.4 s/call &middot; ~9.0K input tokens</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Metric</th>
+          <th>Binary (theft vs clean)</th>
+          <th>Multiclass (13 classes)</th>
+          <th class="t-left">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="t-left">AUC&#8209;ROC</td><td>0.500</td><td>&mdash;</td><td class="t-left">chance &mdash; pseudo-score from confidence levels</td></tr>
+        <tr><td class="t-left">Bal. Acc</td><td>0.500</td><td>&mdash;</td><td class="t-left">collapses to chance after correcting class imbalance</td></tr>
+        <tr><td class="t-left">F1</td><td>0.954</td><td>&mdash;</td><td class="t-left">artifact of 91% attack base-rate (always saying "manipulated" scores well)</td></tr>
+        <tr><td class="t-left">Recall (theft)</td><td>1.000</td><td>&mdash;</td><td class="t-left">catches 103/103 attacks</td></tr>
+        <tr><td class="t-left">Specificity (clean)</td><td><strong style="color:#D9453E;">0.000</strong></td><td>&mdash;</td><td class="t-left">all 10 clean days flagged manipulated</td></tr>
+        <tr><td class="t-left">Precision</td><td>0.912</td><td>&mdash;</td><td class="t-left">= base rate</td></tr>
+        <tr><td class="t-left">Macro F1</td><td>&mdash;</td><td>0.136</td><td class="t-left">attack4 absorbs most other classes; only attack0 and attack9 are reliably resolved</td></tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#C88A1A;">Takeaway:</strong> Qwen2.5-VL-7B catches every attack (recall 1.000) but classifies <em>every</em>
+      clean day as manipulated (specificity 0.000), so once class balance is corrected the binary score
+      collapses to chance. The headline F1 of 0.95 is purely a base-rate artifact &mdash; the moaz-subset
+      is 91% attacks, so always saying "manipulated" still scores well. Multiclass Macro-F1 of <strong>0.136</strong>
+      reflects a dominant <em>"attack4" default bias</em>: attacks 0 and 9 are recognized cleanly
+      (9/9 and 8/8), while attacks 1, 3, 5, and 12 collapse onto attack4. Two follow-ups in flight:
+      (a) re-run with the <em>split-image prompt (v2)</em> to test whether separating the reference week and query day
+      reduces confident false positives, and (b) try a reasoning model (Qwen3-VL-8B-Thinking) whose chain-of-thought
+      can anchor on the "original" pattern before committing.
+    </p>
+  </div>
+
+  <!-- ===== Card 8: LLM Pilot Results — Qwen3-VL-32B-Thinking Diagnostic ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#C88A1A;">LLM Pilot &mdash; Qwen3-VL-32B-Thinking</h2>
+        <p class="card-subtitle">513-trial pilot across 41 consumer-months &middot; <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">mode=both</code> &middot; 512 / 513 calls used prompt v2 (split-image, sha <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">df172652</code>); 1 / 513 used prompt v1 (sha <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">158bc83</code>) &middot; max_output_tokens = 2,048</p>
+      </div>
+      <span class="card-meta">28 / 513 parsed (5.5%) &middot; median 89.0 s/call &middot; ~9.4K input tokens</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Diagnostic</th>
+          <th>Value</th>
+          <th class="t-left">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="t-left">Trials attempted</td><td>513</td><td class="t-left">all 12 attack types + clean (<em>original</em>) across 41 consumer-months (~40 / class)</td></tr>
+        <tr><td class="t-left">Output-token saturation</td><td><strong style="color:#D9453E;">483 / 513 (94%)</strong></td><td class="t-left">hit the 2,048-token cap inside <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">&lt;think&gt;&hellip;&lt;/think&gt;</code> &mdash; JSON answer never reached</td></tr>
+        <tr><td class="t-left">Parseable JSON output</td><td><strong style="color:#D9453E;">28 / 513 (5.5%)</strong></td><td class="t-left">structured answer extracted only when the reasoning chain finished within budget</td></tr>
+        <tr><td class="t-left">Categories with any parsed output</td><td><strong style="color:#D9453E;">3 / 13</strong></td><td class="t-left">all 28 parses come from <em>attack0</em>, <em>attack9</em>, <em>attack6</em>; the other 10 categories: 0 / 379</td></tr>
+        <tr><td class="t-left">Parse rate on <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">original</code> (clean)</td><td><strong style="color:#D9453E;">0 / 41 (0%)</strong></td><td class="t-left">model never commits to "not manipulated" within budget &mdash; can't rule out all 12 attacks before hitting the cap</td></tr>
+        <tr><td class="t-left">Median latency</td><td>89.0 s</td><td class="t-left">vs Qwen2.5-VL-7B at 4.4 s &mdash; ~20&times; slower per call</td></tr>
+        <tr><td class="t-left">Multiclass acc on parsed subset</td><td>25 / 28 (89%)</td><td class="t-left">attack0: 16 / 16 &middot; attack9: 9 / 9 &middot; attack6: 0 / 3 &mdash; biased to "obvious" classes</td></tr>
+        <tr><td class="t-left">Binary acc on parsed subset</td><td>28 / 28 (100%)</td><td class="t-left"><em>uninformative</em> &mdash; 0 clean trials parsed, so no specificity data in the subset</td></tr>
+      </tbody>
+    </table>
+    <div class="bar-grid" style="margin-top:14px;">
+      <div class="bar-row"><span class="bar-label">attack0</span><div class="bar-track"><div class="bar-fill" style="width:40.0%; background:#C88A1A;"></div></div><span class="bar-value">0.400</span></div>
+      <div class="bar-row"><span class="bar-label">attack9</span><div class="bar-track"><div class="bar-fill" style="width:23.1%; background:#C88A1A;"></div></div><span class="bar-value">0.231</span></div>
+      <div class="bar-row"><span class="bar-label">attack6</span><div class="bar-track"><div class="bar-fill" style="width:7.7%;  background:#D9453E;"></div></div><span class="bar-value">0.077</span></div>
+      <div class="bar-row"><span class="bar-label">attack 1, 2, 3, 4, 5, 7, 10, 12, ieee</span><div class="bar-track"><div class="bar-fill" style="width:0.5%; background:#D9453E;"></div></div><span class="bar-value">0.000</span></div>
+      <div class="bar-row"><span class="bar-label" style="color:#D9453E; font-weight:600;">original (clean)</span><div class="bar-track"><div class="bar-fill" style="width:0.5%; background:#D9453E;"></div></div><span class="bar-value" style="color:#D9453E; font-weight:600;">0.000</span></div>
+    </div>
+    <p class="takeaway" style="margin-top:10px;">
+      <strong style="color:#D9453E;">Takeaway:</strong> The token-saturation pattern is now confirmed at scale (94% of 513 calls)
+      &mdash; <em>and the parse failures are not random</em>. The model commits within budget only on visually-trivial attacks
+      (attack0's flat-zero day, attack9's flat-constant day) and almost never on the rest. Most consequentially,
+      <strong>0 / 41 clean (<code style="font-family:'JetBrains Mono', monospace; font-size:10px;">original</code>) trials parse</strong>: ruling out all 12 attack hypotheses takes more reasoning than the budget
+      allows, so the model never commits to "not manipulated". When the chain does finish, multiclass accuracy on the
+      <em>biased</em> 28-trial subset is 89% (attack0 16/16, attack9 9/9, attack6 0/3), and binary accuracy is uninformative
+      (no clean trials in the subset). Same configuration fixes still apply (raise <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">max_output_tokens</code> to ~6&ndash;8K
+      or suppress the <code style="font-family:'JetBrains Mono', monospace; font-size:10px;">&lt;think&gt;</code> block), but the new finding is that the
+      <em>chain length is class-dependent</em>: easy classes commit, hard classes run away. Even with a larger budget, this
+      bias toward visually-distinctive verdicts is the constraint to design around.
+    </p>
+  </div>
+
+</section>
+
+</body>
+</html>
