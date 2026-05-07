@@ -880,11 +880,11 @@ Attack_Behavior_Explanation:
         This keeps the old two-image example above and adds the new version below it. The same original example is rerun with the reference week and query day combined into a single chart. The prompt was adapted to state that the model receives one combined plot, not two image inputs.
       </p>
       <div class="pill-row">
-        <span class="pill">model=qwen3-vl-235b-a22b-thinking</span>
+        <span class="pill">sample=CONS200_MONTH13 / original_day</span>
+        <span class="pill">models=plus + 235B thinking</span>
         <span class="pill">combined_prompt_sha=85b4637c06a235d6</span>
-        <span class="pill">input_tokens=3,753</span>
-        <span class="pill">output_tokens=734</span>
-        <span class="pill">latency=16.8s</span>
+        <span class="pill">plus=Manipulated / Attack 1</span>
+        <span class="pill">235B=Original</span>
         <span class="pill">parse_error=None</span>
       </div>
       <figure style="margin-top:14px">
@@ -896,23 +896,54 @@ Attack_Behavior_Explanation:
       </figure>
     </section>
 
+    <section class="panel">
+      <h3>Prompt Adjustment Summary</h3>
+      <ul>
+        <li>The prompt says there is one combined plot, not two separate images.</li>
+        <li>The blue left segment is defined as the clean normal reference week.</li>
+        <li>The red right segment is defined as the query day to classify.</li>
+        <li>The hatched gap is defined as omitted, non-continuous time, not a zero interval.</li>
+        <li>The y-axis is shared and starts at zero for both segments.</li>
+      </ul>
+      <p class="tiny">Exact prompt saved at <span class="mono">output/one_plot_experiment/CONS200_MONTH13_original_day_combined_one_plot_prompt.txt</span>.</p>
+    </section>
+
     <section class="grid-2">
       <article class="panel">
-        <h3>Prompt Adjustment Summary</h3>
-        <ul>
-          <li>The prompt says there is one combined plot, not two separate images.</li>
-          <li>The blue left segment is defined as the clean normal reference week.</li>
-          <li>The red right segment is defined as the query day to classify.</li>
-          <li>The hatched gap is defined as omitted, non-continuous time, not a zero interval.</li>
-          <li>The y-axis is shared and starts at zero for both segments.</li>
-        </ul>
-        <p class="tiny">Exact prompt saved at <span class="mono">output/one_plot_experiment/CONS200_MONTH13_original_day_combined_one_plot_prompt.txt</span>.</p>
+        <h3>qwen3-vl-plus Single-Plot Result</h3>
+        <p class="muted">
+          Parsed result: <strong>Manipulated</strong>, most likely <strong>Attack 1</strong>, confidence <strong>High</strong>.
+          This remains an incorrect prediction for the original example.
+        </p>
+        <p class="tiny">Tokens: input 3,753; output 2,114; total 5,867; latency 25.4s.</p>
+        <h3>Thinking excerpt</h3>
+        <pre class="code">So, let's analyze the plot step by step. First, the blue line is the normal reference week (clean baseline), and the red line is the query day. We need to compare the query day's consumption pattern to the normal week's Friday.
+
+The normal Friday has peaks and valleys, with varying levels throughout the day. The query day has a different pattern; the model interprets the red segment as preserving a similar temporal trend but with lower magnitude.
+
+[...]
+
+The model concludes that the reduction is uniform across the entire day rather than limited to a specific segment, so it selects Attack 1.</pre>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Manipulated
+
+Identified Attack:
+- Most Likely: Attack 1
+- Confidence: High
+- Reasoning: The query day exhibits a consumption pattern with identical temporal trend as the normal Friday but with uniformly reduced magnitude across all intervals. Attack 1 preserves trend while reducing magnitude. Attack 3 was ruled out because the trend remains consistent, and Attack 4 was ruled out because the reduction appears uniform across the entire day.
+
+Attack_Behavior_Explanation:
+- Each consumption sample on the query day is multiplied by a constant factor between 0 and 1.
+- Magnitude is reduced consistently, but the daily pattern of peaks and troughs remains similar.
+- Possible causes include meter bypass, magnetic interference, reverse current, or false data injection.</pre>
       </article>
       <article class="panel">
-        <h3>Single-Plot Result</h3>
+        <h3>qwen3-vl-235b-a22b-thinking Single-Plot Result</h3>
         <p class="muted">
           Parsed result: <strong>Original</strong>, with no identified attack. This matches the ground truth and matches the two-image 235B result on the same example.
         </p>
+        <p class="tiny">Tokens: input 3,753; output 734; total 4,487; latency 16.8s.</p>
         <h3>Thinking excerpt</h3>
         <pre class="code">So, let's analyze this plot step by step. First, the blue line is the normal reference week (clean baseline), and the red line is the query day. The query day is labeled as Jan 11, which is a Friday.
 
@@ -925,6 +956,83 @@ The query day matches the normal Friday in both magnitude and trend. Since it is
 So the classification is Original.</pre>
         <h3>Final output</h3>
         <pre class="code">Classification:
+- Original
+
+Identified Attack:
+- Most Likely: N/A
+- Confidence: N/A
+- Reasoning: N/A
+
+Attack_Behavior_Explanation:
+- N/A</pre>
+      </article>
+    </section>
+
+    <h2>235B False Positive Rerun</h2>
+    <section class="panel metric-notes">
+      <h3>Two-Image Error Rechecked As One Plot</h3>
+      <p>
+        Example selected from the current two-image 235B parquet: <span class="mono">CONS093_MONTH14 / original_day</span>.
+        Ground truth is <strong>Original</strong>, but the two-image 235B run parsed it as <strong>Manipulated / Attack 10</strong>.
+        The same sample was rerun with the new single combined plot structure.
+      </p>
+      <div class="pill-row">
+        <span class="pill">old_two_image=Manipulated / Attack 10</span>
+        <span class="pill">new_single_plot=Original</span>
+        <span class="pill">combined_prompt_sha=21b957a9d8549140</span>
+        <span class="pill">input_tokens=3,752</span>
+        <span class="pill">output_tokens=1,544</span>
+        <span class="pill">latency=42.5s</span>
+      </div>
+      <figure style="margin-top:14px">
+        <img src="images/CONS093_MONTH14_original_day_combined_one_plot.png" alt="Single combined plot for CONS093 month 14 original day false positive rerun">
+        <figcaption>
+          <strong>Single-Plot Rerun Input</strong>
+          Same original query day that 235B misclassified in the two-image setup, now shown as one labeled chart with a visible non-continuous time gap.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h3>Old 235B Two-Image Output</h3>
+        <p class="muted">
+          Parsed result: <strong>Manipulated</strong>, most likely <strong>Attack 10</strong>, confidence <strong>High</strong>.
+        </p>
+        <h3>Thinking excerpt</h3>
+        <pre class="code">The normal week shows regular daily cycles, with dips at night and peaks during daytime. The query day has a similar y-axis range, but the model interprets the beginning of the query day as high consumption at midnight.
+
+[...]
+
+It concludes that this looks like a reversed pattern, where high consumption appears early and lower consumption appears later, matching Attack 10.</pre>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Manipulated
+
+Identified Attack:
+- Most Likely: Attack 10
+- Confidence: High
+- Reasoning: The query day starts with high consumption at the beginning of the interval, contradicting the normal nighttime low usage in the reference week. This reversed pattern matches Attack 10. Attack 5 and Attack 12 were ruled out.
+
+Attack_Behavior_Explanation:
+- The attacker reverses the time series of consumption values for the day.
+- Total energy is approximately preserved, but the temporal trend is inverted.
+- Possible cause: false data injection to exploit time-varying pricing.</pre>
+      </article>
+      <article class="panel">
+        <h3>New 235B Single-Plot Output</h3>
+        <p class="muted">
+          Parsed result: <strong>Original</strong>, with no identified attack. The single-plot rerun corrected this selected false positive.
+        </p>
+        <h3>Thinking excerpt</h3>
+        <pre class="code">The red query day is Saturday, Feb 23, and the blue normal reference week includes Saturday, Feb 2. The model compares the red Saturday to the blue Saturday.
+
+[...]
+
+The blue Saturday and red Saturday both start low, rise, peak, and vary within a similar magnitude range. Since the query day is consistent with the normal reference week's Saturday, it is likely original.</pre>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Original | Manipulated
 - Original
 
 Identified Attack:
