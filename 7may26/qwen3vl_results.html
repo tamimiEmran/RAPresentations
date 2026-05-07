@@ -418,7 +418,7 @@
     <section class="panel">
       <h2 style="margin-top:0">Report Scope</h2>
       <p>
-        This file now contains a partial metric snapshot taken at 2026-05-07 07:52:50. The background runs are still active, so these values describe only the rows completed at snapshot time and should be replaced after both parquet files reach 1,261 rows.
+        This file now contains a partial snapshot taken at 2026-05-07 09:15:05. Completed parsed rows: qwen3-vl-plus 231/1,261, 235B thinking 116/1,261. These values describe the rows completed at snapshot time and should be replaced after both parquet files reach 1,261 rows.
       </p>
       <div class="flow" aria-label="evaluation flow">
         <div class="flow-step">
@@ -625,20 +625,20 @@ Attack_Behavior_Explanation:
             </tr>
           </thead>
           <tbody>
-            <tr>
+                        <tr>
               <td>qwen3-vl-plus</td>
-              <td>72 / 1,261</td>
-              <td>0.0%</td>
-              <td>97.0%</td>
-              <td>48.5%</td>
+              <td>231 / 1,261</td>
+              <td>5.6%</td>
+              <td>99.1%</td>
+              <td>52.3%</td>
               <td>0</td>
             </tr>
             <tr>
               <td>qwen3-vl-235b-a22b-thinking</td>
-              <td>29 / 1,261</td>
+              <td>116 / 1,261</td>
               <td>33.3%</td>
-              <td>92.3%</td>
-              <td>62.8%</td>
+              <td>91.6%</td>
+              <td>62.5%</td>
               <td>0</td>
             </tr>
           </tbody>
@@ -650,10 +650,10 @@ Attack_Behavior_Explanation:
           <p class="axis-note">Y-axis: model. X-axis: balanced accuracy, 0.0 to 1.0.</p>
         </div>
         <div class="bars">
-          <div class="bar-row"><span>qwen3-vl-plus</span><span class="bar-track"><span class="bar green" style="width:48.5%"></span></span><span>48.5%</span></div>
-          <div class="bar-row"><span>235B thinking</span><span class="bar-track"><span class="bar purple" style="width:62.8%"></span></span><span>62.8%</span></div>
+                    <div class="bar-row"><span>qwen3-vl-plus</span><span class="bar-track"><span class="bar green" style="width:52.3%"></span></span><span>52.3%</span></div>
+          <div class="bar-row"><span>235B thinking</span><span class="bar-track"><span class="bar purple" style="width:62.5%"></span></span><span>62.5%</span></div>
         </div>
-        <p class="axis-note">Partial snapshot: 72 / 1,261 rows for qwen3-vl-plus and 29 / 1,261 rows for 235B thinking.</p>
+        <p class="axis-note">Snapshot: 231 / 1,261 rows for qwen3-vl-plus; 116 / 1,261 rows for 235B thinking.</p>
       </div>
     </section>
 
@@ -673,21 +673,21 @@ Attack_Behavior_Explanation:
             </tr>
           </thead>
           <tbody>
-            <tr>
+                        <tr>
               <td>qwen3-vl-plus</td>
-              <td>37.0%</td>
-              <td>45.4%</td>
-              <td>38.8%</td>
-              <td>39.2%</td>
-              <td>45.8%</td>
+              <td>42.7%</td>
+              <td>43.6%</td>
+              <td>37.3%</td>
+              <td>37.3%</td>
+              <td>43.7%</td>
             </tr>
             <tr>
               <td>qwen3-vl-235b-a22b-thinking</td>
-              <td>39.8%</td>
-              <td>48.7%</td>
-              <td>41.5%</td>
-              <td>43.9%</td>
-              <td>51.7%</td>
+              <td>46.2%</td>
+              <td>47.9%</td>
+              <td>41.1%</td>
+              <td>40.7%</td>
+              <td>47.4%</td>
             </tr>
           </tbody>
         </table>
@@ -717,19 +717,19 @@ Attack_Behavior_Explanation:
           </tr>
         </thead>
         <tbody>
-          <tr><td>original</td><td>6 / 3</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>33.3%</td><td>33.3%</td><td>33.3%</td></tr>
-          <tr><td>attack0</td><td>6 / 3</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td></tr>
-          <tr><td>attack1</td><td>6 / 3</td><td>27.8%</td><td>83.3%</td><td>41.7%</td><td>42.9%</td><td>100.0%</td><td>60.0%</td></tr>
-          <tr><td>attack2</td><td>6 / 2</td><td>75.0%</td><td>100.0%</td><td>85.7%</td><td>66.7%</td><td>100.0%</td><td>80.0%</td></tr>
-          <tr><td>attack3</td><td>6 / 2</td><td>25.0%</td><td>16.7%</td><td>20.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
-          <tr><td>attack4</td><td>6 / 2</td><td>28.6%</td><td>33.3%</td><td>30.8%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
-          <tr><td>attack5</td><td>6 / 2</td><td>33.3%</td><td>16.7%</td><td>22.2%</td><td>25.0%</td><td>50.0%</td><td>33.3%</td></tr>
-          <tr><td>attack6</td><td>5 / 2</td><td>66.7%</td><td>40.0%</td><td>50.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
-          <tr><td>attack7</td><td>5 / 2</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
-          <tr><td>attack9</td><td>5 / 2</td><td>62.5%</td><td>100.0%</td><td>76.9%</td><td>50.0%</td><td>100.0%</td><td>66.7%</td></tr>
-          <tr><td>attack10</td><td>5 / 2</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
-          <tr><td>attack12</td><td>5 / 2</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>100.0%</td><td>50.0%</td><td>66.7%</td></tr>
-          <tr><td>attackieee</td><td>5 / 2</td><td>62.5%</td><td>100.0%</td><td>76.9%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td></tr>
+                    <tr><td>original</td><td>18 / 9</td><td>33.3%</td><td>5.6%</td><td>9.5%</td><td>25.0%</td><td>33.3%</td><td>28.6%</td></tr>
+          <tr><td>attack0</td><td>18 / 9</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td></tr>
+          <tr><td>attack1</td><td>18 / 9</td><td>21.7%</td><td>83.3%</td><td>34.5%</td><td>30.0%</td><td>100.0%</td><td>46.2%</td></tr>
+          <tr><td>attack2</td><td>18 / 9</td><td>61.5%</td><td>88.9%</td><td>72.7%</td><td>69.2%</td><td>100.0%</td><td>81.8%</td></tr>
+          <tr><td>attack3</td><td>18 / 9</td><td>12.5%</td><td>5.6%</td><td>7.7%</td><td>40.0%</td><td>22.2%</td><td>28.6%</td></tr>
+          <tr><td>attack4</td><td>18 / 9</td><td>31.8%</td><td>38.9%</td><td>35.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack5</td><td>18 / 9</td><td>15.4%</td><td>11.1%</td><td>12.9%</td><td>30.0%</td><td>33.3%</td><td>31.6%</td></tr>
+          <tr><td>attack6</td><td>18 / 9</td><td>75.0%</td><td>16.7%</td><td>27.3%</td><td>100.0%</td><td>11.1%</td><td>20.0%</td></tr>
+          <tr><td>attack7</td><td>18 / 9</td><td>50.0%</td><td>5.6%</td><td>10.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack9</td><td>18 / 9</td><td>60.0%</td><td>100.0%</td><td>75.0%</td><td>60.0%</td><td>100.0%</td><td>75.0%</td></tr>
+          <tr><td>attack10</td><td>17 / 9</td><td>20.0%</td><td>11.8%</td><td>14.8%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack12</td><td>17 / 9</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>66.7%</td><td>22.2%</td><td>33.3%</td></tr>
+          <tr><td>attackieee</td><td>17 / 8</td><td>73.9%</td><td>100.0%</td><td>85.0%</td><td>80.0%</td><td>100.0%</td><td>88.9%</td></tr>
         </tbody>
       </table>
     </section>
@@ -748,18 +748,18 @@ Attack_Behavior_Explanation:
             </tr>
           </thead>
           <tbody>
-            <tr><td>attack0</td><td>All readings replaced by zero.</td><td>0.657 <span class="tiny">n=7</span></td><td>0.669 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack1</td><td>Uniform random reduction, trend preserved.</td><td>0.679 <span class="tiny">n=7</span></td><td>0.693 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack2</td><td>Zero-valued random duration, on-off behavior.</td><td>0.644 <span class="tiny">n=7</span></td><td>0.640 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack3</td><td>Per-sample random scaling changes trend and amplitude.</td><td>0.652 <span class="tiny">n=7</span></td><td>0.624 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack4</td><td>Selected period of reduced measurements.</td><td>0.630 <span class="tiny">n=4</span></td><td>0.622 <span class="tiny">n=1</span></td></tr>
-            <tr><td>attack5</td><td>False random values based on average consumption.</td><td>0.640 <span class="tiny">n=6</span></td><td>0.653 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack6</td><td>Values capped above a cut-off point.</td><td>0.633 <span class="tiny">n=6</span></td><td>0.637 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack7</td><td>Cut-off subtracted; negative values become zero.</td><td>0.608 <span class="tiny">n=6</span></td><td>0.600 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack9</td><td>Flat constant average daily consumption.</td><td>0.657 <span class="tiny">n=6</span></td><td>0.658 <span class="tiny">n=3</span></td></tr>
-            <tr><td>attack10</td><td>Reversed pattern; total energy not reduced.</td><td>0.623 <span class="tiny">n=6</span></td><td>0.624 <span class="tiny">n=1</span></td></tr>
-            <tr><td>attack12</td><td>Pattern replaced with lower-consuming user.</td><td>0.555 <span class="tiny">n=6</span></td><td>0.623 <span class="tiny">n=2</span></td></tr>
-            <tr><td>attackieee</td><td>Intervals report actual use or zero.</td><td>0.703 <span class="tiny">n=6</span></td><td>0.681 <span class="tiny">n=2</span></td></tr>
+                        <tr><td>attack0</td><td>All readings replaced by zero.</td><td>0.356 <span class="tiny">n=18</span></td><td>0.347 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack1</td><td>Uniform random reduction, trend preserved.</td><td>0.366 <span class="tiny">n=18</span></td><td>0.420 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack2</td><td>Zero-valued random duration, on-off behavior.</td><td>0.259 <span class="tiny">n=18</span></td><td>0.255 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack3</td><td>Per-sample random scaling changes trend and amplitude.</td><td>0.274 <span class="tiny">n=18</span></td><td>0.283 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack4</td><td>Selected period of reduced measurements.</td><td>0.248 <span class="tiny">n=16</span></td><td>0.224 <span class="tiny">n=5</span></td></tr>
+            <tr><td>attack5</td><td>False random values based on average consumption.</td><td>0.256 <span class="tiny">n=18</span></td><td>0.269 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack6</td><td>Values capped above a cut-off point.</td><td>0.245 <span class="tiny">n=18</span></td><td>0.250 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack7</td><td>Cut-off subtracted; negative values become zero.</td><td>0.244 <span class="tiny">n=18</span></td><td>0.249 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack9</td><td>Flat constant average daily consumption.</td><td>0.273 <span class="tiny">n=18</span></td><td>0.281 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attack10</td><td>Reversed pattern; total energy not reduced.</td><td>0.243 <span class="tiny">n=17</span></td><td>0.234 <span class="tiny">n=4</span></td></tr>
+            <tr><td>attack12</td><td>Pattern replaced with lower-consuming user.</td><td>0.150 <span class="tiny">n=17</span></td><td>0.177 <span class="tiny">n=9</span></td></tr>
+            <tr><td>attackieee</td><td>Intervals report actual use or zero.</td><td>0.377 <span class="tiny">n=17</span></td><td>0.329 <span class="tiny">n=8</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -769,14 +769,14 @@ Attack_Behavior_Explanation:
           <p class="axis-note">Example partial BERT-F1 bars for three attack classes.</p>
         </div>
         <div class="bars">
-          <div class="bar-row"><span>attack0 plus</span><span class="bar-track"><span class="bar green" style="width:65.7%"></span></span><span>0.657</span></div>
-          <div class="bar-row"><span>attack0 235B</span><span class="bar-track"><span class="bar purple" style="width:66.9%"></span></span><span>0.669</span></div>
-          <div class="bar-row"><span>attack10 plus</span><span class="bar-track"><span class="bar purple" style="width:62.3%"></span></span><span>0.623</span></div>
-          <div class="bar-row"><span>attack10 235B</span><span class="bar-track"><span class="bar" style="width:62.4%"></span></span><span>0.624</span></div>
-          <div class="bar-row"><span>attackieee plus</span><span class="bar-track"><span class="bar green" style="width:70.3%"></span></span><span>0.703</span></div>
-          <div class="bar-row"><span>attackieee 235B</span><span class="bar-track"><span class="bar purple" style="width:68.1%"></span></span><span>0.681</span></div>
+                    <div class="bar-row"><span>attack0 qwen3-vl-plus</span><span class="bar-track"><span class="bar green" style="width:35.6%"></span></span><span>0.356</span></div>
+          <div class="bar-row"><span>attack0 235B thinking</span><span class="bar-track"><span class="bar purple" style="width:34.7%"></span></span><span>0.347</span></div>
+          <div class="bar-row"><span>attack10 qwen3-vl-plus</span><span class="bar-track"><span class="bar green" style="width:24.3%"></span></span><span>0.243</span></div>
+          <div class="bar-row"><span>attack10 235B thinking</span><span class="bar-track"><span class="bar purple" style="width:23.4%"></span></span><span>0.234</span></div>
+          <div class="bar-row"><span>attackieee qwen3-vl-plus</span><span class="bar-track"><span class="bar green" style="width:37.7%"></span></span><span>0.377</span></div>
+          <div class="bar-row"><span>attackieee 235B thinking</span><span class="bar-track"><span class="bar purple" style="width:32.9%"></span></span><span>0.329</span></div>
         </div>
-        <p class="axis-note">Full grouped chart can be generated after both background runs reach 1,261 rows.</p>
+        <p class="axis-note">Example partial BERT-F1 bars updated at 2026-05-07 09:15:05; full table uses 231 completed rows from the largest run.</p>
       </div>
     </section>
 
@@ -786,7 +786,7 @@ Attack_Behavior_Explanation:
       <p>
         Original-case sample from the currently running shared subset:
         <span class="mono">CONS200_MONTH13 / original_day</span>. Ground truth is
-        <strong>Original</strong>. The image pair is the normal reference week against the original query day shown in the example-input section above.
+        <strong>Original</strong>. The image pair below is the normal reference week against the original query day.
       </p>
       <div class="pill-row">
         <span class="pill">season=winter</span>
@@ -794,13 +794,22 @@ Attack_Behavior_Explanation:
         <span class="pill">gt_binary=original</span>
         <span class="pill">gt_attack=original</span>
       </div>
-      <figure style="margin-top:14px">
-        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/original_day.png" alt="Original query day plot for CONS200 month 13">
-        <figcaption>
-          <strong>Original Query Day</strong>
-          The query-day plot used for the two model outputs below. Expected binary label: Original.
-        </figcaption>
-      </figure>
+      <div class="grid-2" style="margin-top:14px">
+        <figure>
+          <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/normal_week.png" alt="Normal reference week plot for CONS200 month 13">
+          <figcaption>
+            <strong>Reference Week</strong>
+            Clean normal-week baseline sent as the first image in both model calls.
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/original_day.png" alt="Original query day plot for CONS200 month 13">
+          <figcaption>
+            <strong>Original Query Day</strong>
+            Query-day plot sent as the second image in both model calls. Expected binary label: Original.
+          </figcaption>
+        </figure>
+      </div>
     </section>
 
     <section class="grid-2">
