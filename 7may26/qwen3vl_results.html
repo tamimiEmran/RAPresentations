@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alibaba Qwen3-VL Results Scaffold</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --panel-soft: #f0f3f6;
+      --line: #d8dee6;
+      --text: #18202c;
+      --muted: #5f6c7b;
+      --quiet: #8792a0;
+      --green: #0f8f71;
+      --green-soft: #e7f5f1;
+      --blue: #2f6fd0;
+      --blue-soft: #e7eefb;
+      --red: #c9433d;
+      --red-soft: #fae9e8;
+      --amber: #aa7418;
+      --amber-soft: #fbf0db;
+      --purple: #7856b5;
+      --purple-soft: #f0ebf8;
+      --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.48;
+    }
+    .page {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 34px 36px 56px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: start;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 0;
+      line-height: 1.16;
+    }
+    h2 {
+      margin: 34px 0 14px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    p { margin: 0 0 10px; }
+    .muted { color: var(--muted); }
+    .tiny {
+      color: var(--quiet);
+      font-size: 12px;
+    }
+    .mono { font-family: var(--mono); }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: var(--panel);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(24, 32, 44, 0.04);
+    }
+    .panel.compact { padding: 14px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .prompt-card {
+      min-height: 152px;
+      border-top: 4px solid var(--blue);
+    }
+    .prompt-card:nth-child(2) { border-top-color: var(--green); }
+    .prompt-card:nth-child(3) { border-top-color: var(--amber); }
+    .prompt-card:nth-child(4) { border-top-color: var(--purple); }
+    .prompt-card:nth-child(5) { border-top-color: var(--red); }
+    .prompt-card:nth-child(6) { border-top-color: var(--blue); }
+    .prompt-card ul,
+    .metric-notes ul {
+      margin: 9px 0 0 18px;
+      padding: 0;
+    }
+    .prompt-card li,
+    .metric-notes li {
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .status {
+      min-width: 300px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--panel-soft);
+      font-size: 13px;
+    }
+    .status-row:last-child { border-bottom: 0; }
+    .status-row span:first-child { color: var(--muted); }
+    .status-row span:last-child {
+      font-family: var(--mono);
+      text-align: right;
+    }
+    .image-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    figure {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+    figure img {
+      display: block;
+      width: 100%;
+      height: 236px;
+      object-fit: contain;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+    figcaption {
+      min-height: 66px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    figcaption strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      table-layout: fixed;
+    }
+    th {
+      padding: 9px 10px;
+      text-align: left;
+      color: var(--muted);
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      vertical-align: bottom;
+    }
+    td {
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      vertical-align: top;
+    }
+    td.placeholder {
+      color: var(--quiet);
+      font-family: var(--mono);
+      background: #fbfcfd;
+    }
+    .metric-plan {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .figure-shell {
+      min-height: 240px;
+      border: 1px dashed #b8c2ce;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(47,111,208,0.05), rgba(15,143,113,0.04)),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(95,108,123,0.08) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(95,108,123,0.08) 80px);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .figure-shell strong {
+      font-size: 14px;
+    }
+    .figure-shell .axis-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .bars {
+      display: grid;
+      gap: 9px;
+      margin-top: 16px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 150px 1fr 46px;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bar-track {
+      height: 18px;
+      background: #e8edf2;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--blue);
+    }
+    .bar.green { background: var(--green); }
+    .bar.purple { background: var(--purple); }
+    .code {
+      overflow: auto;
+      max-height: 360px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #10151f;
+      color: #e7eef8;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .flow-step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 12px;
+    }
+    .flow-step .num {
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .attack-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .attack-chip {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px;
+      background: #fbfcfd;
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 64px;
+    }
+    .attack-chip strong {
+      display: block;
+      color: var(--text);
+      font-family: var(--mono);
+      margin-bottom: 3px;
+    }
+    .callout {
+      border-left: 4px solid var(--amber);
+      background: var(--amber-soft);
+      padding: 12px 14px;
+      border-radius: 6px;
+      color: #5c4217;
+      font-size: 13px;
+      margin: 12px 0 0;
+    }
+    @media (max-width: 920px) {
+      .page { padding: 22px 16px 42px; }
+      header,
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .image-grid,
+      .metric-plan,
+      .flow,
+      .attack-list {
+        grid-template-columns: 1fr;
+      }
+      .status { min-width: 0; }
+      figure img { height: auto; }
+      .bar-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
+<style>
+  .rap-nav, .rap-nav * { box-sizing: border-box; }
+  .rap-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
+    padding: 6px 14px; height: 40px;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 12px; font-weight: 400; line-height: 1;
+    letter-spacing: 0; color: #1A1D26;
+  }
+  .rap-nav a {
+    text-decoration: none; color: #5A5E6E;
+    padding: 6px 10px; border-radius: 6px;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap; font-weight: 400;
+  }
+  .rap-nav a:hover { background: rgba(59, 111, 214, 0.08); color: #3B6FD6; }
+  .rap-nav .rap-nav-back {
+    color: #1A1D26; font-weight: 500;
+    border: 1px solid rgba(224, 226, 232, 0.9);
+    margin-right: 8px; padding: 5px 10px;
+  }
+  .rap-nav .rap-nav-back:hover { border-color: #3B6FD6; }
+  .rap-nav .rap-nav-current {
+    background: rgba(14, 154, 126, 0.1); color: #0E9A7E;
+    font-weight: 500; pointer-events: none;
+  }
+  body { padding-top: 48px; }
+  @media (max-width: 720px) {
+    .rap-nav { font-size: 11px; padding: 6px 8px; }
+    .rap-nav a { padding: 5px 7px; }
+  }
+</style>
+<nav class="rap-nav">
+  <a class="rap-nav-back" href="index.html">&larr; 7 May Hub</a>
+  <a href="llm_experiment_design.html">LLM Design</a>
+  <a class="rap-nav-current" href="qwen3vl_results.html">Qwen3-VL Results</a>
+</nav>
+<!-- ==== /RAPresentations nav ==== -->
+  <main class="page">
+    <header>
+      <section>
+        <h1>Alibaba Qwen3-VL Energy-Theft Results</h1>
+        <p class="muted">Static report scaffold for the two Alibaba Model Studio runs over the updated shared image package.</p>
+        <div class="pill-row">
+          <span class="pill">Dataset: updated shared.zip</span>
+          <span class="pill">Rows expected: 1,261</span>
+          <span class="pill">Prompt SHA: 8f1e540eac8f6fc1</span>
+          <span class="pill">Created: 2026-05-07</span>
+        </div>
+      </section>
+      <aside class="status">
+        <div class="status-row"><span>Model A</span><span>qwen3-vl-plus</span></div>
+        <div class="status-row"><span>Model B</span><span>qwen3-vl-235b-a22b-thinking</span></div>
+        <div class="status-row"><span>Input mode</span><span>two plots + prompt</span></div>
+        <div class="status-row"><span>Max output</span><span>10,000 tokens</span></div>
+        <div class="status-row"><span>Metric state</span><span>partial snapshot</span></div>
+      </aside>
+    </header>
+
+    <section class="panel">
+      <h2 style="margin-top:0">Report Scope</h2>
+      <p>
+        This file now contains a partial metric snapshot taken at 2026-05-07 07:52:50. The background runs are still active, so these values describe only the rows completed at snapshot time and should be replaced after both parquet files reach 1,261 rows.
+      </p>
+      <div class="flow" aria-label="evaluation flow">
+        <div class="flow-step">
+          <span class="num">1</span>
+          <h3>Binary Task</h3>
+          <p class="muted">Original versus manipulated detection from two plot images.</p>
+        </div>
+        <div class="flow-step">
+          <span class="num">2</span>
+          <h3>Attack Class</h3>
+          <p class="muted">Single most likely attack class for manipulated days.</p>
+        </div>
+        <div class="flow-step">
+          <span class="num">3</span>
+          <h3>Explanation</h3>
+          <p class="muted">Behavior, magnitude/trend effect, and technical causes.</p>
+        </div>
+        <div class="flow-step">
+          <span class="num">4</span>
+          <h3>Scoring</h3>
+          <p class="muted">Balanced accuracy, multiclass metrics, and per-class BERT-F1.</p>
+        </div>
+      </div>
+    </section>
+
+    <h2>Prompt Summary</h2>
+    <section class="grid-3">
+      <article class="panel prompt-card">
+        <h3>Role Definition</h3>
+        <p class="muted">The model is positioned as a smart-grid security and non-technical-loss expert.</p>
+        <ul>
+          <li>Domain: smart meters and energy theft.</li>
+          <li>Focus: consumption-pattern manipulation.</li>
+          <li>Assumption: normal reference week is clean.</li>
+        </ul>
+      </article>
+      <article class="panel prompt-card">
+        <h3>Input Contract</h3>
+        <p class="muted">Each sample contains two images in a fixed order.</p>
+        <ul>
+          <li>Image 1: one normal reference week.</li>
+          <li>Image 2: one query day from the same meter.</li>
+          <li>Metadata adds season, weekday, date, and IDs.</li>
+        </ul>
+      </article>
+      <article class="panel prompt-card">
+        <h3>Attack Definitions</h3>
+        <p class="muted">The prompt defines the retained attack scenarios with behavior and likely causes.</p>
+        <ul>
+          <li>Magnitude-reduction attacks: 1, 3, 4, 6, 7.</li>
+          <li>Pattern-altering attacks: 5, 10, 12.</li>
+          <li>Zero/flat attacks: 0, 2, 9, IEEE.</li>
+        </ul>
+      </article>
+      <article class="panel prompt-card">
+        <h3>Task Sequence</h3>
+        <p class="muted">The model must decide in order, not jump straight to an attack label.</p>
+        <ul>
+          <li>Classify original versus manipulated.</li>
+          <li>If manipulated, identify one most likely attack.</li>
+          <li>Explain why the top alternatives were ruled out.</li>
+        </ul>
+      </article>
+      <article class="panel prompt-card">
+        <h3>Output Contract</h3>
+        <p class="muted">The response format is sectioned text rather than strict JSON.</p>
+        <ul>
+          <li>Classification: Original or Manipulated.</li>
+          <li>Identified Attack: most likely, confidence, reasoning.</li>
+          <li>Attack behavior explanation: manipulation, impact, causes.</li>
+        </ul>
+      </article>
+      <article class="panel prompt-card">
+        <h3>Evaluation Hooks</h3>
+        <p class="muted">The output is parsed into fields for later metric computation.</p>
+        <ul>
+          <li>Binary label drives balanced accuracy.</li>
+          <li>Most Likely drives multiclass metrics.</li>
+          <li>Explanation text drives BERT-F1 per class.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h3>Attack Classes Used In The Prompt</h3>
+      <div class="attack-list">
+        <div class="attack-chip"><strong>original</strong>Consistent with the normal reference behavior.</div>
+        <div class="attack-chip"><strong>attack0</strong>All samples replaced by zero.</div>
+        <div class="attack-chip"><strong>attack1</strong>Uniform scaling by a factor between 0 and 1.</div>
+        <div class="attack-chip"><strong>attack2</strong>Zero replacement during a random interval.</div>
+        <div class="attack-chip"><strong>attack3</strong>Per-sample random scaling.</div>
+        <div class="attack-chip"><strong>attack4</strong>Random period with reduced measurements.</div>
+        <div class="attack-chip"><strong>attack5</strong>False samples from average consumption times random factors.</div>
+        <div class="attack-chip"><strong>attack6</strong>Consumption capped at a random cut-off.</div>
+        <div class="attack-chip"><strong>attack7</strong>Subtract cut-off; negative values become zero.</div>
+        <div class="attack-chip"><strong>attack9</strong>Flat average daily consumption.</div>
+        <div class="attack-chip"><strong>attack10</strong>Reversed pattern without reducing total energy.</div>
+        <div class="attack-chip"><strong>attack12</strong>Pattern replaced with a lower-consuming user.</div>
+        <div class="attack-chip"><strong>attackieee</strong>Each interval is either actual consumption or zero.</div>
+      </div>
+    </section>
+
+    <h2>Image Examples</h2>
+    <section class="image-grid">
+      <figure>
+        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/normal_week.png" alt="Normal reference week for CONS200 month 13">
+        <figcaption>
+          <strong>Reference Week</strong>
+          Clean week used as the consumer-specific baseline for all query-day comparisons.
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/original_day.png" alt="Original query day for CONS200 month 13">
+        <figcaption>
+          <strong>Original Query Day</strong>
+          Expected binary label: Original. Attack-identification fields should remain empty.
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/attack10.png" alt="Attack 10 query day for CONS200 month 13">
+        <figcaption>
+          <strong>Manipulated Query Day</strong>
+          Example attack class: attack10, where the time pattern is reversed while total energy is not reduced.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="grid-2" style="margin-top:16px">
+      <figure>
+        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/attack0.png" alt="Attack 0 query day for CONS200 month 13">
+        <figcaption>
+          <strong>Attack 0 Example</strong>
+          Zero-consumption signature; useful as a simple visual sanity check.
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/attackieee.png" alt="Attack IEEE query day for CONS200 month 13">
+        <figcaption>
+          <strong>Attack IEEE Example</strong>
+          Irregular interval-level zero substitution across the day.
+        </figcaption>
+      </figure>
+    </section>
+
+    <h2>Example Output</h2>
+    <section class="grid-2">
+      <article class="panel">
+        <h3>Expected Original-Case Shape</h3>
+        <pre class="code">Classification:
+- Original
+
+Identified Attack:
+- Most Likely:
+- Confidence:
+- Reasoning:
+
+Attack_Behavior_Explanation:
+-</pre>
+      </article>
+      <article class="panel">
+        <h3>Expected Manipulated-Case Shape</h3>
+        <pre class="code">Classification:
+- Manipulated
+
+Identified Attack:
+- Most Likely: Attack 10
+- Confidence: Medium
+- Reasoning: The query day shifts the high-consumption region relative to the reference week while preserving comparable magnitude. Attack 12 and Attack 4 are less likely because the curve is not simply from a lower-consuming user and does not show one localized reduced segment.
+
+Attack_Behavior_Explanation:
+- Consumption values are temporally rearranged relative to normal behavior.
+- Magnitude is broadly preserved, but the trend and peak timing change.
+- Possible cause: false data injection intended to shift apparent usage into off-peak periods.</pre>
+      </article>
+    </section>
+
+    <h2>Partial Results Snapshot</h2>
+    <section class="panel metric-notes">
+      <h3>Metric Order</h3>
+      <ul>
+        <li><strong>Balanced accuracy first:</strong> binary original/manipulated score computed as the average of original recall and manipulated recall.</li>
+        <li><strong>Multiclass second:</strong> per-class precision, recall, and F1 over original plus retained attack classes, using the parsed most-likely label.</li>
+        <li><strong>BERT-F1 third:</strong> per-class semantic similarity between the generated explanation and that class definition from the prompt.</li>
+        <li><strong>Current BERT-F1 method:</strong> extracted Attack_Behavior_Explanation only, bert-base-uncased token matching, no IDF weighting, 512-token truncation per field.</li>
+      </ul>
+      <div class="callout">
+        BERT-F1 is computed only on rows with a successful API response, no parse error, and a non-empty parsed Attack_Behavior_Explanation field. Original rows remain N/A unless a separate original-behavior reference text is defined.
+      </div>
+    </section>
+
+    <h2>Balanced Accuracy</h2>
+    <section class="metric-plan">
+      <div class="panel">
+        <h3>Binary Detection Table</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Rows</th>
+              <th>Original Recall</th>
+              <th>Manipulated Recall</th>
+              <th>Balanced Accuracy</th>
+              <th>Parse Failures</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>qwen3-vl-plus</td>
+              <td>72 / 1,261</td>
+              <td>0.0%</td>
+              <td>97.0%</td>
+              <td>48.5%</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>qwen3-vl-235b-a22b-thinking</td>
+              <td>29 / 1,261</td>
+              <td>33.3%</td>
+              <td>92.3%</td>
+              <td>62.8%</td>
+              <td>0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="figure-shell">
+        <div>
+          <strong>Figure 1. Binary Balanced Accuracy</strong>
+          <p class="axis-note">Y-axis: model. X-axis: balanced accuracy, 0.0 to 1.0.</p>
+        </div>
+        <div class="bars">
+          <div class="bar-row"><span>qwen3-vl-plus</span><span class="bar-track"><span class="bar green" style="width:48.5%"></span></span><span>48.5%</span></div>
+          <div class="bar-row"><span>235B thinking</span><span class="bar-track"><span class="bar purple" style="width:62.8%"></span></span><span>62.8%</span></div>
+        </div>
+        <p class="axis-note">Partial snapshot: 72 / 1,261 rows for qwen3-vl-plus and 29 / 1,261 rows for 235B thinking.</p>
+      </div>
+    </section>
+
+    <h2>Multiclass Results</h2>
+    <section class="metric-plan">
+      <div class="panel">
+        <h3>Overall Multiclass Summary</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Macro Precision</th>
+              <th>Macro Recall</th>
+              <th>Macro F1</th>
+              <th>Weighted F1</th>
+              <th>Accuracy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>qwen3-vl-plus</td>
+              <td>37.0%</td>
+              <td>45.4%</td>
+              <td>38.8%</td>
+              <td>39.2%</td>
+              <td>45.8%</td>
+            </tr>
+            <tr>
+              <td>qwen3-vl-235b-a22b-thinking</td>
+              <td>39.8%</td>
+              <td>48.7%</td>
+              <td>41.5%</td>
+              <td>43.9%</td>
+              <td>51.7%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="figure-shell">
+        <div>
+          <strong>Figure 2. Multiclass Confusion Matrix</strong>
+          <p class="axis-note">Rows: ground truth. Columns: parsed prediction. One matrix per model.</p>
+        </div>
+        <p class="axis-note">Placeholder for a 13-class confusion matrix using original, attack0, attack1, attack2, attack3, attack4, attack5, attack6, attack7, attack9, attack10, attack12, and attackieee.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Per-Class Multiclass Metrics</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Support (Plus / 235B)</th>
+            <th>Plus Precision</th>
+            <th>Plus Recall</th>
+            <th>Plus F1</th>
+            <th>235B Precision</th>
+            <th>235B Recall</th>
+            <th>235B F1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>original</td><td>6 / 3</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>33.3%</td><td>33.3%</td><td>33.3%</td></tr>
+          <tr><td>attack0</td><td>6 / 3</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td></tr>
+          <tr><td>attack1</td><td>6 / 3</td><td>27.8%</td><td>83.3%</td><td>41.7%</td><td>42.9%</td><td>100.0%</td><td>60.0%</td></tr>
+          <tr><td>attack2</td><td>6 / 2</td><td>75.0%</td><td>100.0%</td><td>85.7%</td><td>66.7%</td><td>100.0%</td><td>80.0%</td></tr>
+          <tr><td>attack3</td><td>6 / 2</td><td>25.0%</td><td>16.7%</td><td>20.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack4</td><td>6 / 2</td><td>28.6%</td><td>33.3%</td><td>30.8%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack5</td><td>6 / 2</td><td>33.3%</td><td>16.7%</td><td>22.2%</td><td>25.0%</td><td>50.0%</td><td>33.3%</td></tr>
+          <tr><td>attack6</td><td>5 / 2</td><td>66.7%</td><td>40.0%</td><td>50.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack7</td><td>5 / 2</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack9</td><td>5 / 2</td><td>62.5%</td><td>100.0%</td><td>76.9%</td><td>50.0%</td><td>100.0%</td><td>66.7%</td></tr>
+          <tr><td>attack10</td><td>5 / 2</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+          <tr><td>attack12</td><td>5 / 2</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>100.0%</td><td>50.0%</td><td>66.7%</td></tr>
+          <tr><td>attackieee</td><td>5 / 2</td><td>62.5%</td><td>100.0%</td><td>76.9%</td><td>100.0%</td><td>100.0%</td><td>100.0%</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <h2>BERT-F1 Explanation Alignment</h2>
+    <section class="metric-plan">
+      <div class="panel">
+        <h3>Per-Class BERT-F1 Table</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Reference Text</th>
+              <th>qwen3-vl-plus</th>
+              <th>235B Thinking</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>attack0</td><td>All readings replaced by zero.</td><td>0.657 <span class="tiny">n=7</span></td><td>0.669 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack1</td><td>Uniform random reduction, trend preserved.</td><td>0.679 <span class="tiny">n=7</span></td><td>0.693 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack2</td><td>Zero-valued random duration, on-off behavior.</td><td>0.644 <span class="tiny">n=7</span></td><td>0.640 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack3</td><td>Per-sample random scaling changes trend and amplitude.</td><td>0.652 <span class="tiny">n=7</span></td><td>0.624 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack4</td><td>Selected period of reduced measurements.</td><td>0.630 <span class="tiny">n=4</span></td><td>0.622 <span class="tiny">n=1</span></td></tr>
+            <tr><td>attack5</td><td>False random values based on average consumption.</td><td>0.640 <span class="tiny">n=6</span></td><td>0.653 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack6</td><td>Values capped above a cut-off point.</td><td>0.633 <span class="tiny">n=6</span></td><td>0.637 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack7</td><td>Cut-off subtracted; negative values become zero.</td><td>0.608 <span class="tiny">n=6</span></td><td>0.600 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack9</td><td>Flat constant average daily consumption.</td><td>0.657 <span class="tiny">n=6</span></td><td>0.658 <span class="tiny">n=3</span></td></tr>
+            <tr><td>attack10</td><td>Reversed pattern; total energy not reduced.</td><td>0.623 <span class="tiny">n=6</span></td><td>0.624 <span class="tiny">n=1</span></td></tr>
+            <tr><td>attack12</td><td>Pattern replaced with lower-consuming user.</td><td>0.555 <span class="tiny">n=6</span></td><td>0.623 <span class="tiny">n=2</span></td></tr>
+            <tr><td>attackieee</td><td>Intervals report actual use or zero.</td><td>0.703 <span class="tiny">n=6</span></td><td>0.681 <span class="tiny">n=2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="figure-shell">
+        <div>
+          <strong>Figure 3. BERT-F1 By Attack Class</strong>
+          <p class="axis-note">Example partial BERT-F1 bars for three attack classes.</p>
+        </div>
+        <div class="bars">
+          <div class="bar-row"><span>attack0 plus</span><span class="bar-track"><span class="bar green" style="width:65.7%"></span></span><span>0.657</span></div>
+          <div class="bar-row"><span>attack0 235B</span><span class="bar-track"><span class="bar purple" style="width:66.9%"></span></span><span>0.669</span></div>
+          <div class="bar-row"><span>attack10 plus</span><span class="bar-track"><span class="bar purple" style="width:62.3%"></span></span><span>0.623</span></div>
+          <div class="bar-row"><span>attack10 235B</span><span class="bar-track"><span class="bar" style="width:62.4%"></span></span><span>0.624</span></div>
+          <div class="bar-row"><span>attackieee plus</span><span class="bar-track"><span class="bar green" style="width:70.3%"></span></span><span>0.703</span></div>
+          <div class="bar-row"><span>attackieee 235B</span><span class="bar-track"><span class="bar purple" style="width:68.1%"></span></span><span>0.681</span></div>
+        </div>
+        <p class="axis-note">Full grouped chart can be generated after both background runs reach 1,261 rows.</p>
+      </div>
+    </section>
+
+    <h2>Original Example Outputs</h2>
+    <section class="panel metric-notes">
+      <h3>Example Input</h3>
+      <p>
+        Original-case sample from the currently running shared subset:
+        <span class="mono">CONS200_MONTH13 / original_day</span>. Ground truth is
+        <strong>Original</strong>. The image pair is the normal reference week against the original query day shown in the example-input section above.
+      </p>
+      <div class="pill-row">
+        <span class="pill">season=winter</span>
+        <span class="pill">weekday=Friday</span>
+        <span class="pill">gt_binary=original</span>
+        <span class="pill">gt_attack=original</span>
+      </div>
+      <figure style="margin-top:14px">
+        <img src="../output/alibaba_shared/shared/plots/CONS200_MONTH13/original_day.png" alt="Original query day plot for CONS200 month 13">
+        <figcaption>
+          <strong>Original Query Day</strong>
+          The query-day plot used for the two model outputs below. Expected binary label: Original.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h3>qwen3-vl-plus</h3>
+        <p class="muted">
+          Parsed result: <strong>Manipulated</strong>, most likely <strong>Attack 10</strong>, confidence <strong>High</strong>.
+          This is an incorrect prediction for the original example.
+        </p>
+        <h3>Thinking excerpt</h3>
+        <pre class="code">So, let's tackle this problem step by step. First, I need to compare the normal week plot with the query day plot to see if there's manipulation.
+
+First, look at the normal week plot. It's a week of data, with x-axis as 15-min intervals up to 700. The consumption shows typical daily patterns: peaks during the day, lower at night. There are recurring patterns every day, with high consumption in the morning, then a drop, then another peak.
+
+[...]
+
+So the manipulation is shifting the peak time. Attack 10 is designed for shifting consumption to off-peak periods, which fits. The query day's total might be similar, which fits Attack 10. Attack 12 would have a different total if it is a lower-consuming user, but the query day's total seems similar.
+
+So the most likely is Attack 10.</pre>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Manipulated
+
+Identified Attack:
+- Most Likely: Attack 10
+- Confidence: High
+- Reasoning: The query day exhibits a reversed temporal pattern compared to the normal week, shifting the typical afternoon/evening consumption peaks to an early-morning peak. This matches Attack 10's definition of reversing the consumption pattern to shift high consumption to off-peak periods without reducing total energy use. Attack 12 was ruled out because it involves replacing with a lower-consuming user's pattern, but the query day's magnitude and total consumption area appear similar to normal, not reduced. Attack 4 was ruled out because it reduces consumption over a period, but the query day's total consumption is consistent with normal behavior.
+
+Attack_Behavior_Explanation:
+- The temporal sequence of consumption values is reversed while preserving the total daily consumption amount.
+- The magnitude remains similar to normal, but the trend is altered because the timing of peaks shifts from typical daytime/evening hours to early morning.
+- Possible cause: false data injection that reorders or inverts the time-series data before transmission.</pre>
+      </article>
+
+      <article class="panel">
+        <h3>qwen3-vl-235b-a22b-thinking</h3>
+        <p class="muted">
+          Parsed result: <strong>Original</strong>, with no identified attack. This matches the ground truth for the original example.
+        </p>
+        <h3>Thinking excerpt</h3>
+        <pre class="code">So, let's start by analyzing the two plots. The first plot is a week of normal consumption for Consumer 200, Month 13. The second plot is one day of consumption for the same consumer.
+
+First, check if the day is original or manipulated. The normal week plot shows multiple daily cycles, with several peaks and troughs. The query day has a single cycle, which is expected for a day, but let's compare the pattern.
+
+[...]
+
+The problem says that if the day is consistent with the customer's typical consumption behavior, classify it as original. The normal week shows low consumption at night, then a rise to day consumption. The query day also shows low consumption at the start, rises to around 145, then declines.
+
+Given that the query day's pattern matches the general trend and magnitude of the normal days, it is likely original.</pre>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Original
+
+Identified Attack:
+- Most Likely: N/A
+- Confidence: N/A
+- Reasoning: N/A
+
+Attack_Behavior_Explanation:
+- N/A</pre>
+      </article>
+    </section>
+
+  </main>
+</body>
+</html>

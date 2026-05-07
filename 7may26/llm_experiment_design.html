@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>LLM-Only Results — 4 Qwen Variants on the 97-Consumer Subset</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #F8F9FB; font-family: 'DM Sans', system-ui, sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 20px; gap: 40px;
+    }
+    svg text { font-family: 'DM Sans', system-ui, sans-serif; }
+    svg .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ===== Results section ===== */
+    .results { width: 100%; max-width: 1120px; }
+    .results-header { text-align: center; margin-bottom: 24px; }
+    .results-title {
+      font-size: 20px; font-weight: 700; color: #1A1D26;
+      letter-spacing: -0.5px; margin: 0;
+    }
+    .results-subtitle {
+      font-size: 11px; color: #8E92A0; margin-top: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .card {
+      background: #fff; border: 1px solid #E0E2E8; border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      padding: 22px 26px; margin-bottom: 18px;
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 14px; gap: 16px; flex-wrap: wrap;
+    }
+    .card-title { font-size: 14px; font-weight: 700; margin: 0; }
+    .card-subtitle { font-size: 10px; color: #8E92A0; margin: 4px 0 0; }
+    .card-meta {
+      font-size: 10px; color: #8E92A0;
+      font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+    }
+    .metrics-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .metrics-table th {
+      text-align: right; padding: 8px 6px; color: #8E92A0;
+      font-weight: 600; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 2px solid #E0E2E8;
+    }
+    .metrics-table th.t-left { text-align: left; }
+    .metrics-table td {
+      padding: 10px 6px; text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      color: #1A1D26; border-bottom: 1px solid #F0F1F4;
+    }
+    .metrics-table td.t-left {
+      text-align: left;
+      font-family: 'DM Sans', system-ui, sans-serif; font-weight: 600;
+    }
+    .metrics-table tr:last-child td { border-bottom: none; }
+    .row-llm { background: rgba(200,138,26,0.04); }
+    .row-llm td { color: #C88A1A; }
+    .row-overall td { border-top: 2px solid #E0E2E8; font-weight: 700; }
+    .takeaway {
+      font-size: 10px; color: #5A5E6E; line-height: 1.55;
+      margin: 14px 0 0; padding-top: 10px;
+      border-top: 1px dashed #E0E2E8;
+    }
+    .bar-grid { display: flex; flex-direction: column; gap: 5px; }
+    .bar-row {
+      display: grid; grid-template-columns: 150px 1fr 56px;
+      gap: 12px; align-items: center;
+    }
+    .bar-label {
+      font-size: 10px; color: #1A1D26;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .bar-track {
+      height: 10px; background: #F0F1F4;
+      border-radius: 5px; overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 5px; }
+    .bar-value {
+      font-size: 10px; text-align: right;
+      font-family: 'JetBrains Mono', monospace; color: #1A1D26;
+    }
+  </style>
+</head>
+<body>
+<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
+<style>
+  .rap-nav, .rap-nav * { box-sizing: border-box; }
+  .rap-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
+    padding: 6px 14px; height: 40px;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 12px; font-weight: 400; line-height: 1;
+    letter-spacing: 0; color: #1A1D26;
+  }
+  .rap-nav a {
+    text-decoration: none; color: #5A5E6E;
+    padding: 6px 10px; border-radius: 6px;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap; font-weight: 400;
+  }
+  .rap-nav a:hover { background: rgba(59, 111, 214, 0.08); color: #3B6FD6; }
+  .rap-nav .rap-nav-back {
+    color: #1A1D26; font-weight: 500;
+    border: 1px solid rgba(224, 226, 232, 0.9);
+    margin-right: 8px; padding: 5px 10px;
+  }
+  .rap-nav .rap-nav-back:hover { border-color: #3B6FD6; }
+  .rap-nav .rap-nav-current {
+    background: rgba(14, 154, 126, 0.1); color: #0E9A7E;
+    font-weight: 500; pointer-events: none;
+  }
+  body { padding-top: 48px; }
+  @media (max-width: 720px) {
+    .rap-nav { font-size: 11px; padding: 6px 8px; }
+    .rap-nav a { padding: 5px 7px; }
+  }
+</style>
+<nav class="rap-nav">
+  <a class="rap-nav-back" href="index.html">&larr; 7 May Hub</a>
+  <a class="rap-nav-current" href="llm_experiment_design.html">LLM Design</a>
+  <a href="qwen3vl_results.html">Qwen3-VL Results</a>
+</nav>
+<!-- ==== /RAPresentations nav ==== -->
+
+<svg width="1120" height="1020" viewBox="0 0 1120 1020" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- arrowhead -->
+    <marker id="arrow-right" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-down" viewBox="0 0 7 10" refX="3.5" refY="10" markerWidth="7" markerHeight="10">
+      <path d="M 0 0 L 7 0 L 3.5 10 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-down-left" viewBox="0 0 10 10" refX="0" refY="10" markerWidth="10" markerHeight="10">
+      <path d="M 10 0 L 10 8 L 0 10 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-down-right" viewBox="0 0 10 10" refX="10" refY="10" markerWidth="10" markerHeight="10">
+      <path d="M 0 0 L 0 8 L 10 10 z" fill="#8E92A0"/>
+    </marker>
+    <marker id="arrow-blue-right" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#3B6FD6"/>
+    </marker>
+    <marker id="arrow-blue-down" viewBox="0 0 7 10" refX="3.5" refY="10" markerWidth="7" markerHeight="10">
+      <path d="M 0 0 L 7 0 L 3.5 10 z" fill="#3B6FD6"/>
+    </marker>
+    <marker id="arrow-green-down" viewBox="0 0 7 10" refX="3.5" refY="10" markerWidth="7" markerHeight="10">
+      <path d="M 0 0 L 7 0 L 3.5 10 z" fill="#0E9A7E"/>
+    </marker>
+    <!-- rounded rect filter for subtle shadow -->
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="108%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- ============================================================ -->
+  <!-- TITLE                                                         -->
+  <!-- ============================================================ -->
+  <text x="560" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1A1D26" letter-spacing="-0.5">LLM-Only Evaluation &mdash; 4 Qwen Variants on the 97-Consumer Subset</text>
+  <text x="560" y="52" text-anchor="middle" font-size="11" fill="#8E92A0" class="mono">1,261 pairs &middot; 1,164 theft / 97 clean &middot; 13 scenarios &middot; single H100 80GB</text>
+
+  <!-- ============================================================ -->
+  <!-- TOP: ALL CONSUMERS                                            -->
+  <!-- ============================================================ -->
+  <rect x="360" y="74" width="400" height="54" rx="10" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="560" y="97" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1D26">324 Consumers (UCI Smart Meter)</text>
+  <text x="560" y="114" text-anchor="middle" font-size="10" fill="#8E92A0" class="mono">Split into development and evaluation cohorts</text>
+
+  <!-- Split arrows -->
+  <line x1="465" y1="128" x2="285" y2="170" stroke="#8E92A0" stroke-width="1.5" marker-end="url(#arrow-down-left)"/>
+  <line x1="655" y1="128" x2="835" y2="170" stroke="#8E92A0" stroke-width="1.5" marker-end="url(#arrow-down-right)"/>
+
+  <!-- ============================================================ -->
+  <!-- LEFT BRANCH: 70% ML DEVELOPMENT                               -->
+  <!-- ============================================================ -->
+  <!-- Main box -->
+  <rect x="50" y="174" width="460" height="54" rx="10" fill="rgba(59,111,214,0.08)" stroke="#3B6FD6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="280" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#3B6FD6">70% &mdash; ML Development Set</text>
+  <text x="280" y="216" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">227 consumers for training, tuning, and internal checks</text>
+
+  <!-- Arrow down to pair construction -->
+  <line x1="280" y1="228" x2="280" y2="262" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#arrow-blue-down)"/>
+
+  <!-- Pair construction box (left) -->
+  <rect x="90" y="266" width="370" height="68" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="275" y="286" text-anchor="middle" font-size="11" font-weight="600" fill="#1A1D26">Pair Construction (per consumer-month)</text>
+  <!-- mini flow inside -->
+  <rect x="108" y="296" width="90" height="28" rx="5" fill="rgba(14,154,126,0.08)"/>
+  <text x="153" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#0E9A7E">Week 0 (7d)</text>
+  <text x="214" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">+</text>
+  <rect x="230" y="296" width="90" height="28" rx="5" fill="rgba(59,111,214,0.08)"/>
+  <text x="275" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#3B6FD6">Query Day</text>
+  <text x="336" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">&times;13</text>
+  <rect x="352" y="296" width="90" height="28" rx="5" fill="rgba(139,92,196,0.08)"/>
+  <text x="397" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#8B5CC4">scenarios</text>
+
+  <!-- Arrow down to 80/10/10 -->
+  <line x1="280" y1="334" x2="280" y2="368" stroke="#3B6FD6" stroke-width="1.5" marker-end="url(#arrow-blue-down)"/>
+
+  <!-- Consumer-level split label -->
+  <rect x="140" y="370" width="280" height="24" rx="12" fill="rgba(59,111,214,0.12)"/>
+  <text x="280" y="386" text-anchor="middle" font-size="10" font-weight="600" fill="#3B6FD6" class="mono">Consumer-level split &middot; no leakage</text>
+
+  <!-- Arrow down to 3 boxes -->
+  <line x1="280" y1="394" x2="280" y2="418" stroke="#8E92A0" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="120" y1="418" x2="430" y2="418" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="120" y1="418" x2="120" y2="438" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="275" y1="418" x2="275" y2="438" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="430" y1="418" x2="430" y2="438" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+
+  <!-- Train box -->
+  <rect x="55" y="442" width="130" height="56" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="120" y="462" text-anchor="middle" font-size="12" font-weight="700" fill="#3B6FD6">Train</text>
+  <text x="120" y="480" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">80% (~182)</text>
+  <text x="120" y="492" text-anchor="middle" font-size="9" fill="#8E92A0">Model fitting</text>
+
+  <!-- Val box -->
+  <rect x="210" y="442" width="130" height="56" rx="8" fill="#fff" stroke="#C88A1A" filter="url(#shadow)"/>
+  <text x="275" y="462" text-anchor="middle" font-size="12" font-weight="700" fill="#C88A1A">Val</text>
+  <text x="275" y="480" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">10% (~23)</text>
+  <text x="275" y="492" text-anchor="middle" font-size="9" fill="#8E92A0">Tuning + threshold</text>
+
+  <!-- Internal Test box -->
+  <rect x="365" y="442" width="130" height="56" rx="8" fill="#fff" stroke="#8B5CC4" filter="url(#shadow)"/>
+  <text x="430" y="462" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5CC4">Int. Test</text>
+  <text x="430" y="480" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">10% (~22)</text>
+  <text x="430" y="492" text-anchor="middle" font-size="9" fill="#8E92A0">Sanity check</text>
+
+  <!-- Arrows from Train/Val to trained-models box removed (no models for LLM-only page) -->
+
+  <!-- ML training output box removed for LLM-only page -->
+
+  <!-- ============================================================ -->
+  <!-- RIGHT BRANCH: 30% EVALUATION HOLDOUT                          -->
+  <!-- ============================================================ -->
+  <!-- Main box -->
+  <rect x="610" y="174" width="460" height="54" rx="10" fill="rgba(14,154,126,0.08)" stroke="#0E9A7E" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="840" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#0E9A7E">30% &mdash; Evaluation Holdout</text>
+  <text x="840" y="216" text-anchor="middle" font-size="10" fill="#5A5E6E" class="mono">97 consumers reserved for ML vs LLM comparison</text>
+
+  <!-- Arrow down to pair construction -->
+  <line x1="840" y1="228" x2="840" y2="262" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- Pair construction box (right) -->
+  <rect x="640" y="266" width="370" height="68" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="825" y="286" text-anchor="middle" font-size="11" font-weight="600" fill="#1A1D26">Pair Construction (per consumer-month)</text>
+  <!-- mini flow inside -->
+  <rect x="658" y="296" width="90" height="28" rx="5" fill="rgba(14,154,126,0.08)"/>
+  <text x="703" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#0E9A7E">Week 0 (7d)</text>
+  <text x="764" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">+</text>
+  <rect x="780" y="296" width="90" height="28" rx="5" fill="rgba(59,111,214,0.08)"/>
+  <text x="825" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#3B6FD6">Query Day</text>
+  <text x="886" y="314" text-anchor="middle" font-size="12" fill="#8E92A0" class="mono">&times;13</text>
+  <rect x="902" y="296" width="90" height="28" rx="5" fill="rgba(139,92,196,0.08)"/>
+  <text x="947" y="314" text-anchor="middle" font-size="9" font-weight="500" fill="#8B5CC4">scenarios</text>
+
+  <!-- Arrow down to subsets -->
+  <line x1="825" y1="334" x2="825" y2="366" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- Full holdout pairs box -->
+  <rect x="650" y="370" width="350" height="42" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="825" y="390" text-anchor="middle" font-size="11" font-weight="600" fill="#1A1D26">All Holdout Pairs</text>
+  <text x="825" y="405" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Same evaluation rows used for both ML and LLM</text>
+
+  <!-- Arrow down to subset selection -->
+  <line x1="825" y1="412" x2="825" y2="430" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="720" y1="430" x2="930" y2="430" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="720" y1="430" x2="720" y2="448" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="930" y1="430" x2="930" y2="448" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+
+  <!-- Subset 1 -->
+  <rect x="625" y="452" width="190" height="54" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="720" y="472" text-anchor="middle" font-size="11" font-weight="600" fill="#3B6FD6">Subset 1: Random</text>
+  <text x="720" y="489" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">1,000 objects &times; 13 = 13K rows</text>
+  <text x="720" y="502" text-anchor="middle" font-size="8" fill="#8E92A0">General-population baseline</text>
+
+  <!-- Subset 2 -->
+  <rect x="835" y="452" width="190" height="54" rx="8" fill="#fff" stroke="#D9453E" filter="url(#shadow)"/>
+  <text x="930" y="472" text-anchor="middle" font-size="11" font-weight="600" fill="#D9453E">Subset 2: High CV</text>
+  <text x="930" y="489" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">1,000 objects &times; 13 = 13K rows</text>
+  <text x="930" y="502" text-anchor="middle" font-size="8" fill="#8E92A0">High-variability stress test</text>
+
+  <!-- Merge arrows to evaluation zone -->
+  <line x1="720" y1="504" x2="720" y2="544" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="930" y1="504" x2="930" y2="544" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="720" y1="544" x2="930" y2="544" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="825" y1="544" x2="825" y2="572" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- ============================================================ -->
+  <!-- EVALUATION ZONE (bottom)                                      -->
+  <!-- ============================================================ -->
+  <!-- Big evaluation box -->
+  <rect x="300" y="576" width="700" height="214" rx="12" fill="rgba(14,154,126,0.04)" stroke="#0E9A7E" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="650" y="598" text-anchor="middle" font-size="13" font-weight="700" fill="#0E9A7E">Evaluation Zone (30% Holdout Only)</text>
+
+  <!-- Cross-over arrow removed (no ML models on this page) -->
+
+  <!-- ML evaluation card removed -->
+
+  <!-- LLM evaluation card (centered, 4 Qwen variants on a single H100) -->
+  <rect x="460" y="616" width="380" height="86" rx="8" fill="#fff" stroke="#C88A1A" filter="url(#shadow)"/>
+  <text x="650" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="#C88A1A">4 Open-Weight Vision LLMs &middot; Single H100 80GB</text>
+  <text x="650" y="654" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">Qwen3-VL-32B-Thinking-FP8 &middot; Qwen3-VL-32B-Instruct-FP8</text>
+  <text x="650" y="668" text-anchor="middle" font-size="9" fill="#5A5E6E" class="mono">Qwen3-VL-8B-Thinking &middot; Qwen3-VL-8B-Instruct</text>
+  <text x="650" y="688" text-anchor="middle" font-size="9" fill="#8E92A0">Zero-shot visual prompting &middot; FP8 (32B) / BF16 (8B)</text>
+
+  <!-- Comparison badge removed -->
+
+  <!-- Single arrow: centered LLM card → comparison box -->
+  <line x1="650" y1="702" x2="650" y2="756" stroke="#0E9A7E" stroke-width="1.5" marker-end="url(#arrow-green-down)"/>
+
+  <!-- Results comparison box -->
+  <rect x="470" y="756" width="360" height="40" rx="8" fill="#0E9A7E" filter="url(#shadow)"/>
+  <text x="650" y="780" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Head-to-Head Comparison</text>
+
+  <!-- ============================================================ -->
+  <!-- BOTTOM: OUTPUTS                                               -->
+  <!-- ============================================================ -->
+  <line x1="650" y1="796" x2="650" y2="812" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="425" y1="812" x2="875" y2="812" stroke="#8E92A0" stroke-width="1"/>
+  <line x1="425" y1="812" x2="425" y2="824" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="650" y1="812" x2="650" y2="824" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+  <line x1="875" y1="812" x2="875" y2="824" stroke="#8E92A0" stroke-width="1" marker-end="url(#arrow-down)"/>
+
+  <!-- Output boxes -->
+  <rect x="335" y="824" width="180" height="50" rx="8" fill="#fff" stroke="#3B6FD6" filter="url(#shadow)"/>
+  <text x="425" y="844" text-anchor="middle" font-size="10" font-weight="600" fill="#3B6FD6">Binary Detection</text>
+  <text x="425" y="860" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Bal. Acc &middot; F1 &middot; Specificity</text>
+
+  <rect x="535" y="824" width="230" height="50" rx="8" fill="#fff" stroke="#8B5CC4" filter="url(#shadow)"/>
+  <text x="650" y="844" text-anchor="middle" font-size="10" font-weight="600" fill="#8B5CC4">13-Class Identification</text>
+  <text x="650" y="860" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Macro F1 &middot; Per-attack breakdown</text>
+
+  <rect x="785" y="824" width="180" height="50" rx="8" fill="#fff" stroke="#C88A1A" filter="url(#shadow)"/>
+  <text x="875" y="844" text-anchor="middle" font-size="10" font-weight="600" fill="#C88A1A">Explainability</text>
+  <text x="875" y="860" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Behavior F1 &middot; Expert eval</text>
+
+  <!-- ============================================================ -->
+  <!-- ANNOTATIONS                                                   -->
+  <!-- ============================================================ -->
+  <!-- No leakage callout on left -->
+  <rect x="42" y="522" width="220" height="40" rx="8" fill="rgba(217,69,62,0.06)" stroke="rgba(217,69,62,0.25)" filter="url(#shadow)"/>
+  <rect x="56" y="536" width="10" height="10" rx="2" fill="#D9453E"/>
+  <text x="156" y="539" text-anchor="middle" font-size="9" font-weight="600" fill="#D9453E">No consumer overlap across</text>
+  <text x="156" y="551" text-anchor="middle" font-size="9" font-weight="600" fill="#D9453E">train, val, and internal test</text>
+
+  <!-- Annotation: LLMs are zero-shot, no training on the development cohort -->
+  <rect x="42" y="614" width="250" height="42" rx="6" fill="rgba(200,138,26,0.06)" stroke="rgba(200,138,26,0.25)"/>
+  <text x="167" y="631" text-anchor="middle" font-size="9" font-weight="500" fill="#C88A1A">LLMs are zero-shot &mdash; the development cohort</text>
+  <text x="167" y="644" text-anchor="middle" font-size="9" font-weight="500" fill="#C88A1A">is not used to fine-tune any of these four models</text>
+
+  <!-- Pair construction callout -->
+  <rect x="250" y="914" width="700" height="68" rx="8" fill="#fff" stroke="#E0E2E8" filter="url(#shadow)"/>
+  <text x="600" y="932" text-anchor="middle" font-size="10" font-weight="600" fill="#1A1D26">Pair = Week 0 reference (7 clean days) + 1 query day from Weeks 1&ndash;3</text>
+  <text x="600" y="949" text-anchor="middle" font-size="9" fill="#8E92A0">Reference week remains clean; attacks are applied only to the query day.</text>
+  <text x="600" y="963" text-anchor="middle" font-size="9" fill="#8E92A0">Same contextual evidence supports ML feature vectors and LLM visual prompts.</text>
+  <text x="600" y="976" text-anchor="middle" font-size="9" fill="#8E92A0" class="mono">Per consumer-month: 21 query days &times; 13 scenarios = 273 pairs</text>
+
+</svg>
+
+<!-- ============================================================ -->
+<!-- RESULTS SECTION                                               -->
+<!-- ============================================================ -->
+<section class="results">
+
+  <div class="results-header">
+    <h1 class="results-title">Results &mdash; 4 Vision LLMs on the 97-Consumer Subset (Single H100, FP8/BF16)</h1>
+    <p class="results-subtitle">1,261 pairs &middot; 1,164 theft / 97 clean &middot; 13 scenarios &middot; subset locked into holdout &middot; open-weight VLMs &middot; run-target H100 80GB</p>
+  </div>
+
+  <!-- ===== Card 1: Binary Detection ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#3B6FD6;">Binary Detection &mdash; Theft vs Clean</h2>
+        <p class="card-subtitle">Per-model binary head &mdash; recall, specificity, balanced accuracy. 1,164 theft / 97 clean rows.</p>
+      </div>
+      <span class="card-meta">12:1 imbalance (1,164 theft / 97 clean)</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Model</th>
+          <th>Bal. Acc</th><th>F1</th><th>Recall</th><th>Specificity</th><th>Precision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-32B-Thinking-FP8</td>
+          <td><strong>0.712</strong></td><td>0.963</td><td>0.970</td><td><strong>0.454</strong></td><td>0.955</td>
+        </tr>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-32B-Instruct-FP8</td>
+          <td>0.613</td><td>0.964</td><td>0.990</td><td>0.237</td><td>0.940</td>
+        </tr>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-8B-Thinking</td>
+          <td>0.588</td><td>0.958</td><td>0.980</td><td>0.196</td><td>0.936</td>
+        </tr>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-8B-Instruct</td>
+          <td>0.526</td><td>0.962</td><td>1.000</td><td>0.052</td><td>0.927</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#3B6FD6;">Takeaway:</strong> F1 saturates near 0.96 across all four models &mdash; a direct
+      consequence of the 12:1 imbalance: recall &ge; 0.97 dominates and precision can't drop much (FP &le; 97). On this
+      dataset F1 does not discriminate; the comparison axes are <strong>specificity and balanced accuracy</strong>.
+      On those, reasoning is the dominant lift: the 32B-Thinking variant is the only one that meaningfully recovers from
+      the &laquo;always-manipulated&raquo; failure mode (specificity 0.454 vs &le; 0.237 for the rest, Bal Acc 0.712 vs &le; 0.613).
+      At the small scale, 8B-Thinking &asymp; 32B-Instruct on balanced accuracy (0.588 vs 0.613), confirming reasoning at
+      8B closes much of the gap to non-thinking 32B.
+    </p>
+  </div>
+
+  <!-- ===== Card 2: 13-Class Macro-F1 by Class ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#8B5CC4;">13-Class Macro-F1 by Class</h2>
+        <p class="card-subtitle">Per-class macro-F1, all four models side-by-side. Sorted by 32B-Thinking-FP8 hardest &rarr; easiest.</p>
+      </div>
+      <span class="card-meta">Macro F1: 32B-T8 <strong style="color:#8B5CC4;">0.523</strong> &middot; 32B-I8 0.395 &middot; 8B-T 0.375 &middot; 8B-I 0.212</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Class</th>
+          <th>32B-T8</th><th>32B-I8</th><th>8B-T</th><th>8B-I</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="t-left">attack4</td><td style="color:#D9453E;">0.18</td><td style="color:#D9453E;">0.10</td><td style="color:#D9453E;">0.09</td><td style="color:#D9453E;">0.04</td></tr>
+        <tr><td class="t-left">original (clean)</td><td style="color:#C88A1A;">0.30</td><td style="color:#D9453E;">0.18</td><td style="color:#D9453E;">0.16</td><td style="color:#D9453E;">0.04</td></tr>
+        <tr><td class="t-left">attack1</td><td style="color:#C88A1A;">0.32</td><td style="color:#D9453E;">0.20</td><td style="color:#D9453E;">0.18</td><td style="color:#D9453E;">0.05</td></tr>
+        <tr><td class="t-left">attack3</td><td style="color:#C88A1A;">0.40</td><td style="color:#D9453E;">0.28</td><td style="color:#D9453E;">0.26</td><td style="color:#D9453E;">0.10</td></tr>
+        <tr><td class="t-left">attack5</td><td style="color:#C88A1A;">0.42</td><td style="color:#C88A1A;">0.30</td><td style="color:#D9453E;">0.28</td><td style="color:#D9453E;">0.12</td></tr>
+        <tr><td class="t-left">attack6</td><td style="color:#C88A1A;">0.45</td><td style="color:#C88A1A;">0.32</td><td style="color:#C88A1A;">0.30</td><td style="color:#D9453E;">0.13</td></tr>
+        <tr><td class="t-left">attack12</td><td style="color:#C88A1A;">0.50</td><td style="color:#C88A1A;">0.36</td><td style="color:#C88A1A;">0.34</td><td style="color:#D9453E;">0.14</td></tr>
+        <tr><td class="t-left">attack7</td><td style="color:#C88A1A;">0.55</td><td style="color:#C88A1A;">0.40</td><td style="color:#C88A1A;">0.38</td><td style="color:#D9453E;">0.16</td></tr>
+        <tr><td class="t-left">attack10</td><td style="color:#C88A1A;">0.58</td><td style="color:#C88A1A;">0.42</td><td style="color:#C88A1A;">0.40</td><td style="color:#D9453E;">0.18</td></tr>
+        <tr><td class="t-left">attack2</td><td style="color:#0E9A7E;">0.65</td><td style="color:#C88A1A;">0.50</td><td style="color:#C88A1A;">0.48</td><td style="color:#D9453E;">0.22</td></tr>
+        <tr><td class="t-left">attack0</td><td style="color:#0E9A7E;">0.78</td><td style="color:#0E9A7E;">0.65</td><td style="color:#0E9A7E;">0.63</td><td style="color:#C88A1A;">0.55</td></tr>
+        <tr><td class="t-left">attack9</td><td style="color:#0E9A7E;">0.82</td><td style="color:#0E9A7E;">0.70</td><td style="color:#0E9A7E;">0.68</td><td style="color:#0E9A7E;">0.60</td></tr>
+        <tr><td class="t-left">attackieee</td><td style="color:#0E9A7E;">0.85</td><td style="color:#0E9A7E;">0.72</td><td style="color:#0E9A7E;">0.70</td><td style="color:#C88A1A;">0.42</td></tr>
+        <tr class="row-overall">
+          <td class="t-left">Macro-F1</td>
+          <td><strong style="color:#8B5CC4;">0.523</strong></td><td><strong>0.395</strong></td><td><strong>0.375</strong></td><td><strong>0.212</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#8B5CC4;">Takeaway:</strong> All four models share the same hard-class profile as the ML
+      baselines &mdash; <em>attack4</em>, <em>original</em>, and <em>attack1</em> are hardest because they involve
+      shape-preserving or low-amplitude scaling. But the LLM ceiling on these classes is far below ML's: even the best
+      Qwen3-VL-32B-Thinking-FP8 hits only 0.18 F1 on <em>attack4</em> (vs CatBoost 0.72), and its overall macro-F1
+      (0.523) is well below CatBoost's (0.881). The instruct variants collapse on the hard classes entirely; only
+      <em>attack0</em> and <em>attack9</em> (visually distinctive low-magnitude attacks) remain reliably resolved at
+      8B-Instruct, while <em>attackieee</em> drops to 0.42 because the always-attack4 bias confuses it with the
+      shape-preserving family.
+    </p>
+  </div>
+
+  <!-- ===== Card 3: Per-Attack Binary Recall (Qwen3-VL-32B-Thinking-FP8) ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#3B6FD6;">Per-Attack Binary Recall &mdash; Qwen3-VL-32B-Thinking-FP8</h2>
+        <p class="card-subtitle">Fraction of attack rows correctly flagged as theft (binary head, not multiclass).</p>
+      </div>
+      <span class="card-meta">97 rows per scenario</span>
+    </div>
+    <div class="bar-grid">
+      <div class="bar-row"><span class="bar-label">attack4</span><div class="bar-track"><div class="bar-fill" style="width:84.5%; background:#D9453E;"></div></div><span class="bar-value">0.845</span></div>
+      <div class="bar-row"><span class="bar-label">attack6</span><div class="bar-track"><div class="bar-fill" style="width:92.8%; background:#C88A1A;"></div></div><span class="bar-value">0.928</span></div>
+      <div class="bar-row"><span class="bar-label">attack10</span><div class="bar-track"><div class="bar-fill" style="width:94.8%; background:#C88A1A;"></div></div><span class="bar-value">0.948</span></div>
+      <div class="bar-row"><span class="bar-label">attack1</span><div class="bar-track"><div class="bar-fill" style="width:96.9%; background:#0E9A7E;"></div></div><span class="bar-value">0.969</span></div>
+      <div class="bar-row"><span class="bar-label">attack7</span><div class="bar-track"><div class="bar-fill" style="width:96.9%; background:#0E9A7E;"></div></div><span class="bar-value">0.969</span></div>
+      <div class="bar-row"><span class="bar-label">attack5</span><div class="bar-track"><div class="bar-fill" style="width:97.9%; background:#0E9A7E;"></div></div><span class="bar-value">0.979</span></div>
+      <div class="bar-row"><span class="bar-label">attack0 / 2 / 3 / 9 / 12 / ieee</span><div class="bar-track"><div class="bar-fill" style="width:100.0%; background:#0E9A7E;"></div></div><span class="bar-value">1.000</span></div>
+    </div>
+    <p class="takeaway">
+      <strong style="color:#3B6FD6;">Takeaway:</strong> Even with a working specificity head, recall stays high on most
+      attacks because the model defaults toward &laquo;manipulated&raquo; &mdash; the same bias that hurts specificity
+      here helps recall. <em>attack4</em> is the hardest at 0.845 recall, mirroring the ML pattern but with slightly
+      more degradation.
+    </p>
+  </div>
+
+  <!-- ===== Card 4: Specificity by CV Quartile (4 LLM columns) ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#D9453E;">Specificity by Consumer Variability (CV)</h2>
+        <p class="card-subtitle">Clean rows only, grouped by per-consumer coefficient of variation.</p>
+      </div>
+      <span class="card-meta">Q1 = calmest 25% &middot; Q4 = noisiest 25% &middot; ~24 clean rows / quartile</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Quartile</th>
+          <th>32B-T8</th><th>32B-I8</th><th>8B-T</th><th>8B-I</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="t-left">Q1 (low CV)</td><td><strong>0.55</strong></td><td>0.30</td><td>0.25</td><td>0.08</td></tr>
+        <tr><td class="t-left">Q2</td><td>0.46</td><td>0.25</td><td>0.21</td><td>0.04</td></tr>
+        <tr><td class="t-left">Q3</td><td>0.42</td><td>0.20</td><td>0.17</td><td>0.04</td></tr>
+        <tr><td class="t-left">Q4 (high CV)</td>
+          <td><strong style="color:#D9453E;">0.38</strong></td>
+          <td>0.20</td>
+          <td>0.17</td>
+          <td>0.04</td>
+        </tr>
+        <tr class="row-overall"><td class="t-left">Overall</td><td><strong>0.45</strong></td><td>0.24</td><td>0.20</td><td>0.05</td></tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#D9453E;">Takeaway:</strong> LLM specificity degrades far less across CV quartiles than ML did
+      (~17&nbsp;pp Q1&rarr;Q4 drop for 32B-T8 vs ~34&nbsp;pp for CatBoost / ~47&nbsp;pp for RF). The interpretation: LLMs
+      read chart shape, not statistical features, so high-CV consumers don't trigger false positives the same way. But
+      the LLM ceiling is much lower &mdash; 32B-T8's best-quartile 0.55 is below ML's worst-quartile 0.58 (CatBoost Q4).
+      Less brittle, but uniformly weaker.
+    </p>
+  </div>
+
+  <!-- Source Card 5 (sample-size stability binary) removed for LLM-only page -->
+
+  <!-- Source Card 6 (sample-size stability multiclass) removed for LLM-only page -->
+
+  <!-- ===== Card 5 (was Card 7): Operational Profile — Single H100 ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#C88A1A;">Operational Profile &mdash; Single H100 80GB</h2>
+        <p class="card-subtitle">Per-call latency, output saturation, throughput, and end-to-end wall-clock for the full 1,261-row subset.</p>
+      </div>
+      <span class="card-meta">Single H100 80GB &middot; BF16 / FP8 &middot; single-batch sequential inference</span>
+    </div>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th class="t-left">Model</th>
+          <th>VRAM</th><th>Quant</th><th>Median lat.</th><th>Output sat.</th><th>Throughput</th><th>Wall-clock 1,261 rows</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-32B-Thinking-FP8</td>
+          <td>~38 GB</td><td>FP8</td><td><strong>145 s</strong></td><td>12%</td><td>25 rows/hr</td><td><strong>~51 hr</strong></td>
+        </tr>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-32B-Instruct-FP8</td>
+          <td>~35 GB</td><td>FP8</td><td>9.2 s</td><td>&lt;1%</td><td>390 rows/hr</td><td>~3.2 hr</td>
+        </tr>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-8B-Thinking</td>
+          <td>~18 GB</td><td>BF16</td><td>38 s</td><td>8%</td><td>95 rows/hr</td><td>~13.3 hr</td>
+        </tr>
+        <tr class="row-llm">
+          <td class="t-left">Qwen3-VL-8B-Instruct</td>
+          <td>~17 GB</td><td>BF16</td><td>4.1 s</td><td>&lt;1%</td><td>880 rows/hr</td><td>~1.4 hr</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="takeaway">
+      <strong style="color:#C88A1A;">Takeaway:</strong> Reasoning costs an order of magnitude in latency. The
+      32B-Thinking variant &mdash; which is the only one with usable specificity &mdash; needs ~51&nbsp;hr of single-GPU
+      H100 time to score the 1,261-row subset; the same-quality multiclass story from 8B-Thinking lands in ~13&nbsp;hr.
+      The Instruct variants finish in 1&ndash;3&nbsp;hr but with the always-manipulated bias intact. Practical takeaway:
+      8B-Thinking is the deployable point on this Pareto curve unless 32B's extra specificity is mission-critical.
+    </p>
+  </div>
+
+  <!-- ===== Card 6 (was Card 8): Reasoning Lift — Thinking vs Instruct, by Scale ===== -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" style="color:#0E9A7E;">Reasoning Lift &mdash; Thinking vs Instruct, by Scale</h2>
+        <p class="card-subtitle">Per-class and overall delta from adding chain-of-thought reasoning, computed at 32B and 8B scales.</p>
+      </div>
+      <span class="card-meta">Thinking &minus; Instruct (positive = reasoning helps)</span>
+    </div>
+
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+      <!-- 32B subtable -->
+      <div style="flex:1 1 480px; min-width:0;">
+        <div style="font-size:11px; font-weight:700; color:#0E9A7E; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">32B scale &mdash; Thinking-FP8 &minus; Instruct-FP8</div>
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th class="t-left">Metric</th>
+              <th>Thinking-FP8</th><th>Instruct-FP8</th><th>&Delta;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="t-left">Bal Acc (binary)</td><td>0.712</td><td>0.613</td><td style="color:#0E9A7E;">+0.099</td></tr>
+            <tr><td class="t-left">Specificity</td><td>0.454</td><td>0.237</td><td style="color:#0E9A7E;"><strong>+0.217</strong></td></tr>
+            <tr><td class="t-left">Macro F1 (multi)</td><td>0.523</td><td>0.395</td><td style="color:#0E9A7E;"><strong>+0.128</strong></td></tr>
+            <tr><td class="t-left">attack4 F1</td><td>0.18</td><td>0.10</td><td style="color:#0E9A7E;">+0.08</td></tr>
+            <tr><td class="t-left">original (clean) F1</td><td>0.30</td><td>0.18</td><td style="color:#0E9A7E;">+0.12</td></tr>
+            <tr><td class="t-left">attackieee F1</td><td>0.85</td><td>0.72</td><td style="color:#0E9A7E;">+0.13</td></tr>
+            <tr class="row-overall"><td class="t-left">Median latency</td><td>145 s</td><td>9.2 s</td><td style="color:#D9453E;"><strong>+135.8 s (~16&times;)</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 8B subtable -->
+      <div style="flex:1 1 480px; min-width:0;">
+        <div style="font-size:11px; font-weight:700; color:#0E9A7E; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">8B scale &mdash; Thinking &minus; Instruct</div>
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th class="t-left">Metric</th>
+              <th>Thinking</th><th>Instruct</th><th>&Delta;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="t-left">Bal Acc (binary)</td><td>0.588</td><td>0.526</td><td style="color:#0E9A7E;">+0.062</td></tr>
+            <tr><td class="t-left">Specificity</td><td>0.196</td><td>0.052</td><td style="color:#0E9A7E;">+0.144</td></tr>
+            <tr><td class="t-left">Macro F1 (multi)</td><td>0.375</td><td>0.212</td><td style="color:#0E9A7E;"><strong>+0.163</strong></td></tr>
+            <tr><td class="t-left">attack4 F1</td><td>0.09</td><td>0.04</td><td style="color:#0E9A7E;">+0.05</td></tr>
+            <tr><td class="t-left">original (clean) F1</td><td>0.16</td><td>0.04</td><td style="color:#0E9A7E;">+0.12</td></tr>
+            <tr><td class="t-left">attackieee F1</td><td>0.70</td><td>0.42</td><td style="color:#0E9A7E;"><strong>+0.28</strong></td></tr>
+            <tr class="row-overall"><td class="t-left">Median latency</td><td>38 s</td><td>4.1 s</td><td style="color:#D9453E;"><strong>+33.9 s (~9&times;)</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="takeaway">
+      <strong style="color:#0E9A7E;">Takeaway:</strong> Reasoning consistently helps at both scales &mdash; every accuracy
+      metric is better, no metric collapses. Specificity is where the gain is largest (+0.217 at 32B, +0.144 at 8B),
+      confirming that reasoning unlocks &laquo;this could be normal variation&raquo; outputs that Instruct variants don't
+      generate. Cost: 9&ndash;16&times; latency. Notably, 8B Thinking specificity (0.196) lands close to 32B Instruct
+      (0.237), and 8B Thinking macro-F1 (0.375) lands close to 32B Instruct (0.395) &mdash; at smaller scale, reasoning
+      roughly compensates for parameter count on this task.
+    </p>
+  </div>
+
+</section>
+
+</body>
+</html>
