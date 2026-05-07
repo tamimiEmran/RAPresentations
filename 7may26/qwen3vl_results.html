@@ -1045,6 +1045,97 @@ Attack_Behavior_Explanation:
       </article>
     </section>
 
+    <h2>Max VLM Comparison</h2>
+    <section class="panel metric-notes">
+      <h3>Requested qwen3-vl-max Availability</h3>
+      <p>
+        A direct call with <span class="mono">model=qwen3-vl-max</span> returned <span class="mono">model_not_found</span> on the Alibaba-compatible endpoint:
+        the model does not exist for this account or the key does not have access. The available Max VLM model id used for this comparison is
+        <span class="mono">qwen-vl-max</span>. Thinking was disabled for this model because the API rejected the thinking parameter for Max.
+      </p>
+      <div class="pill-row">
+        <span class="pill">requested=qwen3-vl-max</span>
+        <span class="pill">api_error=model_not_found</span>
+        <span class="pill">used=qwen-vl-max</span>
+        <span class="pill">enable_thinking=False</span>
+        <span class="pill">sample=CONS200_MONTH13 / original_day</span>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h3>Old Version: Two Images</h3>
+        <p class="muted">
+          Same old input contract: first image is the normal reference week, second image is the original query day.
+        </p>
+        <div class="grid-2" style="margin-top:10px">
+          <figure>
+            <img src="images/normal_week.png" alt="Normal reference week for qwen-vl-max two-image run">
+            <figcaption><strong>Reference Week</strong>First image sent to <span class="mono">qwen-vl-max</span>.</figcaption>
+          </figure>
+          <figure>
+            <img src="images/original_day.png" alt="Original query day for qwen-vl-max two-image run">
+            <figcaption><strong>Original Query Day</strong>Second image sent to <span class="mono">qwen-vl-max</span>.</figcaption>
+          </figure>
+        </div>
+      </article>
+      <article class="panel">
+        <h3>New Version: Single Plot</h3>
+        <p class="muted">
+          Same sample rendered as one chart with a shared y-axis and a labeled non-continuous time gap.
+        </p>
+        <figure style="margin-top:10px">
+          <img src="images/CONS200_MONTH13_original_day_combined_one_plot.png" alt="Combined single plot for qwen-vl-max run">
+          <figcaption><strong>Single Combined Plot</strong>One image sent to <span class="mono">qwen-vl-max</span>.</figcaption>
+        </figure>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h3>qwen-vl-max Two-Image Output</h3>
+        <p class="muted">
+          Parsed result: <strong>Manipulated</strong>, most likely <strong>Attack 4</strong>, confidence <strong>High</strong>.
+          This is incorrect for the original example.
+        </p>
+        <p class="tiny">Tokens: input 3,261; output 565; total 3,826; latency 17.6s.</p>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Manipulated
+
+Identified Attack:
+- Most Likely: Attack 4
+- Confidence: High
+- Reasoning: The flagged day shows reduced consumption during a specific time window, approximately intervals 25 to 85. The reduction is localized rather than global, and the profile is not all-zero or flat, so Attack 4 is selected over Attack 0, Attack 9, Attack 1, Attack 3, and Attack 2.
+
+Attack_Behavior_Explanation:
+- Consumption values are reduced during a selected time window.
+- Magnitude is suppressed during that period, distorting the expected daily trend.
+- Possible causes include meter bypass, magnetic interference, reverse current, or false data injection.</pre>
+      </article>
+      <article class="panel">
+        <h3>qwen-vl-max Single-Plot Output</h3>
+        <p class="muted">
+          Parsed result: <strong>Manipulated</strong>, most likely <strong>Attack IEEE</strong>, confidence <strong>High</strong>.
+          This is also incorrect for the original example.
+        </p>
+        <p class="tiny">Tokens: input 2,492; output 541; total 3,033; latency 22.8s.</p>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Manipulated
+
+Identified Attack:
+- Most Likely: Attack IEEE
+- Confidence: High
+- Reasoning: The red query-day segment is interpreted as having some normal-like consumption spikes while other intervals are abruptly zeroed out, creating an irregular fragmented profile. The model selects Attack IEEE and rules out Attack 2 and Attack 5.
+
+Attack_Behavior_Explanation:
+- Some intervals are interpreted as real consumption and others as artificial zeroing.
+- Magnitude is reduced non-uniformly and the trend is disrupted by abrupt drops.
+- Possible causes include false data injection, intermittent meter bypass, or tampering with meter signal transmission.</pre>
+      </article>
+    </section>
+
   </main>
 </body>
 </html>
