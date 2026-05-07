@@ -782,7 +782,7 @@ Attack_Behavior_Explanation:
 
     <h2>Original Example Outputs</h2>
     <section class="panel metric-notes">
-      <h3>Example Input</h3>
+      <h3>Old Version: Two-Image Input</h3>
       <p>
         Original-case sample from the currently running shared subset:
         <span class="mono">CONS200_MONTH13 / original_day</span>. Ground truth is
@@ -859,6 +859,70 @@ First, check if the day is original or manipulated. The normal week plot shows m
 The problem says that if the day is consistent with the customer's typical consumption behavior, classify it as original. The normal week shows low consumption at night, then a rise to day consumption. The query day also shows low consumption at the start, rises to around 145, then declines.
 
 Given that the query day's pattern matches the general trend and magnitude of the normal days, it is likely original.</pre>
+        <h3>Final output</h3>
+        <pre class="code">Classification:
+- Original
+
+Identified Attack:
+- Most Likely: N/A
+- Confidence: N/A
+- Reasoning: N/A
+
+Attack_Behavior_Explanation:
+- N/A</pre>
+      </article>
+    </section>
+
+    <h2>New Version: Single-Plot Example</h2>
+    <section class="panel metric-notes">
+      <h3>Same Example As One Combined Chart</h3>
+      <p>
+        This keeps the old two-image example above and adds the new version below it. The same original example is rerun with the reference week and query day combined into a single chart. The prompt was adapted to state that the model receives one combined plot, not two image inputs.
+      </p>
+      <div class="pill-row">
+        <span class="pill">model=qwen3-vl-235b-a22b-thinking</span>
+        <span class="pill">combined_prompt_sha=85b4637c06a235d6</span>
+        <span class="pill">input_tokens=3,753</span>
+        <span class="pill">output_tokens=734</span>
+        <span class="pill">latency=16.8s</span>
+        <span class="pill">parse_error=None</span>
+      </div>
+      <figure style="margin-top:14px">
+        <img src="../output/one_plot_experiment/CONS200_MONTH13_original_day_combined_one_plot.png" alt="Single combined reference week and query day plot for CONS200 month 13">
+        <figcaption>
+          <strong>New Single-Plot Input</strong>
+          Blue segment is labeled as the normal reference week. Red segment is labeled as the query day. The hatched region marks omitted time and is explicitly labeled as not continuous.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h3>Prompt Adjustment Summary</h3>
+        <ul>
+          <li>The prompt says there is one combined plot, not two separate images.</li>
+          <li>The blue left segment is defined as the clean normal reference week.</li>
+          <li>The red right segment is defined as the query day to classify.</li>
+          <li>The hatched gap is defined as omitted, non-continuous time, not a zero interval.</li>
+          <li>The y-axis is shared and starts at zero for both segments.</li>
+        </ul>
+        <p class="tiny">Exact prompt saved at <span class="mono">output/one_plot_experiment/CONS200_MONTH13_original_day_combined_one_plot_prompt.txt</span>.</p>
+      </article>
+      <article class="panel">
+        <h3>Single-Plot Result</h3>
+        <p class="muted">
+          Parsed result: <strong>Original</strong>, with no identified attack. This matches the ground truth and matches the two-image 235B result on the same example.
+        </p>
+        <h3>Thinking excerpt</h3>
+        <pre class="code">So, let's analyze this plot step by step. First, the blue line is the normal reference week (clean baseline), and the red line is the query day. The query day is labeled as Jan 11, which is a Friday.
+
+First, check if the query day is original or manipulated. Let's compare the red line to the blue line's Friday, Jan 4. The blue Friday has a pattern with peaks and valleys typical of a normal consumption day. The red query day has similar peaks and valleys and seems to follow the same general shape.
+
+[...]
+
+The query day matches the normal Friday in both magnitude and trend. Since it is the same day of the week, normal behavior would have similar consumption patterns. The red line does not show signs of manipulation; it is consistent with the normal Friday in the baseline week.
+
+So the classification is Original.</pre>
         <h3>Final output</h3>
         <pre class="code">Classification:
 - Original
