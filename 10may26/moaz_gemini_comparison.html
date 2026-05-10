@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moaz 10 May Results Summary</title>
+  <style>
+    :root {
+      --ink:#172026; --muted:#66727f; --line:#d9e0e8; --band:#f6f8fb;
+      --accent:#2266a8; --good:#2f7659; --bad:#a33f3f; --warn:#ad6b24;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:#fff; line-height:1.45; }
+    header { padding:34px 42px 24px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,#f8fafc,#fff); }
+    main { max-width:1600px; padding:26px 42px 48px; }
+    h1 { margin:0 0 8px; font-size:30px; }
+    h2 { margin:32px 0 12px; font-size:21px; }
+    h3 { margin:0 0 10px; font-size:16px; }
+    p { margin:8px 0; }
+    code { background:#eef2f6; padding:2px 5px; border-radius:4px; }
+    .muted { color:var(--muted); font-size:13px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(245px,1fr)); gap:12px; margin:18px 0 20px; }
+    .card, .panel { border:1px solid var(--line); border-radius:8px; background:#fff; padding:14px 16px; }
+    .label { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; font-weight:700; margin-bottom:10px; }
+    .metric-row { margin:9px 0 12px; }
+    .metric-top { display:flex; justify-content:space-between; gap:12px; font-size:14px; }
+    .metric-row.best strong, .winner { color:var(--good); font-weight:800; }
+    .bar { height:8px; width:100%; background:#e8edf3; border-radius:999px; overflow:hidden; margin-top:5px; }
+    .bar span { display:block; height:100%; background:var(--accent); }
+    .note { border-left:4px solid var(--accent); background:#f4f8fc; padding:10px 12px; border-radius:6px; }
+    .split { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:16px; align-items:start; }
+    .scroll { overflow:auto; border:1px solid var(--line); border-radius:8px; }
+    table { border-collapse:collapse; width:100%; background:#fff; }
+    caption { text-align:left; font-weight:800; padding:10px 12px; background:#f7f9fb; border-bottom:1px solid var(--line); }
+    th,td { border-bottom:1px solid var(--line); padding:8px 10px; text-align:right; white-space:nowrap; vertical-align:middle; }
+    th:first-child,td:first-child { text-align:left; }
+    thead th { background:#f1f4f7; color:#3f4b56; font-size:12px; position:sticky; top:0; z-index:1; }
+    tbody tr:hover { background:#fbfcfd; }
+    .small th,.small td { text-align:center; }
+    .small th:first-child { text-align:left; }
+    .good { background:rgba(47,118,89,.14); font-weight:800; }
+    .bad { background:rgba(163,63,63,.13); font-weight:800; }
+    .total th,.total td { background:#f7f9fb; font-weight:800; }
+    ul { margin:8px 0 0; padding-left:22px; }
+    li { margin:6px 0; }
+    @media (max-width:900px) { header,main { padding-left:18px; padding-right:18px; } }
+  </style>
+</head>
+<body>
+<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
+<style>
+  .rap-nav, .rap-nav * { box-sizing: border-box; }
+  .rap-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
+    padding: 6px 14px; height: 40px;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 12px; font-weight: 400; line-height: 1;
+    letter-spacing: 0; color: #1A1D26;
+  }
+  .rap-nav a {
+    color: #5A5E6E; text-decoration: none;
+    padding: 6px 10px; border-radius: 6px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .rap-nav a:hover { color: #1A1D26; background: rgba(0, 0, 0, 0.04); }
+  .rap-nav-back { color: #1A1D26; font-weight: 500; margin-right: 8px; }
+  .rap-nav-current { color: #1A1D26; background: rgba(14, 154, 126, 0.08); font-weight: 500; }
+  body { padding-top: 48px; }
+  @media (max-width: 720px) {
+    .rap-nav { font-size: 11px; padding: 4px 10px; gap: 2px; }
+    .rap-nav a { padding: 5px 7px; }
+  }
+</style>
+<nav class="rap-nav">
+  <a class="rap-nav-back" href="index.html">&larr; 10 May Hub</a>
+  <a href="deepseek_e010_e010r1_report.html">DeepSeek Results</a>
+  <a class="rap-nav-current" href="moaz_gemini_comparison.html">Gemini 3 Pro vs Flash</a>
+</nav>
+<!-- ==== /RAPresentations nav ==== -->
+  <header>
+    <h1>Moaz 10 May Results Summary</h1>
+    <p class="muted">Generated 2026-05-10 10:11:59 from <code>C:\Users\Admin\Downloads\moaz10May</code>.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Top-Line Comparison</h2>
+      <div class="grid">
+        <article class='card'><div class='label'>Binary balanced accuracy</div><div class='metric-row best'><div class='metric-top'><span>Gemini 3 Pro</span><strong>97.64%</strong></div><div class='bar'><span style='width:97.64%'></span></div></div><div class='metric-row'><div class='metric-top'><span>Gemini Flash</span><strong>94.46%</strong></div><div class='bar'><span style='width:94.46%'></span></div></div><p>Mean of attack recall and original recall.</p></article>
+        <article class='card'><div class='label'>Binary macro F1</div><div class='metric-row best'><div class='metric-top'><span>Gemini 3 Pro</span><strong>96.97%</strong></div><div class='bar'><span style='width:96.97%'></span></div></div><div class='metric-row'><div class='metric-top'><span>Gemini Flash</span><strong>94.67%</strong></div><div class='bar'><span style='width:94.67%'></span></div></div><p>Macro average over original vs attacked.</p></article>
+        <article class='card'><div class='label'>Attack-type macro F1</div><div class='metric-row best'><div class='metric-top'><span>Gemini 3 Pro</span><strong>92.89%</strong></div><div class='bar'><span style='width:92.89%'></span></div></div><div class='metric-row'><div class='metric-top'><span>Gemini Flash</span><strong>76.27%</strong></div><div class='bar'><span style='width:76.27%'></span></div></div><p>Macro average over individual attack classes.</p></article>
+        <article class='card'><div class='label'>Attack-type macro recall</div><div class='metric-row best'><div class='metric-top'><span>Gemini 3 Pro</span><strong>92.70%</strong></div><div class='bar'><span style='width:92.70%'></span></div></div><div class='metric-row'><div class='metric-top'><span>Gemini Flash</span><strong>77.23%</strong></div><div class='bar'><span style='width:77.23%'></span></div></div><p>Average recall across attack classes.</p></article>
+      </div>
+      <div class="note"><strong>Readout:</strong><ul><li>Gemini 3 Pro has the higher binary balanced accuracy: 97.64% vs 94.46%.</li><li>The larger difference is multiclass attack-type performance: macro F1 92.89% vs 76.27%, a +16.62 pp gap.</li><li>Both models are strong at binary attack detection, but Flash has more false positives on original samples (10 vs 4) and more attack misses (9 vs 7).</li><li>Flash degrades most on attack12, attack3, attack7, attack6, and attack5; Pro&#x27;s weaker classes are attack6, attack12, attack9, attack1, and attack5.</li></ul></div>
+    </section>
+
+    <section>
+      <h2>Binary Detection</h2>
+      <div class="scroll"><table><thead><tr><th>Metric</th><th>Gemini 3 Pro</th><th>Gemini Flash</th><th>Pro minus Flash</th></tr></thead><tbody><tr><th>Accuracy</th><td class='winner'>99.13%</td><td>98.49%</td><td>+0.63 pp</td></tr><tr><th>Balanced accuracy</th><td class='winner'>97.64%</td><td>94.46%</td><td>+3.18 pp</td></tr><tr><th>Precision</th><td class='winner'>99.66%</td><td>99.14%</td><td>+0.52 pp</td></tr><tr><th>Attack recall</th><td class='winner'>99.40%</td><td>99.23%</td><td>+0.17 pp</td></tr><tr><th>Original recall</th><td class='winner'>95.88%</td><td>89.69%</td><td>+6.19 pp</td></tr><tr><th>Binary F1</th><td class='winner'>99.53%</td><td>99.18%</td><td>+0.35 pp</td></tr><tr><th>Binary macro F1</th><td class='winner'>96.97%</td><td>94.67%</td><td>+2.30 pp</td></tr></tbody></table></div>
+      <div class="split" style="margin-top:16px;">
+        
+    <table class="matrix small">
+      <caption>Gemini 3 Pro Binary Confusion Matrix</caption>
+      <thead><tr><th>Actual / Predicted</th><th>Original</th><th>Attacked</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><th>Original</th><td class="good">93</td><td class="bad">4</td><td>97</td></tr>
+        <tr><th>Attacked</th><td class="bad">7</td><td class="good">1157</td><td>1164</td></tr>
+        <tr class="total"><th>Total</th><td>100</td><td>1161</td><td>1261</td></tr>
+      </tbody>
+    </table>
+    
+        
+    <table class="matrix small">
+      <caption>Gemini Flash Binary Confusion Matrix</caption>
+      <thead><tr><th>Actual / Predicted</th><th>Original</th><th>Attacked</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><th>Original</th><td class="good">87</td><td class="bad">10</td><td>97</td></tr>
+        <tr><th>Attacked</th><td class="bad">9</td><td class="good">1155</td><td>1164</td></tr>
+        <tr class="total"><th>Total</th><td>96</td><td>1165</td><td>1261</td></tr>
+      </tbody>
+    </table>
+    
+      </div>
+    </section>
+
+    <section>
+      <h2>Attack-Type Classification</h2>
+      <div class="scroll">
+    <table class="wide">
+      <thead>
+        <tr>
+          <th rowspan="2">Attack</th>
+          <th colspan="6">Gemini 3 Pro</th>
+          <th colspan="6">Gemini Flash</th>
+          <th rowspan="2">F1 delta</th>
+          <th rowspan="2">Higher F1</th>
+        </tr>
+        <tr>
+          <th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1</th>
+          <th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1</th>
+        </tr>
+      </thead>
+      <tbody>
+    <tr><th>attack0</th><td>97</td><td>0</td><td>0</td><td>100.00%</td><td>100.00%</td><td class='winner'>100.00%</td><td>97</td><td>0</td><td>0</td><td>100.00%</td><td>100.00%</td><td class='winner'>100.00%</td><td>+0.00 pp</td><td>Tie</td></tr><tr><th>attack1</th><td>94</td><td>24</td><td>3</td><td>79.66%</td><td>96.91%</td><td class='winner'>87.44%</td><td>69</td><td>15</td><td>28</td><td>82.14%</td><td>71.13%</td><td class=''>76.24%</td><td>+11.20 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack2</th><td>97</td><td>1</td><td>0</td><td>98.98%</td><td>100.00%</td><td class='winner'>99.49%</td><td>96</td><td>4</td><td>1</td><td>96.00%</td><td>98.97%</td><td class=''>97.46%</td><td>+2.03 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack3</th><td>90</td><td>4</td><td>7</td><td>95.74%</td><td>92.78%</td><td class='winner'>94.24%</td><td>70</td><td>127</td><td>27</td><td>35.53%</td><td>72.16%</td><td class=''>47.62%</td><td>+46.62 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack4</th><td>95</td><td>1</td><td>2</td><td>98.96%</td><td>97.94%</td><td class='winner'>98.45%</td><td>93</td><td>5</td><td>4</td><td>94.90%</td><td>95.88%</td><td class=''>95.38%</td><td>+3.07 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack5</th><td>93</td><td>8</td><td>4</td><td>92.08%</td><td>95.88%</td><td class='winner'>93.94%</td><td>92</td><td>61</td><td>5</td><td>60.13%</td><td>94.85%</td><td class=''>73.60%</td><td>+20.34 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack6</th><td>63</td><td>0</td><td>34</td><td>100.00%</td><td>64.95%</td><td class='winner'>78.75%</td><td>55</td><td>0</td><td>42</td><td>100.00%</td><td>56.70%</td><td class=''>72.37%</td><td>+6.38 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack7</th><td>94</td><td>0</td><td>3</td><td>100.00%</td><td>96.91%</td><td class='winner'>98.43%</td><td>33</td><td>0</td><td>64</td><td>100.00%</td><td>34.02%</td><td class=''>50.77%</td><td>+47.66 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack9</th><td>97</td><td>33</td><td>0</td><td>74.62%</td><td>100.00%</td><td class='winner'>85.46%</td><td>97</td><td>41</td><td>0</td><td>70.29%</td><td>100.00%</td><td class=''>82.55%</td><td>+2.91 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack10</th><td>90</td><td>1</td><td>7</td><td>98.90%</td><td>92.78%</td><td class='winner'>95.74%</td><td>85</td><td>0</td><td>12</td><td>100.00%</td><td>87.63%</td><td class=''>93.41%</td><td>+2.33 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attack12</th><td>72</td><td>5</td><td>25</td><td>93.51%</td><td>74.23%</td><td class='winner'>82.76%</td><td>15</td><td>2</td><td>82</td><td>88.24%</td><td>15.46%</td><td class=''>26.32%</td><td>+56.44 pp</td><td>Gemini 3 Pro</td></tr><tr><th>attackieee</th><td>97</td><td>0</td><td>0</td><td>100.00%</td><td>100.00%</td><td class='winner'>100.00%</td><td>97</td><td>1</td><td>0</td><td>98.98%</td><td>100.00%</td><td class=''>99.49%</td><td>+0.51 pp</td><td>Gemini 3 Pro</td></tr><tr class='total'><th>MACRO</th><td></td><td></td><td></td><td>94.37%</td><td>92.70%</td><td>92.89%</td><td></td><td></td><td></td><td>85.52%</td><td>77.23%</td><td>76.27%</td><td>+16.62 pp</td><td>Gemini 3 Pro</td></tr></tbody></table></div>
+    </section>
+
+    <section>
+      <h2>Weakest Classes</h2>
+      <div class="split"><div class='panel'><h3>Gemini 3 Pro lowest attack-type F1</h3><table><thead><tr><th>Attack</th><th>F1</th><th>Recall</th><th>Precision</th></tr></thead><tbody><tr><th>attack6</th><td>78.75%</td><td>64.95%</td><td>100.00%</td></tr><tr><th>attack12</th><td>82.76%</td><td>74.23%</td><td>93.51%</td></tr><tr><th>attack9</th><td>85.46%</td><td>100.00%</td><td>74.62%</td></tr><tr><th>attack1</th><td>87.44%</td><td>96.91%</td><td>79.66%</td></tr><tr><th>attack5</th><td>93.94%</td><td>95.88%</td><td>92.08%</td></tr></tbody></table></div><div class='panel'><h3>Gemini Flash lowest attack-type F1</h3><table><thead><tr><th>Attack</th><th>F1</th><th>Recall</th><th>Precision</th></tr></thead><tbody><tr><th>attack12</th><td>26.32%</td><td>15.46%</td><td>88.24%</td></tr><tr><th>attack3</th><td>47.62%</td><td>72.16%</td><td>35.53%</td></tr><tr><th>attack7</th><td>50.77%</td><td>34.02%</td><td>100.00%</td></tr><tr><th>attack6</th><td>72.37%</td><td>56.70%</td><td>100.00%</td></tr><tr><th>attack5</th><td>73.60%</td><td>94.85%</td><td>60.13%</td></tr></tbody></table></div></div>
+    </section>
+
+  </main>
+</body>
+</html>

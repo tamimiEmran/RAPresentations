@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeepSeek E010 + E010R1 Results</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172026;
+      --muted: #66727f;
+      --line: #d8dee6;
+      --band: #f5f7fa;
+      --accent: #2266a8;
+      --accent-2: #5f8f3f;
+      --warn: #ad5d16;
+      --bad: #a33f3f;
+      --good: #2f7659;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #ffffff;
+      line-height: 1.45;
+    }
+    header {
+      padding: 34px 42px 24px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #f8fafc, #ffffff);
+    }
+    main { padding: 26px 42px 46px; max-width: 1680px; }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 0; }
+    h2 { margin: 32px 0 12px; font-size: 20px; letter-spacing: 0; }
+    h3 { margin: 20px 0 10px; font-size: 16px; letter-spacing: 0; }
+    p { margin: 8px 0; }
+    code { background: #eef2f6; padding: 2px 5px; border-radius: 4px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fff;
+    }
+    .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    .card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+    .card .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .split {
+      display: grid;
+      grid-template-columns: minmax(320px, 520px) minmax(500px, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .scroll { overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+    table { border-collapse: collapse; width: 100%; background: #fff; }
+    caption { text-align: left; font-weight: 700; padding: 10px 12px; background: #f7f9fb; border-bottom: 1px solid var(--line); }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: right; vertical-align: middle; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { background: #f1f4f7; font-size: 12px; color: #3f4b56; position: sticky; top: 0; z-index: 1; }
+    tbody tr:hover { background: #fbfcfd; }
+    .matrix th, .matrix td { min-width: 58px; text-align: center; }
+    .matrix th:first-child { min-width: 116px; text-align: left; position: sticky; left: 0; background: #f1f4f7; z-index: 2; }
+    .matrix .heat.diag { background: rgba(47, 118, 89, var(--a)); font-weight: 700; }
+    .matrix .heat.offdiag { background: rgba(163, 63, 63, var(--a)); }
+    .matrix .cell-link { display: block; color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+    .matrix .total, .matrix .totals td, .matrix .totals th { background: #f7f9fb; font-weight: 700; }
+    .bar { width: 110px; height: 7px; background: #e5eaf0; display: inline-block; margin-right: 8px; border-radius: 4px; overflow: hidden; vertical-align: middle; }
+    .bar span { display: block; height: 100%; background: var(--accent); }
+    .note { border-left: 4px solid var(--accent); background: #f4f8fc; padding: 10px 12px; border-radius: 6px; }
+    .warn { border-left-color: var(--warn); background: #fff8ef; }
+    @media (max-width: 900px) {
+      header, main { padding-left: 18px; padding-right: 18px; }
+      .split { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script>
+    document.addEventListener('click', function (event) {
+      const link = event.target.closest('a.cell-link');
+      if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      window.open(link.href, 'confusionCellDetails', 'width=1320,height=880,scrollbars=yes,resizable=yes');
+    });
+  </script>
+</head>
+<body>
+<!-- ==== RAPresentations cross-topic nav (scoped) ==== -->
+<style>
+  .rap-nav, .rap-nav * { box-sizing: border-box; }
+  .rap-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224, 226, 232, 0.85);
+    padding: 6px 14px; height: 40px;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 12px; font-weight: 400; line-height: 1;
+    letter-spacing: 0; color: #1A1D26;
+  }
+  .rap-nav a {
+    color: #5A5E6E; text-decoration: none;
+    padding: 6px 10px; border-radius: 6px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .rap-nav a:hover { color: #1A1D26; background: rgba(0, 0, 0, 0.04); }
+  .rap-nav-back { color: #1A1D26; font-weight: 500; margin-right: 8px; }
+  .rap-nav-current { color: #1A1D26; background: rgba(14, 154, 126, 0.08); font-weight: 500; }
+  body { padding-top: 48px; }
+  @media (max-width: 720px) {
+    .rap-nav { font-size: 11px; padding: 4px 10px; gap: 2px; }
+    .rap-nav a { padding: 5px 7px; }
+  }
+</style>
+<nav class="rap-nav">
+  <a class="rap-nav-back" href="index.html">&larr; 10 May Hub</a>
+  <a class="rap-nav-current" href="deepseek_e010_e010r1_report.html">DeepSeek Results</a>
+  <a href="moaz_gemini_comparison.html">Gemini 3 Pro vs Flash</a>
+</nav>
+<!-- ==== /RAPresentations nav ==== -->
+  <header>
+    <h1>DeepSeek E010 + E010R1 Results</h1>
+    <p class="muted">Generated 2026-05-09 12:03:07 from <code>results\llm\E010_api_text_numeric_deepseek_v4_pro_high_reasoning.parquet</code> and <code>results\llm\E010R1_api_text_numeric_deepseek_v4_pro_high_reasoning_truncation_retry.parquet</code>.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Evaluation Set</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Merged Rows</div><div class="value">1261</div><div class="sub">E010 with E010R1 truncation overrides</div></div>
+        <div class="card"><div class="label">Evaluated Rows</div><div class="value">1261</div><div class="sub">100.0% coverage</div></div>
+        <div class="card"><div class="label">E010R1 Overrides</div><div class="value">55</div><div class="sub">All 55 retry rows parsed successfully</div></div>
+        <div class="card"><div class="label">Offline Reparse Recoveries</div><div class="value">13</div><div class="sub">Valid Markdown outputs recovered without API calls</div></div>
+        <div class="card"><div class="label">Median Latency</div><div class="value">1.69 min</div><div class="sub">Evaluated rows only</div></div>
+        <div class="card"><div class="label">Total Tokens</div><div class="value">11,944,544</div><div class="sub">Prompt + completion tokens in evaluated rows</div></div>
+      </div>
+      <div class="note">
+        <p><strong>Merge rule:</strong> E010R1 rows replace the matching E010 rows that were true truncations. Remaining E010 rows are reused, and parseable Markdown-style outputs are reparsed with the updated parser.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Binary Results</h2>
+      <p class="muted">Binary mapping: <strong>original</strong> is the negative class; every attack class is the positive class.</p>
+      <div class="grid">
+        <div class="card"><div class="label">Balanced Accuracy</div><div class="value">89.2%</div><div class="sub">Mean of original recall and attack recall</div></div>
+        <div class="card"><div class="label">Macro F1</div><div class="value">86.3%</div><div class="sub">Average F1 across original and attacked</div></div>
+        <div class="card"><div class="label">Accuracy</div><div class="value">95.8%</div><div class="sub">Overall binary hit rate</div></div>
+        <div class="card"><div class="label">Weighted F1</div><div class="value">96.0%</div><div class="sub">Support-weighted binary F1</div></div>
+      </div>
+      <div class="split">
+        <div><table><thead><tr><th>Class</th><th>Support</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody><tr><td>original</td><td>97</td><td>69.3%</td><td>81.4%</td><td>74.9%</td></tr><tr><td>attacked</td><td>1164</td><td>98.4%</td><td>97.0%</td><td>97.7%</td></tr></tbody></table></div>
+        <div class="scroll"><table class="matrix"><caption>Binary Confusion Matrix</caption><thead><tr><th>Actual / Predicted</th><th>original</th><th>attacked</th><th>Total</th></tr></thead><tbody><tr><th>original</th><td class="heat diag" style="--a:0.170"><a class="cell-link" href="deepseek_e010_e010r1_cells/binary/actual-original__predicted-original.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=original">79</a></td><td class="heat offdiag" style="--a:0.131"><a class="cell-link" href="deepseek_e010_e010r1_cells/binary/actual-original__predicted-attacked.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attacked">18</a></td><td class="total">97</td></tr><tr><th>attacked</th><td class="heat offdiag" style="--a:0.142"><a class="cell-link" href="deepseek_e010_e010r1_cells/binary/actual-attacked__predicted-original.html" target="_blank" rel="noopener" title="Open rows where actual=attacked and predicted=original">35</a></td><td class="heat diag" style="--a:0.840"><a class="cell-link" href="deepseek_e010_e010r1_cells/binary/actual-attacked__predicted-attacked.html" target="_blank" rel="noopener" title="Open rows where actual=attacked and predicted=attacked">1129</a></td><td class="total">1164</td></tr><tr class="totals"><th>Total</th><td>114</td><td>1147</td><td>1261</td></tr></tbody></table></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Multiclass Results</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Multiclass Accuracy</div><div class="value">72.9%</div><div class="sub">Exact class match</div></div>
+        <div class="card"><div class="label">Macro F1</div><div class="value">71.8%</div><div class="sub">Unweighted average across 13 classes</div></div>
+        <div class="card"><div class="label">Weighted F1</div><div class="value">71.8%</div><div class="sub">Support-weighted across 13 classes</div></div>
+      </div>
+      <h3>Per-Class F1</h3>
+      <div class="scroll"><table><thead><tr><th>Class</th><th>Support</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody><tr><td><strong>original</strong><div class="muted">Original, unmanipulated day.</div></td><td>97</td><td>69.3%</td><td>81.4%</td><td><div class="bar"><span style="width:74.9%"></span></div>74.9%</td></tr><tr><td><strong>attack0</strong><div class="muted">All readings replaced with zero.</div></td><td>97</td><td>100.0%</td><td>100.0%</td><td><div class="bar"><span style="width:100.0%"></span></div>100.0%</td></tr><tr><td><strong>attack1</strong><div class="muted">Uniform random reduction.</div></td><td>97</td><td>81.0%</td><td>52.6%</td><td><div class="bar"><span style="width:63.7%"></span></div>63.7%</td></tr><tr><td><strong>attack2</strong><div class="muted">Contiguous zero/on-off interval.</div></td><td>97</td><td>75.8%</td><td>100.0%</td><td><div class="bar"><span style="width:86.2%"></span></div>86.2%</td></tr><tr><td><strong>attack3</strong><div class="muted">Per-sample random scaling.</div></td><td>97</td><td>37.6%</td><td>70.1%</td><td><div class="bar"><span style="width:48.9%"></span></div>48.9%</td></tr><tr><td><strong>attack4</strong><div class="muted">Random selected period is reduced.</div></td><td>97</td><td>69.2%</td><td>74.2%</td><td><div class="bar"><span style="width:71.6%"></span></div>71.6%</td></tr><tr><td><strong>attack5</strong><div class="muted">Synthetic random values from normal average.</div></td><td>97</td><td>69.7%</td><td>71.1%</td><td><div class="bar"><span style="width:70.4%"></span></div>70.4%</td></tr><tr><td><strong>attack6</strong><div class="muted">Values above a cut-off are capped.</div></td><td>97</td><td>95.8%</td><td>71.1%</td><td><div class="bar"><span style="width:81.7%"></span></div>81.7%</td></tr><tr><td><strong>attack7</strong><div class="muted">Cut-off subtraction with floor at zero.</div></td><td>97</td><td>95.2%</td><td>20.6%</td><td><div class="bar"><span style="width:33.9%"></span></div>33.9%</td></tr><tr><td><strong>attack9</strong><div class="muted">Flat average-consumption profile.</div></td><td>97</td><td>77.0%</td><td>100.0%</td><td><div class="bar"><span style="width:87.0%"></span></div>87.0%</td></tr><tr><td><strong>attack10</strong><div class="muted">Reversed consumption pattern.</div></td><td>97</td><td>93.8%</td><td>61.9%</td><td><div class="bar"><span style="width:74.5%"></span></div>74.5%</td></tr><tr><td><strong>attack12</strong><div class="muted">Lower-consuming user profile substitution.</div></td><td>97</td><td>61.1%</td><td>45.4%</td><td><div class="bar"><span style="width:52.1%"></span></div>52.1%</td></tr><tr><td><strong>attackieee</strong><div class="muted">Selective zeroing of intervals.</div></td><td>97</td><td>80.0%</td><td>99.0%</td><td><div class="bar"><span style="width:88.5%"></span></div>88.5%</td></tr></tbody></table></div>
+      <h3>Full Confusion Matrix</h3>
+      <div class="scroll"><table class="matrix"><caption>Multiclass Confusion Matrix</caption><thead><tr><th>Actual / Predicted</th><th>original</th><th>attack0</th><th>attack1</th><th>attack2</th><th>attack3</th><th>attack4</th><th>attack5</th><th>attack6</th><th>attack7</th><th>attack9</th><th>attack10</th><th>attack12</th><th>attackieee</th><th>Total</th></tr></thead><tbody><tr><th>original</th><td class="heat diag" style="--a:0.706"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-original.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=original">79</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.135"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack1.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack1">2</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack2">1</a></td><td class="heat offdiag" style="--a:0.135"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack3">2</a></td><td class="heat offdiag" style="--a:0.187"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack4.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack4">9</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack5.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack5">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack7.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack7">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.135"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-original__predicted-attack10.html" target="_blank" rel="noopener" title="Open rows where actual=original and predicted=attack10">2</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack0</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.840"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack0__predicted-attack0.html" target="_blank" rel="noopener" title="Open rows where actual=attack0 and predicted=attack0">97</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack1</th><td class="heat offdiag" style="--a:0.142"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-original.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=original">3</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.499"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-attack1.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=attack1">51</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=attack2">1</a></td><td class="heat offdiag" style="--a:0.335"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=attack3">29</a></td><td class="heat offdiag" style="--a:0.135"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-attack4.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=attack4">2</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-attack5.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=attack5">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.194"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack1__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack1 and predicted=attack12">10</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack2</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.840"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack2__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attack2 and predicted=attack2">97</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack3</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack3__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attack3 and predicted=attack2">1</a></td><td class="heat diag" style="--a:0.625"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack3__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=attack3 and predicted=attack3">68</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.261"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack3__predicted-attack5.html" target="_blank" rel="noopener" title="Open rows where actual=attack3 and predicted=attack5">19</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack3__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack3 and predicted=attack12">1</a></td><td class="heat offdiag" style="--a:0.179"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack3__predicted-attackieee.html" target="_blank" rel="noopener" title="Open rows where actual=attack3 and predicted=attackieee">8</a></td><td class="total">97</td></tr><tr><th>attack4</th><td class="heat offdiag" style="--a:0.231"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack4__predicted-original.html" target="_blank" rel="noopener" title="Open rows where actual=attack4 and predicted=original">15</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.142"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack4__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attack4 and predicted=attack2">3</a></td><td class="heat offdiag" style="--a:0.150"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack4__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=attack4 and predicted=attack3">4</a></td><td class="heat diag" style="--a:0.654"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack4__predicted-attack4.html" target="_blank" rel="noopener" title="Open rows where actual=attack4 and predicted=attack4">72</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.135"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack4__predicted-attack10.html" target="_blank" rel="noopener" title="Open rows where actual=attack4 and predicted=attack10">2</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack4__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack4 and predicted=attack12">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack5</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.276"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack5__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=attack5 and predicted=attack3">21</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.632"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack5__predicted-attack5.html" target="_blank" rel="noopener" title="Open rows where actual=attack5 and predicted=attack5">69</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack5__predicted-attack6.html" target="_blank" rel="noopener" title="Open rows where actual=attack5 and predicted=attack6">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack5__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack5 and predicted=attack12">1</a></td><td class="heat offdiag" style="--a:0.157"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack5__predicted-attackieee.html" target="_blank" rel="noopener" title="Open rows where actual=attack5 and predicted=attackieee">5</a></td><td class="total">97</td></tr><tr><th>attack6</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack6__predicted-attack5.html" target="_blank" rel="noopener" title="Open rows where actual=attack6 and predicted=attack5">1</a></td><td class="heat diag" style="--a:0.632"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack6__predicted-attack6.html" target="_blank" rel="noopener" title="Open rows where actual=attack6 and predicted=attack6">69</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.320"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack6__predicted-attack9.html" target="_blank" rel="noopener" title="Open rows where actual=attack6 and predicted=attack9">27</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack7</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack1.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack1">1</a></td><td class="heat offdiag" style="--a:0.291"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack2">23</a></td><td class="heat offdiag" style="--a:0.343"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack3">30</a></td><td class="heat offdiag" style="--a:0.172"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack4.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack4">7</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack6.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack6">1</a></td><td class="heat diag" style="--a:0.268"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack7.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack7">20</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.157"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attack12">5</a></td><td class="heat offdiag" style="--a:0.194"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack7__predicted-attackieee.html" target="_blank" rel="noopener" title="Open rows where actual=attack7 and predicted=attackieee">10</a></td><td class="total">97</td></tr><tr><th>attack9</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.840"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack9__predicted-attack9.html" target="_blank" rel="noopener" title="Open rows where actual=attack9 and predicted=attack9">97</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack10</th><td class="heat offdiag" style="--a:0.246"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack10__predicted-original.html" target="_blank" rel="noopener" title="Open rows where actual=attack10 and predicted=original">17</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack10__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attack10 and predicted=attack2">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.187"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack10__predicted-attack4.html" target="_blank" rel="noopener" title="Open rows where actual=attack10 and predicted=attack4">9</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.565"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack10__predicted-attack10.html" target="_blank" rel="noopener" title="Open rows where actual=attack10 and predicted=attack10">60</a></td><td class="heat offdiag" style="--a:0.194"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack10__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack10 and predicted=attack12">10</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="total">97</td></tr><tr><th>attack12</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.187"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack1.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack1">9</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.320"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack3.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack3">27</a></td><td class="heat offdiag" style="--a:0.157"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack4.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack4">5</a></td><td class="heat offdiag" style="--a:0.179"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack5.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack5">8</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack6.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack6">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.135"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack9.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack9">2</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.447"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attack12.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attack12">44</a></td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attack12__predicted-attackieee.html" target="_blank" rel="noopener" title="Open rows where actual=attack12 and predicted=attackieee">1</a></td><td class="total">97</td></tr><tr><th>attackieee</th><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.127"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attackieee__predicted-attack2.html" target="_blank" rel="noopener" title="Open rows where actual=attackieee and predicted=attack2">1</a></td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat offdiag" style="--a:0.120">0</td><td class="heat diag" style="--a:0.833"><a class="cell-link" href="deepseek_e010_e010r1_cells/multiclass/actual-attackieee__predicted-attackieee.html" target="_blank" rel="noopener" title="Open rows where actual=attackieee and predicted=attackieee">96</a></td><td class="total">97</td></tr><tr class="totals"><th>Total</th><td>114</td><td>97</td><td>63</td><td>128</td><td>181</td><td>104</td><td>99</td><td>72</td><td>21</td><td>126</td><td>64</td><td>72</td><td>120</td><td>1261</td></tr></tbody></table></div>
+      <h3>Top Off-Diagonal Confusions</h3>
+      <div class="scroll"><table><thead><tr><th>Actual</th><th>Predicted</th><th>Count</th></tr></thead><tbody><tr><td>attack7</td><td>attack3</td><td>30</td></tr><tr><td>attack1</td><td>attack3</td><td>29</td></tr><tr><td>attack6</td><td>attack9</td><td>27</td></tr><tr><td>attack12</td><td>attack3</td><td>27</td></tr><tr><td>attack7</td><td>attack2</td><td>23</td></tr><tr><td>attack5</td><td>attack3</td><td>21</td></tr><tr><td>attack3</td><td>attack5</td><td>19</td></tr><tr><td>attack10</td><td>original</td><td>17</td></tr><tr><td>attack4</td><td>original</td><td>15</td></tr><tr><td>attack1</td><td>attack12</td><td>10</td></tr><tr><td>attack7</td><td>attackieee</td><td>10</td></tr><tr><td>attack10</td><td>attack12</td><td>10</td></tr><tr><td>attack10</td><td>attack4</td><td>9</td></tr><tr><td>original</td><td>attack4</td><td>9</td></tr><tr><td>attack12</td><td>attack1</td><td>9</td></tr><tr><td>attack3</td><td>attackieee</td><td>8</td></tr><tr><td>attack12</td><td>attack5</td><td>8</td></tr><tr><td>attack7</td><td>attack4</td><td>7</td></tr><tr><td>attack12</td><td>attack4</td><td>5</td></tr><tr><td>attack5</td><td>attackieee</td><td>5</td></tr></tbody></table></div>
+    </section>
+
+    <section>
+      <h2>Coverage And Exclusions</h2>
+      <div class="split">
+        <div><table><thead><tr><th>Source</th><th>Rows</th><th>Evaluated</th><th>Excluded</th><th>Coverage</th></tr></thead><tbody><tr><td>E010</td><td>1206</td><td>1206</td><td>0</td><td>100.0%</td></tr><tr><td>E010R1</td><td>55</td><td>55</td><td>0</td><td>100.0%</td></tr></tbody></table></div>
+        <div>
+          <div class="note warn">
+            <p><strong>Excluded rows:</strong> 0 rows remain unavailable for metric scoring after the E010R1 retry and offline reparsing.</p>
+          </div>
+        </div>
+      </div>
+      <h3>Excluded Row Details</h3>
+      <div class="scroll"><p class="muted">No excluded rows.</p></div>
+    </section>
+  </main>
+</body>
+</html>
