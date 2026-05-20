@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deep Dive — Where the constant c comes from</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <script defer src="katex-config.js"></script>
+  <style>
+    .skeleton-step.highlight::before { background: #f59e0b; }
+    .step-info-trigger {
+      display: inline-block;
+      width: 18px; height: 18px; line-height: 18px;
+      text-align: center; border-radius: 50%;
+      background: #f59e0b; color: white;
+      font-size: 11px; font-weight: bold;
+      cursor: help; position: relative;
+      vertical-align: middle; margin-left: 6px;
+    }
+    .step-tooltip {
+      display: none; position: absolute;
+      left: 0; top: calc(100% + 10px);
+      width: 370px; background: #fffbeb;
+      border: 1px solid #f59e0b; border-radius: 8px;
+      padding: 12px 14px; font-size: 0.85rem;
+      font-weight: normal; color: #333;
+      line-height: 1.55; z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .step-info-trigger:hover .step-tooltip { display: block; }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../index.html" class="home">&larr; RA Presentations</a>
+  <span class="center">Deep Dive</span>
+</nav>
+
+<main class="week">
+
+<header class="week-header">
+  <span class="badge">Scale equivariant &middot; Stateless</span>
+  <h1>Overview and where we fit</h1>
+</header>
+
+<div class="proof-skeleton">
+  <div class="skeleton-title">Overview</div>
+
+  <div class="skeleton-step">
+    <span class="step-name">Lower bound (Theorem 3)</span>
+    <span class="step-math">Proves $\Omega(\delta\rho^2)$ is unavoidable via indistinguishability. This establishes $\delta\rho^2$ as the natural scale.</span>
+  </div>
+
+  <div class="skeleton-step highlight">
+    <span class="step-name">Definition 1 (the abstraction)</span>
+    <span class="step-math">Defines $(\delta_{\max}, c)$-ARAgg with error $\le c\delta\rho^2$. This is the unique form matching the lower bound.</span>
+    <span class="step-info-trigger">i<span class="step-tooltip"><strong>What I'd need to show (step 1):</strong> that my aggregator is scale-equivariant, i.e. $A(\alpha x_1, \dots, \alpha x_n) = \alpha \cdot A(x_1, \dots, x_n)$. This forces error to be linear in $\rho^2$ via $h(st) = s \cdot h(t)$. A Bayesian-weighted aggregator should satisfy this since the belief vector $\pi$ is dimensionless (probabilities, not gradients).</span></span>
+  </div>
+
+  <div class="skeleton-step">
+    <span class="step-name">Bucketing lemma (Lemma C.1)</span>
+    <span class="step-math">Proves $\tilde\rho^2 = \rho^2/s$ and $\tilde\delta = \delta s$, giving invariant $\tilde\delta \cdot \tilde\rho^2 = \delta\rho^2$.</span>
+  </div>
+
+  <div class="skeleton-step highlight">
+    <span class="step-name">Aggregator-specific proofs (Theorem 2)</span>
+    <span class="step-math">Each aggregator proves its own $f(\delta_{\max})$. Combined with bucketing, this becomes $c = f(\delta_{\max})/\delta_{\max}$.</span>
+    <span class="step-info-trigger">i<span class="step-tooltip"><strong>What I'd need to show (step 2):</strong> a bound $\E\|\hat{x} - \bar{x}\|^2 \le f(\delta_{\max}) \cdot \tilde\rho^2$ for my specific aggregator. $f(\delta_{\max})$ measures degradation near the breakdown point, then $c = f(\delta_{\max}) / \delta_{\max}$. For a Bayesian aggregator, $f$ would depend on how concentrated $\pi$ is. Worst case (Mimic, $\pi$ stays flat): same $f$ as stateless.</span></span>
+  </div>
+
+  <div class="skeleton-step">
+    <span class="step-name">Convergence (Theorem 2, general)</span>
+    <span class="step-math">Any $(\delta_{\max}, c)$-ARAgg plugs into the optimization bound: error floor $\sim c\delta\zeta^2$.</span>
+  </div>
+</div>
+
+<div class="math-meaning">
+  <div class="meaning-label">The one sentence summary</div>
+  <p>Each aggregator pays its own constant $c$ for imperfect filtering. The $\delta\rho^2$ scaling it multiplies is universal: scale equivariance forces error $\propto \rho^2$, the bucket size constraint $s = \delta_{\max}/\delta$ introduces $\delta$, and the lower bound proves $\Omega(\delta\rho^2)$ is tight.</p>
+</div>
+
+<!-- ================================================================
+     §1  THE DEFINITION
+     ================================================================ -->
+<section>
+<h2>1. The definition: what $c$ measures</h2>
+
+<div class="math-card">
+  <div class="label def">Definition 1 &middot; main.tex:329</div>
+  <h3>$(\delta_{\max}, c)$-Agnostic Robust Aggregator</h3>
+  <div class="formal">
+    <p>Given inputs $\{x_1, \ldots, x_n\}$ of which a good subset $\mathcal{G}$ of size $|\mathcal{G}| > (1-\delta)n$ for $\delta \le \delta_{\max} < 0.5$ satisfies
+    $\E\|x_i - x_j\|^2 \le \rho^2$, the output $\hat{x}$ satisfies:</p>
+    $$\E\|\hat{x} - \bar{x}\|^2 \;\le\; \cb{c}\;\co{\delta}\;\cg{\rho^2}$$
+    <p>where $\bar{x} = \frac{1}{|\mathcal{G}|}\sum_{j \in \mathcal{G}} x_j$. The aggregator does not need to know $\rho^2$.</p>
+  </div>
+</div>
+
+<div class="callout intuition">
+  <div class="callout-title">What each piece means</div>
+  <p>$\co{\delta}$ &mdash; Byzantine fraction (their voting power).</p>
+  <p>$\cg{\rho^2}$ &mdash; good-input spread (the cover attackers hide within).</p>
+  <p>$\cb{c}$ &mdash; aggregator-specific filtering cost. A perfect aggregator has $c = 1$; real ones pay more.</p>
+</div>
+
+<p>$c$ is not assumed. It is derived from each aggregator's proof. All aggregators, combined with bucketing, land on $O(\delta\rho^2)$. The next section shows why the $\rho^2$ part is forced.</p>
+</section>
+
+
+<!-- ================================================================
+     §2  WHY LINEAR IN rho^2
+     ================================================================ -->
+<section>
+<h2>2. Why the error is linear in $\rho^2$: scale equivariance</h2>
+
+<p>The form $f(\delta_{\max}) \cdot \rho^2$ is forced by a symmetry all agnostic aggregators share. Scale every input by $\alpha$:</p>
+
+<div class="symbol-map">
+  <div class="map-title">Effect of scaling inputs by $\alpha$</div>
+  <div class="symbol-grid">
+    <div class="symbol-chip">
+      <span class="sym">$\bar{x} \to \alpha\bar{x}$</span>
+      <span class="role"><strong>Mean scales.</strong> The average of scaled vectors is the scaled average.</span>
+    </div>
+    <div class="symbol-chip">
+      <span class="sym">$\rho^2 \to \alpha^2\rho^2$</span>
+      <span class="role"><strong>Variance scales quadratically.</strong> $\E\|\alpha x_i - \alpha x_j\|^2 = \alpha^2 \E\|x_i - x_j\|^2$.</span>
+    </div>
+    <div class="symbol-chip">
+      <span class="sym">$\hat{x} \to \alpha\hat{x}$</span>
+      <span class="role"><strong>Output scales</strong> (if the aggregator is scale-equivariant).</span>
+    </div>
+    <div class="symbol-chip">
+      <span class="sym">$\|\hat{x} - \bar{x}\|^2 \to \alpha^2\|\hat{x} - \bar{x}\|^2$</span>
+      <span class="role"><strong>Error scales quadratically</strong>, matching $\rho^2$.</span>
+    </div>
+  </div>
+</div>
+
+<h3>Which aggregators are scale-equivariant?</h3>
+
+<p>$A$ is scale-equivariant if $A(\alpha x_1, \ldots, \alpha x_n) = \alpha \cdot A(x_1, \ldots, x_n)$:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aggregator</th>
+      <th>Scale equivariant?</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Krum</td>
+      <td>Yes</td>
+      <td>Minimizes $\sum\|x_i - x_j\|^2$ over neighbors. Scaling multiplies all squared distances by $\alpha^2$; argmin unchanged, selected point scales by $\alpha$.</td>
+    </tr>
+    <tr>
+      <td>Geometric median</td>
+      <td>Yes</td>
+      <td>Minimizes $\sum\|y - y_i\|$. The minimizer of the scaled problem is $\alpha$ times the original minimizer.</td>
+    </tr>
+    <tr>
+      <td>Coordinate-wise median</td>
+      <td>Yes</td>
+      <td>$\operatorname{median}(\alpha x_i^{(j)}) = \alpha \cdot \operatorname{median}(x_i^{(j)})$ for each coordinate.</td>
+    </tr>
+    <tr>
+      <td>CClip</td>
+      <td style="color: var(--red);"><strong>No</strong></td>
+      <td>Clipping radius $\tau$ is fixed. When inputs scale by $\alpha$, $\tau$ stays put, so clipping behavior changes. Not agnostic.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The functional equation</h3>
+
+<div class="math-card">
+  <div class="label">Derivation</div>
+  <h3>Scale equivariance forces linearity in $\rho^2$</h3>
+  <div class="formal">
+    <p>Let $h(\rho^2, \delta_{\max}) := \E\|\hat{x} - \bar{x}\|^2$. After scaling all inputs by $\alpha$:</p>
+    <ul>
+      <li>New variance: $\alpha^2\rho^2$</li>
+      <li>New error: $\alpha^2 \cdot h(\rho^2, \delta_{\max})$ (by scale equivariance)</li>
+      <li>Byzantine fraction $\delta$: unchanged (scaling doesn't change who is Byzantine)</li>
+    </ul>
+    <p>Since $\delta_{\max}$ is unaffected by scaling, the new error also equals $h(\alpha^2\rho^2, \delta_{\max})$:</p>
+    $$h(\alpha^2\rho^2,\; \delta_{\max}) \;=\; \alpha^2 \cdot h(\rho^2,\; \delta_{\max}) \qquad \forall\;\alpha > 0$$
+    <p>Setting $t = \rho^2$ and $s = \alpha^2$, this gives $h(st) = s \cdot h(t)$ for all $s > 0$, $t > 0$.<br>
+    <em>Why $\alpha > 0$?</em> We need $s = \alpha^2 > 0$ since it represents a variance ratio. $\alpha^2 > 0$ for any $\alpha \ne 0$, so the sign of $\alpha$ doesn't matter. Writing $\alpha > 0$ just ensures $s$ sweeps all positive reals.</p>
+    <p>This must hold for every positive $s$ and $t$, so we can pick $t = 1$:</p>
+
+    <p><strong>Step A.</strong> Start with the general rule, valid for all $s > 0$ and all $t > 0$:</p>
+    $$h(s \cdot t) = s \cdot h(t)$$
+
+    <p><strong>Step B.</strong> Pick $t = 1$. LHS becomes $h(s \cdot 1) = h(s)$, RHS becomes $s \cdot h(1)$:</p>
+    $$h(s) = s \cdot h(1)$$
+    <p>$h(s \cdot 1)$ is just $h(s)$. The two-variable equation collapses: $h$ at any argument $s$ equals $s$ times the constant $h(1)$.</p>
+
+    <p><strong>Step C.</strong> This holds for every $s > 0$, so $h$ is linear through the origin with slope $h(1)$.</p>
+
+    <p><strong>Step D.</strong> Substitute $s = \rho^2$:</p>
+    $$h(\rho^2) = \rho^2 \cdot h(1) = \underbrace{h(1, \delta_{\max})}_{= f(\delta_{\max})} \cdot\; \rho^2$$
+
+    <p>$\alpha$ was a probe to discover $h$'s form. Once we know $h$ is linear, $\alpha$ has done its job.</p>
+  </div>
+</div>
+
+<div class="callout warning">
+  <div class="callout-title">Limitation</div>
+  <p>Scaling only probes $h$'s dependence on $\rho^2$. It says nothing about $\delta$ (scaling doesn't change who is Byzantine). So we get $h(\rho^2, \delta_{\max}) = f(\delta_{\max}) \cdot \rho^2$, but $f(\delta_{\max})$ could be anything. The form of $f$ requires the actual aggregator-specific proofs from the appendix.</p>
+</div>
+
+<div class="callout intuition">
+  <div class="callout-title">Agnosticism = scale equivariance</div>
+  <p>The definition requires the aggregator to work without knowing $\rho^2$. Scale equivariance is why it doesn't need to: $\rho^2$ factors out cleanly. CClip fails this because its clipping radius $\tau$ is absolute, so its quality depends on $\tau/\rho$.</p>
+</div>
+
+<div class="callout why">
+  <div class="callout-title">Why $\rho^2$ and not $\rho$ or $\rho^4$?</div>
+  <p>Both error $\E\|\hat{x} - \bar{x}\|^2$ and variance $\rho^2 = \E\|x_i - x_j\|^2$ are squared norms, both scaling as $\alpha^2$. They match. $\rho^4$ would scale as $\alpha^4$, breaking the relationship.</p>
+</div>
+</section>
+
+
+<!-- ================================================================
+     §3  THREE QUANTITIES
+     ================================================================ -->
+<section>
+<h2>3. Breakdown point vs. $\delta_{\max}$ vs. $\delta$</h2>
+
+<p>The paper uses $\delta_{\max}$ in ways that confused me at first. There are three distinct quantities:</p>
+
+<div class="symbol-map">
+  <div class="map-title">The three-level hierarchy</div>
+  <div class="symbol-grid">
+    <div class="symbol-chip">
+      <span class="sym" style="color: var(--red);">breakdown point</span>
+      <span class="role">The fraction where the proof denominator hits zero. Fixed by the algorithm: $\frac{1}{4}$ for Krum, $\frac{1}{2}$ for GM/CM.</span>
+    </div>
+    <div class="symbol-chip">
+      <span class="sym" style="color: var(--orange);">$\delta_{\max}$</span>
+      <span class="role">Chosen strictly below breakdown: $\delta_{\max} = \text{breakdown} - \nu$, where $\nu > 0$ is the safety margin.</span>
+    </div>
+    <div class="symbol-chip">
+      <span class="sym" style="color: var(--green);">$\delta$</span>
+      <span class="role">Actual fraction of bad workers. Must satisfy $\delta \le \delta_{\max}$.</span>
+    </div>
+  </div>
+</div>
+
+<div class="math-card">
+  <div class="label">Hierarchy</div>
+  <h3>The ordering that must always hold</h3>
+  <div class="formal">
+    $$\co{\delta} \;\le\; \co{\delta_{\max}} \;=\; \cr{\text{breakdown}} - \cp{\nu} \;<\; \cr{\text{breakdown}}$$
+  </div>
+</div>
+
+<div class="callout intuition">
+  <div class="callout-title">Analogy</div>
+  <p>Bridge rated for 10 tons ($\cr{\text{breakdown}}$), policy set to $10 - \nu$ tons ($\co{\delta_{\max}}$), today's truck weighs $\co{\delta}$ tons. $\cp{\nu}$ keeps $c$ finite.</p>
+</div>
+</section>
+
+
+<!-- ================================================================
+     §4  CONCRETE EXAMPLE FIRST: GM
+     ================================================================ -->
+<section>
+<h2>4. Concrete example first: geometric median</h2>
+
+<p>GM is the cleanest to trace end-to-end: four steps, no tricks.</p>
+
+<h3>4a. The GM proof: deriving $f(\delta_{\max})$</h3>
+
+<p>GM operates on bucketed inputs $\{y_1, \ldots, y_m\}$ with variance $\tilde\rho^2$ and Byzantine fraction $\tilde\delta \le \delta_{\max} = \frac{1}{2} - \nu$.</p>
+
+<div class="proof">
+  <div class="proof-header">
+    Deriving $f(\delta_{\max})$ for geometric median
+    <span class="what">appendix.tex:1042&ndash;1067</span>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Triangle inequality on good and bad buckets</div>
+    <div class="formal">
+      <p>The geometric median $y^\star$ minimizes $\sum_i \|y - y_i\|$. For good $i$ and bad $j$:</p>
+      $$\|y^\star - y_i\| \ge \|y^\star - \bar{x}\| - \|y_i - \bar{x}\| \qquad (i \in \tilde{\mathcal{G}})$$
+      $$\|y^\star - y_j\| \ge \|y_j - \bar{x}\| - \|y^\star - \bar{x}\| \qquad\; (j \in \tilde{\mathcal{B}})$$
+    </div>
+    <div class="commentary">
+      Bounds the median's distance from the true mean using distances from good and bad buckets.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Sum over all buckets, use optimality</div>
+    <div class="formal">
+      <p>Summing and using the fact that $y^\star$ minimizes the total distance:</p>
+      $$\|y^\star - \bar{x}\| \le \frac{2}{|\tilde{\mathcal{G}}| - |\tilde{\mathcal{B}}|} \sum_{i \in \tilde{\mathcal{G}}} \|y_i - \bar{x}\|$$
+    </div>
+    <div class="commentary">
+      Denominator $|\tilde{\mathcal{G}}| - |\tilde{\mathcal{B}}|$ is the majority margin. Good buckets must outnumber bad.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Square, apply Cauchy-Schwarz, take expectation</div>
+    <div class="formal">
+      $$\E\|y^\star - \bar{x}\|^2 \le \frac{4|\tilde{\mathcal{G}}|^2}{(m - 2|\tilde{\mathcal{B}}|)^2} \cdot \tilde\rho^2$$
+    </div>
+    <div class="commentary">
+      Cauchy-Schwarz: $(\sum \|y_i - \bar{x}\|)^2 \le |\tilde{\mathcal{G}}| \cdot \sum \|y_i - \bar{x}\|^2$.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Substitute $|\tilde{\mathcal{B}}| \le m(\frac{1}{2} - \nu)$</div>
+    <div class="formal">
+      $$\E\|y^\star - \bar{x}\|^2 \le \frac{4m^2}{(2m\nu)^2}\tilde\rho^2 = \underbrace{\frac{1}{\nu^2}}_{f(\delta_{\max})} \cdot\; \tilde\rho^2$$
+    </div>
+    <div class="commentary">
+      $\nu$ is the gap between Byzantine fraction and breakdown point. As $\nu \to 0$, $f(\delta_{\max}) \to \infty$.
+    </div>
+  </div>
+  <div class="qed">&#9632;</div>
+</div>
+
+<div class="callout intuition">
+  <div class="callout-title">Three things to note</div>
+  <p><strong>1.</strong> $\nu$ is the safety margin from §3. Smaller gap = bigger $f(\delta_{\max})$.</p>
+  <p><strong>2.</strong> The result is $f(\delta_{\max}) \cdot \tilde\rho^2$, not $c \cdot \delta \cdot \rho^2$ yet. The proof only sees bucketed inputs.</p>
+  <p><strong>3.</strong> The bound is proportional to $\tilde\rho^2$ because GM is scale-equivariant (§2).</p>
+</div>
+
+<h3>4b. The bridge: from $f(\delta_{\max})$ to $c$</h3>
+
+<p>Now substitute what bucketing produces:</p>
+
+<div class="math-card">
+  <div class="label eq">The bridge</div>
+  <h3>Bucketing substitution turns $f(\delta_{\max}) \cdot \tilde\rho^2$ into $c \cdot \delta\rho^2$</h3>
+  <div class="formal">
+    <p><strong>From the GM proof:</strong></p>
+    $$\E\|y^\star - \bar{x}\|^2 \;\le\; \underbrace{\frac{1}{\nu^2}}_{f(\delta_{\max})} \cdot\; \tilde\rho^2$$
+    <p><strong>From the bucketing lemma</strong> (with $s = \lfloor\delta_{\max}/\delta\rfloor$):</p>
+    $$\tilde\rho^2 = \frac{\rho^2}{s} = \frac{\delta\rho^2}{\delta_{\max}} = \frac{\delta\rho^2}{1/2 - \nu}$$
+    <p><strong>Substitute:</strong></p>
+    $$\frac{1}{\nu^2} \;\cdot\; \frac{\delta\rho^2}{1/2 - \nu} \;=\; \underbrace{\frac{1}{\nu^2(1/2 - \nu)}}_{c} \;\cdot\; \delta\rho^2$$
+  </div>
+</div>
+
+<div class="callout plain">
+  <div class="callout-title">Summary</div>
+  <p>$f(\delta_{\max}) = \frac{1}{\nu^2}$ absorbed the $\delta_{\max}$ denominator from $\tilde\rho^2 = \delta\rho^2/\delta_{\max}$, giving $c = \frac{1}{\nu^2(1/2 - \nu)}$. The $\delta\rho^2$ factor came from bucketing. Same pattern for every aggregator; only $f(\delta_{\max})$ changes.</p>
+</div>
+
+<p>§5 shows why bucketing always preserves $\delta\rho^2$, §6 generalizes to any aggregator, §7 shows $\delta\rho^2$ is tight.</p>
+</section>
+
+
+<!-- ================================================================
+     §5  THE BUCKETING INVARIANT
+     ================================================================ -->
+<section>
+<h2>5. The bucketing invariant: why $\delta\rho^2$ is preserved</h2>
+
+<p>The bucketing lemma (Lemma C.1) does two things simultaneously:</p>
+
+<div class="math-card">
+  <div class="label lemma">Lemma C.1 &middot; appendix.tex:897</div>
+  <h3>Bucketing reduces variance, amplifies Byzantine fraction</h3>
+  <div class="formal">
+    <p><strong>Before bucketing:</strong></p>
+    <ul>
+      <li>Good-pair variance: $\rho^2$</li>
+      <li>Byzantine fraction: $\delta$</li>
+    </ul>
+    <p><strong>After $s$-bucketing into $m = \lceil n/s \rceil$ buckets:</strong></p>
+    $$\underbrace{\E\|y_i - y_j\|^2 \le \frac{\rho^2}{s}}_{\text{variance shrinks}} \qquad\qquad \underbrace{\tilde\delta = \delta s}_{\text{Byzantine fraction grows}}$$
+  </div>
+</div>
+
+<div class="callout intuition">
+  <div class="callout-title">The cancellation</div>
+  <p>$\tilde\delta \times \tilde\rho^2 = (\delta s) \times \frac{\rho^2}{s} = \delta\rho^2$. The product is invariant under bucketing regardless of $s$.</p>
+</div>
+
+<p>The product doesn't change, but bucketing reshapes the problem:</p>
+
+<div class="symbol-map">
+  <div class="map-title">What bucketing does</div>
+  <div class="symbol-grid">
+    <div class="symbol-chip">
+      <span class="sym" style="color: var(--red);">Before</span>
+      <span class="role">Low $\delta$ + high $\rho^2$. Good inputs spread out, aggregator confuses heterogeneity with attacks.</span>
+    </div>
+    <div class="symbol-chip">
+      <span class="sym" style="color: var(--green);">After</span>
+      <span class="role">Higher $\tilde\delta$ + lower $\tilde\rho^2$. Good bucket-averages cluster tightly, easier to separate from Byzantines.</span>
+    </div>
+  </div>
+</div>
+
+<p>Bucketing puts the aggregator back in the low-variance regime it was designed for.</p>
+</section>
+
+
+<!-- ================================================================
+     §6  THE GENERAL ARGUMENT
+     ================================================================ -->
+<section>
+<h2>6. Why <em>every</em> aggregator achieves $O(\delta\rho^2)$</h2>
+
+<p>The $\delta\rho^2$ scaling is not a coincidence. Any base aggregator combined with bucketing gives $O(\delta\rho^2)$:</p>
+
+<div class="proof">
+  <div class="proof-header">
+    General argument: bucketing + any base aggregator &rarr; $O(\delta\rho^2)$
+    <span class="what">structural, not aggregator-specific</span>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Start with any base aggregator $A$</div>
+    <div class="formal">
+      <p>Suppose $A$ can handle up to $\delta_{\max}$ fraction of Byzantines. On inputs with good-pair variance $\rho^2$, it achieves:</p>
+      $$\E\|\hat{x} - \bar{x}\|^2 \le f(\delta_{\max}) \cdot \rho^2$$
+      <p>where $f(\delta_{\max})$ is some function specific to $A$.</p>
+    </div>
+    <div class="commentary">
+      $f$ is aggregator-specific (Krum: $\frac{4}{3\nu}$, GM: $\frac{1}{\nu^2}$) but always a function of $\delta_{\max}$ only.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Apply bucketing with $s = \lfloor\delta_{\max}/\delta\rfloor$</div>
+    <div class="formal">
+      <p>By the bucketing lemma, the post-bucketing quantities are:</p>
+      $$\tilde\rho^2 = \frac{\rho^2}{s} = \frac{\rho^2 \cdot \delta}{\delta_{\max}} \qquad\qquad \tilde\delta = \delta s \approx \delta_{\max}$$
+    </div>
+    <div class="commentary">
+      Bucket size chosen so $\tilde\delta \approx \delta_{\max}$, right at the aggregator's tolerance limit.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Feed bucketed inputs into $A$</div>
+    <div class="formal">
+      <p>The aggregator sees inputs with variance $\tilde\rho^2$ and Byzantine fraction $\tilde\delta \approx \delta_{\max}$. Applying its guarantee:</p>
+      $$\E\|\hat{x} - \bar{x}\|^2 \le f(\delta_{\max}) \cdot \tilde\rho^2 = f(\delta_{\max}) \cdot \frac{\delta\rho^2}{\delta_{\max}}$$
+    </div>
+    <div class="commentary">
+      Both $f(\delta_{\max})$ and $\delta_{\max}$ are constants, so:</div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Identify $c$</div>
+    <div class="formal">
+      $$\E\|\hat{x} - \bar{x}\|^2 \le \underbrace{\frac{f(\delta_{\max})}{\delta_{\max}}}_{= c \text{ (a constant)}} \cdot\; \delta\rho^2$$
+    </div>
+    <div class="commentary">
+      $c$ absorbs aggregator-specific details. $\delta\rho^2$ comes from bucketing's $\tilde\rho^2 = \rho^2 \cdot \delta/\delta_{\max}$.
+    </div>
+  </div>
+  <div class="qed">&#9632;</div>
+</div>
+
+<div class="callout plain">
+  <div class="callout-title">Takeaway</div>
+  <p>$\delta\rho^2$ is universal because it comes from bucketing, which sits in front of every aggregator. The aggregator only determines $f(\delta_{\max})$, which collapses into $c$.</p>
+</div>
+</section>
+
+
+<!-- ================================================================
+     §7  LOWER BOUND
+     ================================================================ -->
+<section>
+<h2>7. The lower bound: $\delta\rho^2$ is the best any aggregator can do</h2>
+
+<div class="math-card">
+  <div class="label thm">Theorem 3 &middot; main.tex:447 &middot; appendix.tex:1100&ndash;1153</div>
+  <h3>Information-theoretic lower bound</h3>
+  <div class="formal">
+    <p>No algorithm can do better than $\Omega(\delta\rho^2)$. For any algorithm $\mathcal{A}$, there exist inputs where:</p>
+    $$\E\|\nabla f(\mathcal{A}(\ldots))\|^2 \;\ge\; \Omega(\delta\zeta^2)$$
+    <p>The proof constructs two scenarios with identical observations but different optima. The algorithm must be wrong on at least one, giving $\Omega(\delta\zeta^2)$ error. This matches the upper bound from §6, so $\delta\rho^2$ is tight up to $c$.</p>
+  </div>
+</div>
+
+<p>The full proof is covered in <a href="week7.html">Week 7</a> of the course.</p>
+</section>
+
+
+
+
+<!-- ================================================================
+     NAVIGATION
+     ================================================================ -->
+<nav class="bottom-nav">
+  <a href="../index.html">&larr; RA Presentations</a>
+</nav>
+
+</main>
+</body>
+</html>

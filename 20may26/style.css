@@ -1,0 +1,1188 @@
+/* ============================================================
+   Byzantine-Robust FL Course — Light theme
+   ============================================================ */
+
+:root {
+  --bg:            #fafafa;
+  --bg-card:       #ffffff;
+  --bg-soft:       #f3f4f6;
+  --bg-math:       #f8fafc;
+  --bg-proof:      #fefefe;
+  --bg-callout:    #f0f9ff;
+  --bg-warning:    #fffbeb;
+  --bg-success:    #f0fdf4;
+  --bg-question:   #faf5ff;
+  --text:          #1a1a1a;
+  --text-soft:     #4a5568;
+  --text-muted:    #718096;
+  --border:        #e2e8f0;
+  --border-strong: #cbd5e0;
+  --accent:        #2563eb;
+  --accent-soft:   #dbeafe;
+  --green:         #059669;
+  --orange:        #ea580c;
+  --purple:        #7c3aed;
+  --red:           #dc2626;
+  --shadow:        0 1px 3px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.1);
+  --shadow-lg:     0 4px 6px -1px rgba(0,0,0,.05), 0 2px 4px -2px rgba(0,0,0,.05);
+  --radius:        8px;
+  --font-text:     -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:     "SF Mono", "Cascadia Code", Menlo, Monaco, Consolas, monospace;
+  --font-math:     "KaTeX_Main", "Times New Roman", serif;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ============================================================
+   Top navigation bar
+   ============================================================ */
+nav.topnav {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+nav.topnav a {
+  color: var(--text-soft);
+  font-weight: 500;
+}
+nav.topnav .home {
+  font-weight: 700;
+  color: var(--text);
+}
+nav.topnav .center {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   Index page — hero + cards
+   ============================================================ */
+.hero {
+  padding: 80px 24px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin: 0 0 16px;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+.hero .subtitle {
+  font-size: 1.15rem;
+  color: var(--text-soft);
+  max-width: 720px;
+  margin: 0 auto 16px;
+}
+.hero .meta {
+  font-size: .9rem;
+  color: var(--text-muted);
+  margin-top: 24px;
+}
+.hero .meta a { margin: 0 8px; }
+
+.intro-banner {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding: 24px 32px;
+  background: var(--bg-callout);
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+.intro-banner .stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.intro-banner .stat-label {
+  font-size: .9rem;
+  color: var(--text-soft);
+  margin-top: 4px;
+}
+
+.cards {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+.card .week-badge {
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+.card.tier-a .week-badge { background: #fef3c7; color: #92400e; }
+.card.tier-a::after {
+  content: "Math-heavy";
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: .7rem;
+  color: var(--orange);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+.card .summary {
+  color: var(--text-soft);
+  font-size: .92rem;
+  flex-grow: 1;
+  margin-bottom: 12px;
+}
+.card .footer {
+  font-size: .82rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: auto;
+}
+.card .footer .duration { font-weight: 600; }
+.card .footer .arrow { color: var(--accent); font-weight: 700; }
+
+/* ============================================================
+   Week page — content
+   ============================================================ */
+main.week {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.week-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+.week-header .badge {
+  display: inline-block;
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+.week-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 12px 0 8px;
+  letter-spacing: -.015em;
+}
+.week-header .subtitle {
+  color: var(--text-soft);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+main.week h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 48px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -.01em;
+}
+main.week h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 12px;
+  color: var(--text);
+}
+main.week h4 {
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin: 20px 0 8px;
+  color: var(--text-soft);
+}
+main.week p { margin: 12px 0; }
+
+/* ============================================================
+   Math cards — the central UX
+   ============================================================ */
+.math-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+}
+.math-card .label {
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+}
+.math-card .label.thm     { color: var(--purple); }
+.math-card .label.lemma   { color: var(--green); }
+.math-card .label.def     { color: var(--orange); }
+.math-card .label.eq      { color: var(--accent); }
+.math-card .label.assump  { color: var(--text-muted); }
+.math-card h3 {
+  margin: 4px 0 14px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.math-card .formal {
+  background: var(--bg-math);
+  border-left: 3px solid var(--border-strong);
+  padding: 14px 20px;
+  margin: 14px 0;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.math-card .formal .katex-display { margin: 0; }
+
+.intuition-figure {
+  margin: 28px 0;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.intuition-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: var(--bg-math);
+}
+.intuition-figure figcaption {
+  margin-top: 12px;
+  color: var(--text-soft);
+  font-size: .94rem;
+  line-height: 1.5;
+}
+.intuition-figure figcaption strong {
+  color: var(--text);
+}
+
+.math-meaning {
+  margin: 18px 0;
+  padding: 16px 18px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-left: 4px solid var(--orange);
+  border-radius: 6px;
+}
+.math-meaning .meaning-label {
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #9a3412;
+  margin-bottom: 6px;
+}
+.math-meaning p {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.symbol-map {
+  margin: 18px 0;
+  padding: 16px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.symbol-map .map-title {
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+.symbol-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 11px 12px;
+}
+.symbol-chip .sym {
+  display: block;
+  font-family: var(--font-math);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.symbol-chip .role {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-soft);
+  font-size: .88rem;
+  line-height: 1.35;
+}
+
+.proof-skeleton {
+  margin: 22px 0;
+  padding: 18px;
+  background: var(--bg-proof);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  counter-reset: proof-skeleton;
+}
+.proof-skeleton .skeleton-title {
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 12px;
+}
+.proof-skeleton .skeleton-step {
+  position: relative;
+  margin: 10px 0;
+  padding: 12px 14px 12px 46px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.proof-skeleton .skeleton-step::before {
+  counter-increment: proof-skeleton;
+  content: counter(proof-skeleton);
+  position: absolute;
+  left: 14px;
+  top: 13px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.proof-skeleton .step-name {
+  font-weight: 700;
+  color: var(--text);
+}
+.proof-skeleton .step-math {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.theorem-card {
+  margin: 26px 0;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.theorem-card .card-kicker {
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 6px;
+}
+.theorem-card h3 {
+  margin: 0 0 14px;
+  font-size: 1.18rem;
+  line-height: 1.3;
+}
+.theorem-card .theorem-card-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.05fr) minmax(260px, .95fr);
+  gap: 18px;
+  align-items: start;
+}
+.theorem-card .theorem-card-grid > * {
+  min-width: 0;
+}
+.theorem-card figure {
+  margin: 0;
+}
+.theorem-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: var(--bg-math);
+  border: 1px solid var(--border);
+}
+.theorem-card .legend-title,
+.theorem-card .intuition-title,
+.theorem-card .formula-title {
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.theorem-card .symbol-legend {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.theorem-card .symbol-chip {
+  padding: 9px 10px;
+}
+.theorem-card .intuition-line {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #fff7ed;
+  border-left: 4px solid var(--orange);
+  border-radius: 6px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.theorem-card .intuition-title {
+  color: #9a3412;
+}
+.theorem-card .formula-block {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--bg-math);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+.theorem-card .formula-block .katex-display {
+  margin: 0;
+}
+.theorem-card figcaption {
+  margin-top: 8px;
+  font-size: .86rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.callout {
+  padding: 14px 18px;
+  margin: 12px 0;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+.callout .callout-title {
+  font-weight: 700;
+  font-size: .9rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+.callout.plain {
+  background: var(--bg-success);
+  border-color: var(--green);
+}
+.callout.plain .callout-title { color: var(--green); }
+.callout.why {
+  background: var(--bg-callout);
+  border-color: var(--accent);
+}
+.callout.why .callout-title { color: var(--accent); }
+.callout.warning {
+  background: var(--bg-warning);
+  border-color: var(--orange);
+}
+.callout.warning .callout-title { color: var(--orange); }
+.callout.intuition {
+  background: var(--bg-question);
+  border-color: var(--purple);
+}
+.callout.intuition .callout-title { color: var(--purple); }
+
+/* ============================================================
+   Proof blocks
+   ============================================================ */
+.proof {
+  background: var(--bg-proof);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  counter-reset: step;
+}
+.proof > .proof-header {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.proof > .proof-header .what { color: var(--text-muted); font-weight: 500; font-size: .9rem; }
+.step {
+  margin: 18px 0;
+  padding: 16px 18px 16px 56px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  position: relative;
+  border: 1px solid var(--border);
+}
+.step::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .9rem;
+}
+.step .step-title {
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.step .formal {
+  background: var(--bg-math);
+  padding: 12px 16px;
+  border-radius: 4px;
+  border-left: 3px solid var(--border-strong);
+  margin: 10px 0;
+  overflow-x: auto;
+}
+.step .commentary {
+  color: var(--text-soft);
+  font-size: .96rem;
+  margin-top: 8px;
+}
+.qed {
+  text-align: right;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--accent);
+  margin-top: 16px;
+}
+
+/* ============================================================
+   Reading box, links, navigation, plotly, code
+   ============================================================ */
+.reading-box {
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 16px 0 32px;
+  font-size: .95rem;
+}
+.reading-box .label {
+  font-weight: 700;
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.reading-box ul { margin: 4px 0 0; padding-left: 22px; }
+.reading-box code {
+  background: white;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: .88rem;
+  border: 1px solid var(--border);
+}
+
+/* ============================================================
+   Notebook card — multi-action (Preview / Jupyter / Source)
+   ============================================================ */
+.notebook-card {
+  background: var(--bg-callout);
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin: 32px 0;
+}
+.notebook-card .nb-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.notebook-card .nb-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-top: 2px;
+  color: var(--accent);
+}
+.notebook-card .nb-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}
+.notebook-card .nb-sub {
+  color: var(--text-soft);
+  font-size: .92rem;
+  line-height: 1.45;
+  margin-top: 3px;
+}
+.notebook-card .nb-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.notebook-card .nb-action {
+  flex: 1 1 auto;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: .9rem;
+  font-weight: 500;
+  transition: all .12s;
+  cursor: pointer;
+}
+.notebook-card .nb-action:hover {
+  background: white;
+  border-color: var(--accent);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.notebook-card .nb-action.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.notebook-card .nb-action.primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+.notebook-card .nb-action .ax-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.notebook-card .nb-action .ax-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.notebook-card .nb-action .ax-text .lo {
+  font-size: .74rem;
+  font-weight: 400;
+  opacity: .8;
+  margin-top: 2px;
+}
+.notebook-card .nb-tip {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.5);
+  border-radius: 4px;
+  font-size: .84rem;
+  color: var(--text-soft);
+}
+.notebook-card .nb-tip code {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: .85rem;
+}
+
+/* ============================================================
+   Jupyter health indicator on the "Run in Jupyter" button
+   ============================================================ */
+.nb-action.jupyter-link::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e0;          /* gray = unknown / checking */
+  margin-right: 2px;
+  flex-shrink: 0;
+  transition: background-color .2s;
+}
+.jupyter-up   .nb-action.jupyter-link::before { background: #059669; }   /* green = running */
+.jupyter-up   .nb-action.jupyter-link        { border-color: #86efac; }
+.jupyter-down .nb-action.jupyter-link::before { background: #ea580c; }   /* orange = down */
+.jupyter-down .nb-action.jupyter-link {
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+.jupyter-down .nb-action.jupyter-link:hover { background: #ffedd5; }
+
+/* ============================================================
+   Modal: shown when user clicks "Run in Jupyter" but server is down
+   ============================================================ */
+.jupyter-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: jm-fade-in .15s ease-out;
+}
+@keyframes jm-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.jupyter-modal {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 28px 32px 24px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 25px 60px rgba(0,0,0,.25);
+  position: relative;
+  animation: jm-pop .18s ease-out;
+}
+@keyframes jm-pop { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.jupyter-modal h3 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.jupyter-modal p {
+  margin: 0 0 18px;
+  color: var(--text-soft);
+  font-size: .95rem;
+  line-height: 1.5;
+}
+.jupyter-modal .jm-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.jupyter-modal .jm-close:hover { background: var(--bg-soft); color: var(--text); }
+
+.jupyter-modal .jm-step {
+  display: flex;
+  gap: 14px;
+  margin: 12px 0;
+  align-items: flex-start;
+}
+.jupyter-modal .jm-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .9rem;
+  margin-top: 1px;
+}
+.jupyter-modal .jm-step strong {
+  display: block;
+  color: var(--text);
+  font-size: .98rem;
+  margin-bottom: 2px;
+}
+.jupyter-modal .jm-step .jm-hint {
+  color: var(--text-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+  display: block;
+}
+.jupyter-modal .jm-step code {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: .85rem;
+  font-family: var(--font-mono);
+}
+.jupyter-modal .jm-fallback {
+  margin: 18px 0 6px;
+  padding: 12px 14px;
+  background: var(--bg-callout);
+  border: 1px solid var(--accent-soft);
+  border-radius: 6px;
+  font-size: .9rem;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+.jupyter-modal .jm-fallback strong { color: var(--text); }
+.jupyter-modal .jm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+.jupyter-modal .jm-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: .9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.jupyter-modal .jm-actions button:hover { background: var(--bg-soft); }
+.jupyter-modal .jm-actions .jm-recheck {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.jupyter-modal .jm-actions .jm-recheck:hover { background: #1d4ed8; }
+.jupyter-modal .jm-actions .jm-recheck:disabled {
+  background: var(--text-muted);
+  border-color: var(--text-muted);
+  cursor: wait;
+}
+
+.plot-wrap {
+  margin: 24px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  background: var(--bg-card);
+}
+.plot-caption {
+  font-size: .88rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.self-check {
+  background: var(--bg-question);
+  border: 1px solid #e9d5ff;
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin: 32px 0;
+}
+.self-check .label {
+  font-weight: 700;
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--purple);
+  margin-bottom: 10px;
+}
+.self-check ol { margin: 0; padding-left: 22px; }
+.self-check li { margin-bottom: 8px; }
+
+.bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border);
+  font-size: .92rem;
+}
+.bottom-nav a {
+  font-weight: 600;
+  color: var(--accent);
+}
+.bottom-nav .placeholder { color: var(--text-muted); }
+
+code {
+  font-family: var(--font-mono);
+  font-size: .92em;
+  background: var(--bg-soft);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+pre {
+  background: var(--bg-soft);
+  padding: 14px 18px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: .88rem;
+  border: 1px solid var(--border);
+}
+pre code { background: none; padding: 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: .94rem;
+}
+th, td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th {
+  background: var(--bg-soft);
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+ul.outcomes { padding-left: 22px; }
+ul.outcomes li { margin: 6px 0; }
+
+/* ============================================================
+   Notation crib sheet — flashcard grid
+   ============================================================ */
+.notation-section {
+  margin: 24px 0 36px;
+}
+.notation-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+.notation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+.notation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+.notation-card .symbol {
+  font-size: 1.35rem;
+  color: var(--accent);
+  text-align: center;
+  background: var(--bg-callout);
+  padding: 8px 6px;
+  border-radius: 4px;
+  font-family: "KaTeX_Main", "Times New Roman", serif;
+  line-height: 1;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notation-card .meaning {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+.notation-card .meaning strong {
+  color: var(--text);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+.notation-card .mnemonic {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--purple);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   Formula builder — read it in pieces
+   ============================================================ */
+.formula-builder {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  margin: 16px 0 8px;
+}
+.formula-builder .builder-title {
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.formula-builder .color-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.formula-builder .color-legend span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.formula-builder .color-legend .swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  align-self: center;
+}
+.formula-builder .build-step {
+  background: var(--bg-card);
+  padding: 11px 14px 11px 44px;
+  border-radius: 4px;
+  margin: 8px 0;
+  border-left: 3px solid var(--border-strong);
+  position: relative;
+  counter-increment: build-step;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+.formula-builder { counter-reset: build-step; }
+.formula-builder .build-step::before {
+  content: counter(build-step);
+  position: absolute;
+  left: 12px;
+  top: 11px;
+  width: 22px;
+  height: 22px;
+  background: var(--text-muted);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+.formula-builder .build-step.final {
+  border-left-color: var(--accent);
+  background: var(--bg-callout);
+}
+.formula-builder .build-step.final::before {
+  background: var(--accent);
+}
+.formula-builder .build-step .label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-right: 8px;
+}
+.formula-builder .build-step.final .label { color: var(--accent); }
+.formula-builder .build-step .formal-inline {
+  background: var(--bg-math);
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 3px;
+  font-size: 0.96rem;
+}
+
+@media (max-width: 720px) {
+  .hero h1 { font-size: 1.8rem; }
+  .intro-banner { grid-template-columns: 1fr; }
+  main.week { padding: 24px 16px 60px; }
+  .step { padding-left: 48px; }
+  .step::before { left: 10px; }
+  .notation-card { grid-template-columns: 50px 1fr; }
+  .formula-builder { padding: 14px; }
+  .theorem-card { padding: 14px; }
+  .theorem-card .theorem-card-grid { grid-template-columns: 1fr; }
+}
