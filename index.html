@@ -417,6 +417,7 @@
         id: '20may26',
         title: '20 May 2026',
         subtitle: 'Deep dive into the constant c in Byzantine-robust aggregation, plus the final GAF results dashboard — binary detection, multiclass attack ID, stability curves, and confusion matrices across 8 models.',
+        file: '20may26/index.html',
         assetsDir: '20may26',
         status: 'scheduled',
         tags: [
@@ -508,11 +509,8 @@
       const badgeLabel = variant === 'scheduled' ? 'Scheduled' : 'Presented';
 
       if (variant === 'scheduled') {
-        const clickAttr = p.file
-          ? ` style="cursor:pointer" onclick="if(event.target.closest('.detail-link'))return;window.location.href='${p.file}'"`
-          : '';
         return `
-          <div class="card scheduled"${clickAttr}>
+          <div class="card scheduled" style="cursor:pointer" onclick="if(event.target.closest('.detail-link'))return;window.location.href='${p.file}'">
             <div class="card-strip"></div>
             <div class="card-body">
               <div class="card-top">
